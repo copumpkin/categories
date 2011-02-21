@@ -24,6 +24,33 @@ suc i ⊔ suc j = suc (i ⊔ j)
 
 {-# BUILTIN LEVELMAX _⊔_ #-}
 
+infix 4 _≣_
+
+data _≣_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
+  ≣-refl : x ≣ x
+
+{-# BUILTIN EQUALITY _≣_ #-}
+{-# BUILTIN REFL ≣-refl #-}
+
+≣-sym : ∀ {a} {A : Set a} → ∀ {x y : A} → x ≣ y → y ≣ x
+≣-sym ≣-refl = ≣-refl
+
+≣-subst : ∀ {a p} {A : Set a} → (P : A → Set p) → ∀ {x y} → x ≣ y → P x → P y
+≣-subst P ≣-refl x = x
+
+≣-subst₂ : ∀ {a b p} {A : Set a} {B : Set b} (P : A → B → Set p)
+           {x₁ x₂ y₁ y₂} → x₁ ≣ x₂ → y₁ ≣ y₂ → P x₁ y₁ → P x₂ y₂
+≣-subst₂ P ≣-refl ≣-refl p = p
+
+
+≣-cong : ∀ {a b} {A : Set a} {B : Set b}
+         (f : A → B) {x y} → x ≣ y → f x ≣ f y
+≣-cong f ≣-refl = ≣-refl
+
+≣-cong₂ : ∀ {a b c} {A : Set a} {B : Set b} {C : Set c}
+          (f : A → B → C) {x y u v} → x ≣ y → u ≣ v → f x u ≣ f y v
+≣-cong₂ f ≣-refl ≣-refl = ≣-refl
+
 infixr 4 _,_
 
 record Σ {a b} (A : Set a) (B : A → Set b) : Set (a ⊔ b) where

@@ -34,7 +34,7 @@ arrow = record
   infix  4 _≡′_
 
   _≡′_ : {A B : Obj′} → (f g : Hom′ A B) → Set _
-  (f , h , pf₁) ≡′ (i , g , pf₂) = (f ≡ i) × (h ≡ g)
+  (f , h , pf₁) ≡′ (i , g , pf₂) = f ≡ i × h ≡ g
 
   _∘′_ : {A B C : Obj′} → Hom′ B C → Hom′ A B → Hom′ A C
   _∘′_ {a , a′ , x} {b , b′ , y} {c , c′ , z} (f , h , pf₁) (i , g , pf₂) = f ∘ i , h ∘ g , pf
@@ -50,7 +50,7 @@ arrow = record
            (h ∘ y) ∘ i
          ≈⟨ ∘-resp-≡ˡ pf₁ ⟩
            (z ∘ f) ∘ i
-         ≈⟨ assoc  ⟩
+         ≈⟨ assoc ⟩
            z ∘ (f ∘ i)
          ∎
       where 

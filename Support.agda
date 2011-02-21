@@ -166,3 +166,15 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   ._∎ : ∀ x → x IsRelatedTo x
   _∎ _ = relTo refl
     where open IsEquivalence isEquivalence
+
+data ℕ : Set where
+  zero : ℕ
+  suc  : ℕ → ℕ
+
+{-# BUILTIN NATURAL ℕ #-}
+{-# BUILTIN ZERO zero #-}
+{-# BUILTIN SUC suc #-}
+
+data Fin : ℕ → Set where
+  zero : ∀ {n} → Fin (suc n)
+  suc  : ∀ {n} → Fin n → Fin (suc n)

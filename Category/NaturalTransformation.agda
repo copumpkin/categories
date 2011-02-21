@@ -4,7 +4,7 @@ module Category.NaturalTransformation where
 
 open import Support
 open import Category
-open import Category.Functor hiding (id) renaming (_∘_ to _∘F_)
+open import Category.Functor.Core hiding (id) renaming (_∘_ to _∘F_)
 
 record NaturalTransformation {o ℓ e o′ ℓ′ e′}
                              {C : Category o ℓ e}
@@ -12,8 +12,8 @@ record NaturalTransformation {o ℓ e o′ ℓ′ e′}
                              (F G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
   module C = Category.Category C
   module D = Category.Category D
-  module F = Functor F
-  module G = Functor G
+  module F = Functor F hiding (module C; module D)
+  module G = Functor G hiding (module C; module D)
   open F
   open G renaming (F₀ to G₀; F₁ to G₁)
 
@@ -29,7 +29,7 @@ id {C = C} {D} {F} = record
   where
   module C = Category.Category C
   module D = Category.Category D
-  module F = Functor F
+  module F = Functor F hiding (module C; module D)
   open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)
   open D renaming (_≡_ to _≡D_; _∘_ to _∘D_)
   open F
@@ -58,9 +58,9 @@ _∘_ {C = C} {D} {F} {G} {H} X Y = record
   where
   module C = Category.Category C
   module D = Category.Category D
-  module F = Functor F
-  module G = Functor G
-  module H = Functor H
+  module F = Functor F hiding (module C; module D)
+  module G = Functor G hiding (module C; module D)
+  module H = Functor H hiding (module C; module D)
   module X = NaturalTransformation X
   module Y = NaturalTransformation Y
   open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)
@@ -101,10 +101,10 @@ _∘′_ {C = C} {D} {E} {F} {G} {H} {I} X Y = record
   module C = Category.Category C
   module D = Category.Category D
   module E = Category.Category E
-  module F = Functor F
-  module G = Functor G
-  module H = Functor H
-  module I = Functor I
+  module F = Functor F hiding (module C; module D)
+  module G = Functor G hiding (module C; module D)
+  module H = Functor H hiding (module C; module D)
+  module I = Functor I hiding (module C; module D)
   module X = NaturalTransformation X
   module Y = NaturalTransformation Y
   open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)

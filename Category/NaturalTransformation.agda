@@ -4,7 +4,7 @@ module Category.NaturalTransformation where
 open import Support
 open import Category
 open import Category.Functor renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
-open import Category.NaturalTransformation.Core
+open import Category.NaturalTransformation.Core public
 
 
 .equiv : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → IsEquivalence (_≡_ {F = F} {G})

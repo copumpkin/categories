@@ -4,7 +4,6 @@ module Category.Functor where
 open import Support
 open import Category
 open import Category.Functor.Core public
-open import Category.NaturalIsomorphism hiding (equiv)
 open import Category.Morphisms
 
 infix  4 _≡_
@@ -21,6 +20,7 @@ record _≡_ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o
     preserve₀ : ∀ x → F₀ x ≣ G₀ x
     preserve₁ : ∀ {A B} (f : C.Hom A B) → F₁ f ≡D (≣-subst₂ D.Hom (≣-sym (preserve₀ A)) (≣-sym (preserve₀ B)) (G₁ f))
 
+{-
 .equiv : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → IsEquivalence (_≡_ {C = C} {D = D})
 equiv {C = C} {D} = record 
   { refl = refl′
@@ -50,3 +50,4 @@ equiv {C = C} {D} = record
     module G = Functor G hiding (module C; module D) renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
     open F
     open G
+-}

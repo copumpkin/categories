@@ -5,7 +5,7 @@ module Category.NaturalIsomorphism where
 open import Support
 open import Category
 open import Category.Functor.Core hiding (id) renaming (_∘_ to _∘F_)
-open import Category.NaturalTransformation renaming (_∘_ to _∘N_)
+open import Category.NaturalTransformation.Core hiding (_≡_)
 import Category.Morphisms as Morphisms
 
 record NaturalIsomorphism {o ℓ e o′ ℓ′ e′}
@@ -63,8 +63,8 @@ equiv {C = C} {D} = record
     ; iso = iso′
     }
     where
-    F⇒G′ = NaturalIsomorphism.F⇒G Y ∘N NaturalIsomorphism.F⇒G X
-    F⇐G′ = NaturalIsomorphism.F⇐G X ∘N NaturalIsomorphism.F⇐G Y
+    F⇒G′ = NaturalIsomorphism.F⇒G Y ∘₁ NaturalIsomorphism.F⇒G X
+    F⇐G′ = NaturalIsomorphism.F⇐G X ∘₁ NaturalIsomorphism.F⇐G Y
 
     .iso′ : (X : C.Obj) → _
     iso′ Z = record 

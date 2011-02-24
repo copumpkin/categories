@@ -14,7 +14,7 @@ data [_]_∼_ {o ℓ e} (C : Category o ℓ e) {A B} (f : Category.Hom C A B) : 
 _≡_ : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → (F G : Functor C D) → Set (e′ ⊔ ℓ′ ⊔ ℓ ⊔ o)
 _≡_ {C = C} {D} F G = ∀ {A B} → (f : Category.Hom C A B) → [ D ] Functor.F₁ F f ∼ Functor.F₁ G f
 
-{-
+
 .equiv : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → IsEquivalence (_≡_ {C = C} {D = D})
 equiv {C = C} {D} = record 
   { refl = λ {F} → refl′ {F}
@@ -46,7 +46,7 @@ equiv {C = C} {D} = record
     helper : ∀ {a b c d x y} {f : Category.Hom D a b} {g : Category.Hom D c d} {h : Category.Hom D x y}
            → [ D ] f ∼ g → [ D ] g ∼ h → [ D ] f ∼ h
     helper (refl pf₀) (refl pf₁) = refl {C = D} (IsEquivalence.trans (Category.equiv D) pf₀ pf₁)
--}
+
 
 .∘-resp-≡  : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
                {A : Category o₀ ℓ₀ e₀} {B : Category o₁ ℓ₁ e₁} {C : Category o₂ ℓ₂ e₂}

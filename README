@@ -1,3 +1,12 @@
+One of the main goals of this library is to be as general as possible by abstracting over notions of equality between morphisms. 
+
+Another is to keep the definitions of categorical structures as simple as possible and then where possible to prove that the simple definition is equivalent to more interesting formulations.
+For example, we can define a monad as recording containing a functor and two natural transformations. Separately, we can show that a monoid object in the monoidal category of endofunctors is an equivalent definition, and that the composition of an adjoint pair of functors leads to monads, and so on.
+
+
+The module structure is a mess, I realize. A lot of the parametrized modules should not be. Naming of things in general could also be made cleaner, but I've been more interested in definitions and proofs so far.
+
+
 A lot of this is based on http://web.student.chalmers.se/~stevan/ctfp/html/README.html, but with some design changes that I thought were necessary. It's still very much a work in progress.
 
 Other parts (mostly produts) are borrowed from Dan Doel

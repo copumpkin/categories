@@ -145,3 +145,19 @@ _≡_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′
 _≡_ {D = D} X Y = ∀ {x} → NaturalTransformation.η X x ≡D NaturalTransformation.η Y x
   where open Category.Category D renaming (_≡_ to _≡D_)
 
+.equiv : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → IsEquivalence (_≡_ {F = F} {G})
+equiv {C = C} {D} {F} {G} = record 
+  { refl = IsEquivalence.refl D.equiv
+  ; sym = λ x → IsEquivalence.sym D.equiv x -- N.B: η expansion is needed here!
+  ; trans = λ x y → IsEquivalence.trans D.equiv x y
+  }
+  where
+  module C = Category.Category C
+  module D = Category.Category D
+
+setoid : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → Setoid _ _
+setoid {F = F} {G} = record 
+  { Carrier = NaturalTransformation F G
+  ; _≈_ = _≡_
+  ; isEquivalence = equiv {F = F}
+  }

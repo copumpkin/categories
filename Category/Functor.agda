@@ -48,15 +48,17 @@ equiv {C = C} {D} = record
     helper (refl pf₀) (refl pf₁) = refl {C = D} (IsEquivalence.trans (Category.equiv D) pf₀ pf₁)
 
 
+{-
 .∘-resp-≡  : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
                {A : Category o₀ ℓ₀ e₀} {B : Category o₁ ℓ₁ e₁} {C : Category o₂ ℓ₂ e₂}
                {F H : Functor B C} {G I : Functor A B} 
            → F ≡ H → G ≡ I → F ∘ G ≡ H ∘ I
-∘-resp-≡ {B = B} {C} {F} {H} {G} {I} F≡H G≡I {P} {Q} q = helper {p = Functor.F₁ F (Functor.F₁ G q)} {q = Functor.F₁ H (Functor.F₁ I q)} (G≡I q) (F≡H (Functor.F₁ I q))
+∘-resp-≡ {B = B} {C} {F} {H} {G} {I} F≡H G≡I {P} {Q} q = helper {a = Functor.F₀ G P} {b = Functor.F₀ G Q} {c = Functor.F₀ I P} {d = Functor.F₀ I Q} (G≡I q) (F≡H (Functor.F₁ I q))
   where
-  helper : ∀ {a b c d} {z w} -- give it just enough freedom
+  helper : ∀ {a b c d} {z w}
              {f : Category.Hom B a b} {h : Category.Hom B c d} 
              {g : Category.Hom C (Functor.F₀ F c) (Functor.F₀ F d)} {i : Category.Hom C z w} 
              {p : Category.Hom C (Functor.F₀ F a) (Functor.F₀ F b)} {q : Category.Hom C z w}
          → [ B ] f ∼ h → [ C ] g ∼ i → [ C ] p ∼ q
   helper (refl f≡h) (refl g≡i) = refl {!!}
+-}

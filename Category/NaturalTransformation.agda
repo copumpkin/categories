@@ -3,26 +3,53 @@ module Category.NaturalTransformation where
 
 open import Support
 open import Category
-open import Category.Functor renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
+open import Category.Functor hiding (equiv) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Category.NaturalTransformation.Core public
 
-
-.equiv : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → IsEquivalence (_≡_ {F = F} {G})
-equiv {C = C} {D} {F} {G} = record 
-  { refl = IsEquivalence.refl D.equiv
-  ; sym = λ x → IsEquivalence.sym D.equiv x -- N.B: η expansion is needed here!
-  ; trans = λ x y → IsEquivalence.trans D.equiv x y
+_∘ˡ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
+     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+     → {F G : Functor C D} 
+     → (H : Functor D E) → (η : NaturalTransformation F G) → NaturalTransformation (H ∘F F) (H ∘F G)
+_∘ˡ_ {C = C} {D} {E} {F} {G} H η′ = record 
+  { η       = λ X → Functor.F₁ H (NaturalTransformation.η η′ X)
+  ; commute = commute′
   }
   where
   module C = Category.Category C
-  module D = Category.Category D
+  module D = Category.Category D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
+  module E = Category.Category E renaming (_∘_ to _∘E_; _≡_ to _≡E_)
+  module H = Functor H
+  open D
+  open E
 
-setoid : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → Setoid _ _
-setoid {F = F} {G} = record 
-  { Carrier = NaturalTransformation F G
-  ; _≈_ = _≡_
-  ; isEquivalence = equiv {F = F}
+  .commute′ : ∀ {X Y} (f : C.Hom X Y) →
+      Functor.F₁ H (NaturalTransformation.η η′ Y) ∘E Functor.F₁ H (Functor.F₁ F f) ≡E
+      Functor.F₁ H (Functor.F₁ G f) ∘E Functor.F₁ H (NaturalTransformation.η η′ X)
+  commute′ {X} {Y} f = 
+      begin
+        Functor.F₁ H (NaturalTransformation.η η′ Y) ∘E Functor.F₁ H (Functor.F₁ F f)
+      ≈⟨ sym H.homomorphism ⟩
+        Functor.F₁ H (NaturalTransformation.η η′ Y ∘D Functor.F₁ F f)
+      ≈⟨ H.F-resp-≡ (NaturalTransformation.commute η′ f) ⟩
+        Functor.F₁ H (Functor.F₁ G f ∘D NaturalTransformation.η η′ X)
+      ≈⟨ H.homomorphism ⟩
+        Functor.F₁ H (Functor.F₁ G f) ∘E Functor.F₁ H (NaturalTransformation.η η′ X)
+      ∎
+    where
+    open IsEquivalence E.equiv
+    open SetoidReasoning E.hom-setoid
+
+
+_∘ʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
+     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+     → {F G : Functor C D} 
+     → (η : NaturalTransformation F G) → (K : Functor E C) → NaturalTransformation (F ∘F K) (G ∘F K)
+_∘ʳ_ η K = record
+  { η       = λ X → NaturalTransformation.η η (Functor.F₀ K X)
+  ; commute = λ f → NaturalTransformation.commute η (Functor.F₁ K f)
   }
+
+
 
 -- The vertical versions
 .identity₁ˡ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} {X : NaturalTransformation F G} 

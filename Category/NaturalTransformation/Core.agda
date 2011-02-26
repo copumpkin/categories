@@ -10,10 +10,10 @@ record NaturalTransformation {o ℓ e o′ ℓ′ e′}
                              {C : Category o ℓ e}
                              {D : Category o′ ℓ′ e′}
                              (F G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
-  module C = Category.Category C
-  module D = Category.Category D
-  module F = Functor F hiding (module C; module D)
-  module G = Functor G hiding (module C; module D)
+  private module C = Category.Category C
+  private module D = Category.Category D
+  private module F = Functor F
+  private module G = Functor G
   open F
   open G renaming (F₀ to G₀; F₁ to G₁)
 
@@ -29,7 +29,7 @@ id {C = C} {D} {F} = record
   where
   module C = Category.Category C
   module D = Category.Category D
-  module F = Functor F hiding (module C; module D)
+  module F = Functor F
   open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)
   open D renaming (_≡_ to _≡D_; _∘_ to _∘D_)
   open F
@@ -58,9 +58,9 @@ _∘₁_ {C = C} {D} {F} {G} {H} X Y = record
   where
   module C = Category.Category C
   module D = Category.Category D
-  module F = Functor F hiding (module C; module D)
-  module G = Functor G hiding (module C; module D)
-  module H = Functor H hiding (module C; module D)
+  module F = Functor F
+  module G = Functor G
+  module H = Functor H
   module X = NaturalTransformation X
   module Y = NaturalTransformation Y
   open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)
@@ -101,10 +101,10 @@ _∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record
   module C = Category.Category C
   module D = Category.Category D
   module E = Category.Category E
-  module F = Functor F hiding (module C; module D)
-  module G = Functor G hiding (module C; module D)
-  module H = Functor H hiding (module C; module D)
-  module I = Functor I hiding (module C; module D)
+  module F = Functor F
+  module G = Functor G
+  module H = Functor H
+  module I = Functor I
   module X = NaturalTransformation X
   module Y = NaturalTransformation Y
   open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)

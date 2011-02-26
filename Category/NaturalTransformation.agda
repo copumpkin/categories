@@ -87,9 +87,9 @@ identity₀ʳ {C = C} {D} {F} {G} {X} =
   where
   module C = Category.Category C renaming (_∘_ to _∘C_; _≡_ to _≡C_)
   module D = Category.Category D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
-  module F = Functor F hiding (module C; module D)
-  module G = Functor G hiding (module C; module D) renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
-  open NaturalTransformation X hiding (module C; module D; module F; module G)
+  module F = Functor F
+  module G = Functor G renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
+  open NaturalTransformation X
   open SetoidReasoning D.hom-setoid
   open F
   open G
@@ -117,9 +117,9 @@ assoc₀ {C₀ = C₀} {C₁} {C₂} {C₃} {F} {G} {H} {I} {J} {K} {X} {Y} {Z} 
   module I = Functor I renaming (F₀ to I₀; F₁ to I₁; F-resp-≡ to I-resp-≡)
   module J = Functor J renaming (F₀ to J₀; F₁ to J₁; F-resp-≡ to J-resp-≡)
   module K = Functor K renaming (F₀ to K₀; F₁ to K₁; F-resp-≡ to K-resp-≡)
-  module X = NaturalTransformation X hiding (module C; module D; module F; module G)
-  module Y = NaturalTransformation Y hiding (module C; module D; module F; module G)
-  module Z = NaturalTransformation Z hiding (module C; module D; module F; module G)
+  module X = NaturalTransformation X
+  module Y = NaturalTransformation Y
+  module Z = NaturalTransformation Z
   open IsEquivalence C₃.equiv
   open SetoidReasoning C₃.hom-setoid
   open C₂

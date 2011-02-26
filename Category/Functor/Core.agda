@@ -6,8 +6,8 @@ open import Category
 module Category.Functor.Core where
 
 record Functor {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
-  module C = Category.Category C
-  module D = Category.Category D
+  private module C = Category.Category C
+  private module D = Category.Category D
   open C renaming (_∘_ to _∘C_; _≡_ to _≡C_)
   open D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
 
@@ -51,8 +51,8 @@ _∘_ {C = C} {D = D} {E = E} F G = record
   open C renaming (_∘_ to _∘C_; _≡_ to _≡C_)
   open D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
   open E renaming (_∘_ to _∘E_; _≡_ to _≡E_)
-  module F = Functor F hiding (module C; module D)
-  module G = Functor G hiding (module C; module D)
+  module F = Functor F
+  module G = Functor G
   open F
   open G renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
 

@@ -3,7 +3,7 @@ open import Category
 
 module Category.Object.Product {o ℓ e} (C : Category o ℓ e) where
 
-open import Support hiding (_×_)
+open import Support hiding (_×_; ⟨_,_⟩)
 open Category.Category C
 
 -- Borrowed from Dan Doel's definition of products

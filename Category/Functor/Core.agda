@@ -24,6 +24,10 @@ record Functor {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o
 Endofunctor : ∀ {o ℓ e} → Category o ℓ e → Set _
 Endofunctor C = Functor C C
 
+Contravariant : ∀ {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) → Set _
+Contravariant C D = Functor C.op D
+  where module C = Category.Category C
+
 id : ∀ {o ℓ e} {C : Category o ℓ e} → Endofunctor C
 id {C = C} = record 
   { F₀ = λ x → x

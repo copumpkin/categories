@@ -25,7 +25,7 @@ Kleisli {C = C} M = record
   open M
   module μ = NaturalTransformation μ
   module η = NaturalTransformation η
-  open Functor F hiding (module C)
+  open Functor F
   module C = Category.Category C
   open C
 

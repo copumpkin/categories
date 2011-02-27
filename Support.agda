@@ -92,6 +92,9 @@ record _×_ {a b} (A : Set a) (B : Set b) : Set (a ⊔ b) where
 
 open _×_ public
 
+⟨_,_⟩ : ∀ {a b c d} {A : Set a} {B : Set b} {C : Set c} {D : Set d} → (A → B) → (C → D) → A × C → B × D
+⟨ f , g ⟩ (x , y) = f x , g y
+
 _∙_ : ∀ {a b c}
         {A : Set a} {B : A → Set b} {C : {x : A} → B x → Set c} →
       (∀ {x} (y : B x) → C y) → (g : (x : A) → B x) →

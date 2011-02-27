@@ -5,17 +5,17 @@ module Category.NaturalIsomorphism where
 open import Support
 open import Category
 open import Category.Functor.Core hiding (id) renaming (_∘_ to _∘F_)
-open import Category.NaturalTransformation.Core hiding (_≡_)
+open import Category.NaturalTransformation.Core hiding (_≡_; equiv; setoid)
 import Category.Morphisms as Morphisms
 
 record NaturalIsomorphism {o ℓ e o′ ℓ′ e′}
                           {C : Category o ℓ e}
                           {D : Category o′ ℓ′ e′}
                           (F G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
-  module C = Category.Category C
-  module D = Category.Category D
-  module F = Functor F
-  module G = Functor G
+  private module C = Category.Category C
+  private module D = Category.Category D
+  private module F = Functor F
+  private module G = Functor G
   open F
   open G renaming (F₀ to G₀; F₁ to G₁)
 
@@ -72,8 +72,8 @@ equiv {C = C} {D} = record
       ; isoʳ = isoʳ′
       }
       where
-      open NaturalIsomorphism hiding (module C; module D)
-      open NaturalTransformation hiding (module C; module D)
+      open NaturalIsomorphism
+      open NaturalTransformation
 
       isoˡ′ : (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ≡ D.id
       isoˡ′ = begin

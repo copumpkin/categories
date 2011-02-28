@@ -51,6 +51,15 @@ import Category.Functor
 -- F-algebra (TODO: maybe the module should be renamed)
 import Category.Functor.Algebra
 
+-- The category of F-algebras of a functor
+import Category.Functor.Algebras
+
+-- An F-coalgebra
+import Category.Functor.Coalgebra
+
+-- The category of F-coalgebras of a functor
+import Category.Functor.Coalgebras
+
 -- The hom functor, mapping pairs of objects to the morphisms between them
 import Category.Functor.Hom
 

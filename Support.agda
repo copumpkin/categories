@@ -72,8 +72,8 @@ open Σ public
 record Σ′ {a b} (A : Set a) (B : A → Set b) : Set (a ⊔ b) where
   constructor _,_
   field
-    proj′₁ : A
-    .proj′₂ : B proj′₁
+    proj₁′ : A
+    .proj₂′ : B proj₁′
 
 open Σ′ public
 

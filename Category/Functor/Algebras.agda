@@ -26,10 +26,11 @@ F-Algebras {C = C} F = record
   where
   open Category.Category C
   open Functor F
+
   Obj′ = F-Algebra F
 
   Hom′ : (A B : Obj′) → Set _
-  Hom′ (A , α) (B , β) = Σ′ (Hom A B) (λ m → CommutativeSquare α (F₁ m) m β)
+  Hom′ (A , α) (B , β) = Σ′ (Hom A B) (λ m → m ∘ α ≡ β ∘ F₁ m)
 
   _≡′_ : ∀ {A B} (f g : Hom′ A B) → Set _
   f ≡′ g = proj₁′ f ≡ proj₁′ g
@@ -80,3 +81,54 @@ F-Algebras {C = C} F = record
       where
       open IsEquivalence equiv
       open SetoidReasoning hom-setoid
+
+
+
+open import Category.Object.Initial
+
+module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial (F-Algebras F)) where
+  module C = Category.Category C
+  module FA = Category.Category (F-Algebras F) renaming (_∘_ to _∘FA_; _≡_ to _≡FA_)
+  open Functor F
+  import Category.Morphisms as Morphisms
+  open Morphisms C
+  open Initial (F-Algebras F) I
+  open F-Algebra ⊥
+
+  lambek : A ≅ F₀ A
+  lambek = record 
+    { f = f′
+    ; g = g′
+    ; iso = iso′
+    }
+    where
+    f′ : C.Hom A (F₀ A)
+    f′ = proj₁′ (! {lift ⊥}) 
+
+    g′ : C.Hom (F₀ A) A
+    g′ = α
+
+    .iso′ : Iso f′ g′
+    iso′ = record 
+      { isoˡ = isoˡ′
+      ; isoʳ = begin
+                 f′ ∘ g′
+               ≈⟨ proj₂′ (! {lift ⊥}) ⟩
+                 F₁ g′ ∘ F₁ f′
+               ≈⟨ sym homomorphism ⟩
+                 F₁ (g′ ∘ f′)
+               ≈⟨ F-resp-≡ isoˡ′ ⟩
+                 F₁ id
+               ≈⟨ identity ⟩
+                 id
+               ∎
+      }
+      where
+      open C
+      open FA hiding (id)
+      open IsEquivalence C.equiv
+      open SetoidReasoning C.hom-setoid
+
+      isoˡ′ = ⊥-id ((g′ , IsEquivalence.refl C.equiv) ∘FA !)
+
+open Lambek public

@@ -12,3 +12,8 @@ record F-Algebra {o ℓ e} {C : Category o ℓ e} (F : Endofunctor C) : Set (o �
   field
     A : Obj
     α : Hom (F₀ A) A
+
+lift : ∀ {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} → F-Algebra F → F-Algebra F
+lift {F = F} (A , α) = record { A = F₀ A; α = F₁ α }
+  where
+  open Functor F

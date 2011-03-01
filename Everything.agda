@@ -153,6 +153,9 @@ import Category.Object.Zero
 -- A preorder gives rise to a category
 import Category.Preorder
 
+-- A presheaf (functor from C^op to V)
+import Category.Presheaf
+
 -- The product of two categories
 import Category.Product
 

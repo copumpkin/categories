@@ -39,6 +39,9 @@ import Category.Comonad.Cofree
 -- Cones
 import Category.Cone
 
+-- The category of cones over a diagram (functor)
+import Category.Cones
+
 -- Ends
 import Category.End
 

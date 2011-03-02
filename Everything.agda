@@ -42,6 +42,9 @@ import Category.Cone
 -- The category of cones over a diagram (functor)
 import Category.Cones
 
+-- Discrete categories (they only have objects and identity morphisms)
+import Category.Discrete
+
 -- Ends
 import Category.End
 

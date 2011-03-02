@@ -26,11 +26,14 @@ suc i ⊔ suc j = suc (i ⊔ j)
 
 infix 4 _≣_
 
-data _≣_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
+data _≣_ {ℓ} {A : Set ℓ} (x : A) : A → Set ℓ where
   ≣-refl : x ≣ x
 
 {-# BUILTIN EQUALITY _≣_ #-}
 {-# BUILTIN REFL ≣-refl #-}
+
+≣-trans : ∀ {a} {A : Set a} → ∀ {x y z : A} → y ≣ z → x ≣ y → x ≣ z
+≣-trans ≣-refl ≣-refl = ≣-refl
 
 ≣-sym : ∀ {a} {A : Set a} → ∀ {x y : A} → x ≣ y → y ≣ x
 ≣-sym ≣-refl = ≣-refl
@@ -208,3 +211,7 @@ data ℕ : Set where
 data Fin : ℕ → Set where
   zero : ∀ {n} → Fin (suc n)
   suc  : ∀ {n} → Fin n → Fin (suc n)
+
+record ⊤ {ℓ} : Set ℓ where
+  constructor tt
+

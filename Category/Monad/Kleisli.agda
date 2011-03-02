@@ -3,7 +3,7 @@ module Category.Monad.Kleisli where
 
 open import Support
 open import Category
-open import Category.Functor hiding (_≡_; _∘_)
+open import Category.Functor hiding (_≡_; _∘_; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Category.NaturalTransformation hiding (_≡_)
 open import Category.Monad
 

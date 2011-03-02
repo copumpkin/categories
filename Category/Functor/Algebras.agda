@@ -3,7 +3,7 @@ module Category.Functor.Algebras where
 
 open import Support
 open import Category
-open import Category.Functor hiding (_≡_; id; _∘_; equiv)
+open import Category.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Category.Functor.Algebra
 
 F-Algebras : ∀ {o ℓ e} {C : Category o ℓ e} → Endofunctor C → Category (ℓ ⊔ o) (e ⊔ ℓ) e

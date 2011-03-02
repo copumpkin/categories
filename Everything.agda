@@ -12,6 +12,9 @@ import Category.Arrow
 -- Bifunctors (functors from a product category)
 import Category.Bifunctor
 
+-- The category of (small) categories
+import Category.Categories
+
 -- Closed categories
 import Category.Closed
 

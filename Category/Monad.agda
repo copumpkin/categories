@@ -3,7 +3,7 @@ module Category.Monad where
 
 open import Support
 open import Category
-open import Category.Functor hiding (_≡_)
+open import Category.Functor hiding (_≡_; assoc; identityˡ; identityʳ)
 open import Category.NaturalTransformation renaming (id to idN)
 
 record Monad {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where

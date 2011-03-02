@@ -3,7 +3,7 @@ module Category.Cones where
 
 open import Support
 open import Category
-open import Category.Functor hiding (_∘_; _≡_; equiv; id)
+open import Category.Functor hiding (_∘_; _≡_; equiv; id; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Category.Cone
 
 record ConeMorphism {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} {F : Functor J C} (c₁ c₂ : Cone F) : Set (ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where

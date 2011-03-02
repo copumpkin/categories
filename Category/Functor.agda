@@ -15,6 +15,24 @@ _≡_ : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o�
 _≡_ {C = C} {D} F G = ∀ {A B} → (f : Category.Hom C A B) → [ D ] Functor.F₁ F f ∼ Functor.F₁ G f
 
 
+.assoc : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} 
+           {C₀ : Category o₀ ℓ₀ e₀} 
+           {C₁ : Category o₁ ℓ₁ e₁} 
+           {C₂ : Category o₂ ℓ₂ e₂} 
+           {C₃ : Category o₃ ℓ₃ e₃} 
+           {F : Functor C₀ C₁} {G : Functor C₁ C₂} {H : Functor C₂ C₃} 
+       → (H ∘ G) ∘ F ≡ H ∘ (G ∘ F)
+assoc {C₀ = C₀} {C₃ = C₃} {F = F} {G} {H} f = 
+  refl {C = C₃} (Functor.F-resp-≡ H (Functor.F-resp-≡ G (Functor.F-resp-≡ F (IsEquivalence.refl (Category.equiv C₀)))))
+
+
+.identityˡ : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F : Functor C D} → id ∘ F ≡ F
+identityˡ {C = C} {D} {F} f = refl {C = D} (Functor.F-resp-≡ F (IsEquivalence.refl (Category.equiv C)))
+
+.identityʳ : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F : Functor C D} → F ∘ id ≡ F
+identityʳ {C = C} {D} {F} f = refl {C = D} (Functor.F-resp-≡ F (IsEquivalence.refl (Category.equiv C)))
+
+
 .equiv : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → IsEquivalence (_≡_ {C = C} {D = D})
 equiv {C = C} {D} = record 
   { refl = λ {F} → refl′ {F}
@@ -48,17 +66,20 @@ equiv {C = C} {D} = record
     helper (refl pf₀) (refl pf₁) = refl {C = D} (IsEquivalence.trans (Category.equiv D) pf₀ pf₁)
 
 
-{-
 .∘-resp-≡  : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
                {A : Category o₀ ℓ₀ e₀} {B : Category o₁ ℓ₁ e₁} {C : Category o₂ ℓ₂ e₂}
                {F H : Functor B C} {G I : Functor A B} 
            → F ≡ H → G ≡ I → F ∘ G ≡ H ∘ I
-∘-resp-≡ {B = B} {C} {F} {H} {G} {I} F≡H G≡I {P} {Q} q = helper {a = Functor.F₀ G P} {b = Functor.F₀ G Q} {c = Functor.F₀ I P} {d = Functor.F₀ I Q} (G≡I q) (F≡H (Functor.F₁ I q))
+∘-resp-≡ {B = B} {C} {F} {H} {G} {I} F≡H G≡I {P} {Q} q = 
+  helper {a = Functor.F₀ G P} {b = Functor.F₀ G Q} {c = Functor.F₀ I P} {d = Functor.F₀ I Q} 
+         {f = Functor.F₁ G q}
+         {h = Functor.F₁ I q}
+         {i = Functor.F₁ H (Functor.F₁ I q)}
+         (G≡I q) (F≡H (Functor.F₁ I q))
   where
+  module C = Category.Category C
   helper : ∀ {a b c d} {z w}
              {f : Category.Hom B a b} {h : Category.Hom B c d} 
-             {g : Category.Hom C (Functor.F₀ F c) (Functor.F₀ F d)} {i : Category.Hom C z w} 
-             {p : Category.Hom C (Functor.F₀ F a) (Functor.F₀ F b)} {q : Category.Hom C z w}
-         → [ B ] f ∼ h → [ C ] g ∼ i → [ C ] p ∼ q
-  helper (refl f≡h) (refl g≡i) = refl {!!}
--}
+             {i : Category.Hom C z w} 
+         → [ B ] f ∼ h → [ C ] (Functor.F₁ F h) ∼ i → [ C ] (Functor.F₁ F f) ∼ i
+  helper (refl f≡h) (refl g≡i) = refl {C = C} (IsEquivalence.trans C.equiv (Functor.F-resp-≡ F f≡h) g≡i)

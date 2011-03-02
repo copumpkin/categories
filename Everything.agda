@@ -6,6 +6,9 @@ import Category
 -- Adjunctions between functors
 import Category.Adjunction
 
+-- The Agda Set category
+import Category.Agda
+
 -- The arrow category construction on any category
 import Category.Arrow
 

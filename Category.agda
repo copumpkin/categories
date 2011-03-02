@@ -74,29 +74,6 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
 
 {-
 
-Agda : ∀ {o} → Category _ _ _
-Agda {o} = record
-  { Obj = Set o
-  ; Hom = λ d c → d → c
-  ; _≡_ = λ f g → ∀ x → f x ≣ g x
-
-  ; _∘_ = λ f g x → f (g x)
-  ; id = λ x → x
-
-  ; ∘-assoc = λ f g h x → refl
-  ; identityˡ = λ f x → refl
-  ; identityʳ = λ f x → refl
-  ; ≡-equiv = record { refl = λ _ → refl; sym = s; trans = t }
-  ; ∘-resp-≡ = {!!}
-  }
-  where
-  s : {A B : Set o} → {i j : A → B} → ((x : A) → i x ≣ j x) → (x : A) → j x ≣ i x
-  s f x rewrite f x = refl
-
-  t : {A B : Set o} {i j k : A → B} → ((x : A) → i x ≣ j x) → ((x : A) → j x ≣ k x) → (x : A) → i x ≣ k x
-  t f g x rewrite f x | g x = refl
-
-
 module PreorderCategory {o ℓ e} (P : Preorder o e ℓ) where
   open Preorder P
 

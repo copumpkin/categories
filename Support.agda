@@ -172,8 +172,10 @@ record Setoid c ℓ : Set (suc (c ⊔ ℓ)) where
     _≈_           : Rel Carrier ℓ
     .isEquivalence : IsEquivalence _≈_
 
-
-
+record SetoidFunction {c ℓ c′ ℓ′} (X : Setoid c ℓ) (Y : Setoid c′ ℓ′) : Set (c ⊔ ℓ ⊔ c′ ⊔ ℓ′) where
+  field
+    F : Setoid.Carrier X → Setoid.Carrier Y
+    .cong : ∀ {x y} → Setoid._≈_ X x y → Setoid._≈_ Y (F x) (F y)
 
 module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   open Setoid S

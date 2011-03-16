@@ -81,6 +81,9 @@ import Category.Functor.Monoidal
 -- Representable functors (to the category of Agda or Agda setoids; haven't yet decided)
 import Category.Functor.Representable
 
+-- The Grothendieck construction on categories (taking a Sets-valued functor and building a category containing all values)
+import Category.Grothendieck
+
 -- Limits
 import Category.Limit
 

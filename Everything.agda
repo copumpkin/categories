@@ -57,6 +57,9 @@ import Category.End
 -- Equalizers
 import Category.Equalizer
 
+-- Fibrations
+import Category.Fibration
+
 -- Functors
 import Category.Functor
 
@@ -122,9 +125,11 @@ import Category.Monoidal.Closed
 -- interesting things with them.
 import Category.Monoidal.CartesianClosed
 
-
 -- Simple definitions about morphisms, such as mono, epi, and iso
 import Category.Morphisms
+
+-- Cartesian morphisms (used mostly for fibrations)
+import Category.Morphism.Cartesian
 
 -- Natural isomorphisms, defined as an isomorphism of natural transformations
 import Category.NaturalIsomorphism

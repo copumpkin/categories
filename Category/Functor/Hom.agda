@@ -98,7 +98,6 @@ Hom[_,-] {_} {ℓ} {e} {C} B = record
     open SetoidReasoning hom-setoid
     open IsEquivalence equiv
 
-
 Hom[-,_] : ∀ {o ℓ e} → {C : Category o ℓ e} → Category.Obj C → Functor (Category.op C) (Setoids ℓ e)
 Hom[-,_] {_} {ℓ} {e} {C} B = record
   { F₀ = λ x → Hom[-,-].F₀ (x , B)

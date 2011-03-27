@@ -84,6 +84,9 @@ import Category.Functor.Monoidal
 -- Representable functors
 import Category.Functor.Representable
 
+-- Functor categories (of functors between two categories and natural transformations between them)
+import Category.FunctorCategory
+
 -- The Grothendieck construction on categories (taking a Sets-valued functor and building a category containing all values)
 import Category.Grothendieck
 

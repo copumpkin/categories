@@ -3,6 +3,9 @@ module Everything where
 -- Categories
 import Category
 
+-- 2-categories
+import Category.2-Category
+
 -- Adjunctions between functors
 import Category.Adjunction
 

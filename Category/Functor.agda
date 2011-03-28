@@ -8,6 +8,7 @@ open import Category.Morphisms
 
 infix  4 _≡_
 
+-- Evil functor equality
 data [_]_∼_ {o ℓ e} (C : Category o ℓ e) {A B} (f : Category.Hom C A B) : ∀ {X Y} → Category.Hom C X Y → Set (ℓ ⊔ e) where
   refl : {g : Category.Hom C A B} → (f≡g : Category._≡_ C f g) → [ C ] f ∼ g
 
@@ -83,3 +84,27 @@ equiv {C = C} {D} = record
              {i : Category.Hom C z w} 
          → [ B ] f ∼ h → [ C ] (Functor.F₁ F h) ∼ i → [ C ] (Functor.F₁ F f) ∼ i
   helper (refl f≡h) (refl g≡i) = refl {C = C} (IsEquivalence.trans C.equiv (Functor.F-resp-≡ F f≡h) g≡i)
+
+Faithful : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor C D → Set (o ⊔ ℓ ⊔ e ⊔ e′)
+Faithful {C = C} {D} F = ∀ {X Y} → (f g : C.Hom X Y) → F₁ f ≡D F₁ g → f ≡C g
+  where 
+  module C = Category.Category C
+  module D = Category.Category D
+  open C using () renaming (_≡_ to _≡C_)
+  open D using () renaming (_≡_ to _≡D_)
+  open Functor F
+
+-- Is this convoluted double-negated definition really necessary? A naive constructive definition of surjectivity
+-- requires a right inverse, which would probably restrict the things we can provide proofs for
+Full : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor C D → Set (o ⊔ ℓ ⊔ ℓ′ ⊔ e′)
+Full {C = C} {D} F = ∀ {X Y} → ¬ Σ (D.Hom (F₀ X) (F₀ Y)) (λ f → ¬ Σ (C.Hom X Y) (λ g → F₁ g ≡D f))
+  where
+  module C = Category.Category C
+  module D = Category.Category D
+  open C using () renaming (_≡_ to _≡C_)
+  open D using () renaming (_≡_ to _≡D_)
+  open Functor F
+
+Full&Faithful : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor C D → Set (o ⊔ ℓ ⊔ e ⊔ ℓ′ ⊔ e′)
+Full&Faithful F = Full F × Faithful F
+

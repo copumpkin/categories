@@ -214,6 +214,11 @@ data Fin : ℕ → Set where
   zero : ∀ {n} → Fin (suc n)
   suc  : ∀ {n} → Fin n → Fin (suc n)
 
+data ⊥ : Set where
+
+¬_ : ∀ {a} (A : Set a) → Set a
+¬ A = A → ⊥
+
 record ⊤ {ℓ} : Set ℓ where
   constructor tt
 

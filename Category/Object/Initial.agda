@@ -1,6 +1,6 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-open import Support
+open import Support hiding (⊥)
 open import Category
 
 module Category.Object.Initial {o ℓ e} (C : Category o ℓ e) where

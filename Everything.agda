@@ -175,7 +175,6 @@ import Category.Object.Terminal
 -- Zero object (initial and terminal)
 import Category.Object.Zero
 
-
 -- A preorder gives rise to a category
 import Category.Preorder
 

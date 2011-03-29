@@ -1,7 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Category.Functor.Algebras where
 
-open import Support
+open import Support hiding (⊥)
 open import Category
 open import Category.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Category.Functor.Algebra

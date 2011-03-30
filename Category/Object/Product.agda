@@ -17,9 +17,7 @@ record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     .commute₁ : ∀ {C} {f : Hom C A} {g : Hom C B} → π₁ ∘ ⟨ f , g ⟩ ≡ f
     .commute₂ : ∀ {C} {f : Hom C A} {g : Hom C B} → π₂ ∘ ⟨ f , g ⟩ ≡ g
     .universal : ∀ {C} {f : Hom C A} {g : Hom C B} {i : Hom C A×B}
-               → π₁ ∘ i ≡ f
-               → π₂ ∘ i ≡ g
-               → ⟨ f , g ⟩ ≡ i
+               → π₁ ∘ i ≡ f → π₂ ∘ i ≡ g → ⟨ f , g ⟩ ≡ i
 
   .g-η : ∀ {C} {f : Hom C A×B} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
   g-η = universal (IsEquivalence.refl equiv) (IsEquivalence.refl equiv)
@@ -334,3 +332,23 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
 
   ×-assoc : ∀ {X Y Z} → _≅_ C (X × (Y × Z)) ((X × Y) × Z)
   ×-assoc = Associative product product product product
+
+  -- Convenience!
+  π₁ : {A B : Obj} → Hom (A × B) A
+  π₁ = Product.π₁ product
+
+  π₂ : {A B : Obj} → Hom (A × B) B
+  π₂ = Product.π₂ product
+
+  ⟨_,_⟩ : ∀ {A B Q} → Hom Q A → Hom Q B → Hom Q (A × B)
+  ⟨_,_⟩ = Product.⟨_,_⟩ product
+
+  .commute₁ : ∀ {A B C} {f : Hom C A} {g : Hom C B} → π₁ ∘ ⟨ f , g ⟩ ≡ f
+  commute₁ = Product.commute₁ product
+
+  .commute₂ : ∀ {A B C} {f : Hom C A} {g : Hom C B} → π₂ ∘ ⟨ f , g ⟩ ≡ g
+  commute₂ = Product.commute₂ product
+
+  .universal : ∀ {A B C} {f : Hom C A} {g : Hom C B} {i : Hom C (A × B)}
+               → π₁ ∘ i ≡ f → π₂ ∘ i ≡ g → ⟨ f , g ⟩ ≡ i
+  universal = Product.universal product

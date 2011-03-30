@@ -65,10 +65,9 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
   identity-unique f f∘g≡g g∘f≡g = trans (sym identityˡ) (g∘f≡g id)
     where open IsEquivalence equiv
 
-
-
-
-
+  .identity-commutative : ∀ {a b} (f : Hom a b) → f ∘ id ≡ id ∘ f
+  identity-commutative f = trans identityʳ (sym identityˡ)
+    where open IsEquivalence equiv
 
 
 

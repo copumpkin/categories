@@ -6,6 +6,8 @@ open import Category
 
 open import Category.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Category.NaturalIsomorphism
+open import Category.NaturalTransformation using (_∘₀_; _∘₁_; _∘ˡ_; _∘ʳ_; NaturalTransformation) renaming (_≡_ to _≡ⁿ_; id to idⁿ)
+open import Category.Functor.Constant
 
 module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (⊗ : Bifunctor C C C) (id : Category.Obj C) where
   private module C = Category.Category C
@@ -82,14 +84,43 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (⊗ : Bifunctor 
       open IsEquivalence C.equiv renaming (refl to C-refl)
       open SetoidReasoning hom-setoid
 
+  id₁ : Endofunctor C
+  id₁ = idF {C = C}
+
+  id₂ : NaturalTransformation id₁ id₁
+  id₂ = idⁿ {F = id₁}
+
   Triendo : Set (o ⊔ ℓ ⊔ e)
   Triendo = Functor (Product (Product C C) C) C
 
   [x⊗y]⊗z : Triendo
-  [x⊗y]⊗z = ⊗ ∘F (⊗ ⁂ idF {C = C})
+  [x⊗y]⊗z = ⊗ ∘F (⊗ ⁂ id₁)
 
   x⊗[y⊗z] : Triendo 
-  x⊗[y⊗z] = (⊗ ∘F (idF {C = C} ⁂ ⊗)) ∘F preassoc C C C
+  x⊗[y⊗z] = (⊗ ∘F (id₁ ⁂ ⊗)) ∘F preassoc C C C
+
+  TriangleSource : Bifunctor C C C
+  TriangleSource = ⊗ ∘F (x⊗id ⁂ id₁)
+
+  TriangleMidpoint : Bifunctor C C C
+  TriangleMidpoint = ⊗ ∘F (id₁ ⁂ id⊗x)
+
+  module Coherence (identityˡ : NaturalIsomorphism id⊗x idF)
+                   (identityʳ : NaturalIsomorphism x⊗id idF)
+                   (assoc : NaturalIsomorphism [x⊗y]⊗z x⊗[y⊗z]) where
+    open NaturalIsomorphism identityˡ using () renaming (F⇒G to υˡ)
+    open NaturalIsomorphism identityʳ using () renaming (F⇒G to υʳ)
+    open NaturalIsomorphism assoc using () renaming (F⇒G to α)
+
+    TriangleLeftSide : NaturalTransformation TriangleSource ⊗
+    TriangleLeftSide = ⊗ ∘ˡ (υʳ ⁂ⁿ id₂)
+
+    TriangleTopSide : NaturalTransformation TriangleSource TriangleMidpoint
+    TriangleTopSide = α ∘ʳ ((id₁ ※ Constant {D = C} id {C = C}) ⁂ id₁)
+
+    TriangleRightSide : NaturalTransformation TriangleMidpoint ⊗
+    TriangleRightSide = ⊗ ∘ˡ (id₂ ⁂ⁿ υˡ)
+
 
 record Monoidal {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where
   private module C = Category.Category C
@@ -108,3 +139,8 @@ record Monoidal {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where
     identityˡ : NaturalIsomorphism id⊗x idF
     identityʳ : NaturalIsomorphism x⊗id idF
     assoc : NaturalIsomorphism [x⊗y]⊗z x⊗[y⊗z]
+
+  open Coherence identityˡ identityʳ assoc
+
+  field
+    .triangle : TriangleLeftSide ≡ⁿ (TriangleRightSide ∘₁ TriangleTopSide)

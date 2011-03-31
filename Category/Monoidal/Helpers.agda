@@ -3,6 +3,7 @@ module Category.Monoidal.Helpers where
 
 open import Support hiding (_×_)
 open import Category
+open import Category.Monoidal.Builders
 
 open import Category.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Category.NaturalIsomorphism
@@ -16,9 +17,13 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (⊗ : Bifunctor 
   private module ⊗ = Functor ⊗ renaming (F₀ to ⊗₀; F₁ to ⊗₁; F-resp-≡ to ⊗-resp-≡)
   open ⊗
 
+  open MonoidalHelperBuilders C ⊗ id
+
   open import Category.Product
 
   id⊗x : Endofunctor C
+  id⊗x = ⊗ ∘F (Constant {D = C} id {C = C} ※ id₁) 
+  {-
   id⊗x = record 
     { F₀ = λ x → ⊗₀ (id , x)
     ; F₁ = λ f → ⊗₁ (C.id , f)
@@ -50,8 +55,12 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (⊗ : Bifunctor 
       where
       open IsEquivalence C.equiv renaming (refl to C-refl)
       open SetoidReasoning hom-setoid
+  -}
 
   x⊗id : Endofunctor C
+  x⊗id = ⊗ ∘F (id₁ ※ Constant {D = C} id {C = C})
+
+  {-
   x⊗id = record 
     { F₀ = λ x → ⊗₀ (x , id)
     ; F₁ = λ f → ⊗₁ (f , C.id)
@@ -83,46 +92,37 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (⊗ : Bifunctor 
       where
       open IsEquivalence C.equiv renaming (refl to C-refl)
       open SetoidReasoning hom-setoid
-
-  id₁ : Endofunctor C
-  id₁ = idF {C = C}
-
-  id₂ : NaturalTransformation id₁ id₁
-  id₂ = idⁿ {F = id₁}
-
-  Triendo : Set (o ⊔ ℓ ⊔ e)
-  Triendo = Functor (Product (Product C C) C) C
+  -}
 
   [x⊗y]⊗z : Triendo
-  [x⊗y]⊗z = ⊗ ∘F (⊗ ⁂ id₁)
+  [x⊗y]⊗z = ⊗ ⟨⊗⟩ id₁
 
   x⊗[y⊗z] : Triendo 
-  x⊗[y⊗z] = (⊗ ∘F (id₁ ⁂ ⊗)) ∘F preassoc C C C
+  x⊗[y⊗z] = (id₁ ⟨⊗⟩ ⊗) ∘F preassoc C C C
 
-  TriangleSource : Bifunctor C C C
-  TriangleSource = ⊗ ∘F (x⊗id ⁂ id₁)
+  [x⊗id]⊗y : Bifunctor C C C
+  [x⊗id]⊗y = x⊗id ⟨⊗⟩ id₁
 
-  TriangleMidpoint : Bifunctor C C C
-  TriangleMidpoint = ⊗ ∘F (id₁ ⁂ id⊗x)
-  Tetraendo : Set (o ⊔ ℓ ⊔ e)
-  Tetraendo = Functor (Product (Product (Product C C) C) C) C
+  x⊗[id⊗y] : Bifunctor C C C
+  x⊗[id⊗y] = id₁ ⟨⊗⟩ id⊗x
 
   [[x⊗y]⊗z]⊗w : Tetraendo
-  [[x⊗y]⊗z]⊗w = ⊗ ∘F ([x⊗y]⊗z ⁂ id₁)
+  [[x⊗y]⊗z]⊗w = [x⊗y]⊗z ⟨⊗⟩ id₁
   
   [x⊗y]⊗[z⊗w] : Tetraendo
-  [x⊗y]⊗[z⊗w] = (⊗ ∘F (⊗ ⁂ ⊗)) ∘F preassoc (Product C C) C C
+  [x⊗y]⊗[z⊗w] = (⊗ ⟨⊗⟩ ⊗) ∘F preassoc (Product C C) C C
 
   x⊗[y⊗[z⊗w]] : Tetraendo
-  x⊗[y⊗[z⊗w]] = (⊗ ∘F (id₁ ⁂ (⊗ ∘F (id₁ ⁂ ⊗)))) ∘F preassoc C C (Product C C) ∘F preassoc (Product C C) C C
+  x⊗[y⊗[z⊗w]] = (id₁ ⟨⊗⟩ (id₁ ⟨⊗⟩ ⊗)) ∘F preassoc C C (Product C C) ∘F preassoc (Product C C) C C
 
   x⊗[[y⊗z]⊗w] : Tetraendo
-  x⊗[[y⊗z]⊗w] = (⊗ ∘F (id₁ ⁂ [x⊗y]⊗z)) 
+  x⊗[[y⊗z]⊗w] = (id₁ ⟨⊗⟩ [x⊗y]⊗z) 
                   ∘F preassoc C (Product C C) C 
                   ∘F (preassoc C C C ⁂ id₁)
 
-  [x⊗[y⊗z]]⊗w = ⊗ ∘F (x⊗[y⊗z] ⁂ id₁)
-  
+  [x⊗[y⊗z]]⊗w : Tetraendo
+  [x⊗[y⊗z]]⊗w = x⊗[y⊗z] ⟨⊗⟩ id₁
+
   module Coherence (identityˡ : NaturalIsomorphism id⊗x idF)
                    (identityʳ : NaturalIsomorphism x⊗id idF)
                    (assoc : NaturalIsomorphism [x⊗y]⊗z x⊗[y⊗z]) where
@@ -130,26 +130,29 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (⊗ : Bifunctor 
     open NaturalIsomorphism identityʳ using () renaming (F⇒G to υʳ)
     open NaturalIsomorphism assoc using () renaming (F⇒G to α)
 
-    TriangleLeftSide : NaturalTransformation TriangleSource ⊗
-    TriangleLeftSide = ⊗ ∘ˡ (υʳ ⁂ⁿ id₂)
+    TriangleLeftSide : NaturalTransformation [x⊗id]⊗y ⊗
+    TriangleLeftSide = υʳ ⟨⊗⟩ⁿ id₂
 
-    TriangleTopSide : NaturalTransformation TriangleSource TriangleMidpoint
+    TriangleTopSide : NaturalTransformation [x⊗id]⊗y x⊗[id⊗y]
     TriangleTopSide = α ∘ʳ ((id₁ ※ Constant {D = C} id {C = C}) ⁂ id₁)
 
-    TriangleRightSide : NaturalTransformation TriangleMidpoint ⊗
-    TriangleRightSide = ⊗ ∘ˡ (id₂ ⁂ⁿ υˡ)
+    TriangleRightSide : NaturalTransformation x⊗[id⊗y] ⊗
+    TriangleRightSide = id₂ ⟨⊗⟩ⁿ υˡ
+
+    α-over : {C₁ C₂ C₃ : Category o ℓ e} (F₁ : FunctorToC C₁) (F₂ : FunctorToC C₂) (F₃ : FunctorToC C₃) → NaturalTransformation ((F₁ ⟨⊗⟩ F₂) ⟨⊗⟩ F₃) ((F₁ ⟨⊗⟩ (F₂ ⟨⊗⟩ F₃)) ∘F preassoc C₁ C₂ C₃)
+    α-over F₁ F₂ F₃ = α ∘ʳ ((F₁ ⁂ F₂) ⁂ F₃)
 
     PentagonNWSide : NaturalTransformation [[x⊗y]⊗z]⊗w [x⊗y]⊗[z⊗w]
-    PentagonNWSide = α ∘ʳ ((⊗ ⁂ id₁) ⁂ id₁)
+    PentagonNWSide = α-over ⊗ id₁ id₁
 
     PentagonNESide : NaturalTransformation [x⊗y]⊗[z⊗w] x⊗[y⊗[z⊗w]]
-    PentagonNESide = α ∘ʳ (((id₁ ⁂ id₁) ⁂ ⊗) ∘F preassoc (Product C C) C C)
+    PentagonNESide = α-over id₁ id₁ ⊗  ∘ʳ  preassoc (Product C C) C C
 
     PentagonSWSide : NaturalTransformation [[x⊗y]⊗z]⊗w [x⊗[y⊗z]]⊗w
-    PentagonSWSide = ⊗ ∘ˡ (α ⁂ⁿ id₂)
+    PentagonSWSide = α ⟨⊗⟩ⁿ id₂
 
     PentagonSSide : NaturalTransformation [x⊗[y⊗z]]⊗w x⊗[[y⊗z]⊗w]
     PentagonSSide = α ∘ʳ (((id₁ ⁂ ⊗) ∘F preassoc C C C) ⁂ id₁)
 
     PentagonSESide : NaturalTransformation x⊗[[y⊗z]⊗w] x⊗[y⊗[z⊗w]]
-    PentagonSESide = (⊗ ∘ˡ (id₂ ⁂ⁿ α)) ∘ʳ (preassoc C (Product C C) C ∘F (preassoc C C C ⁂ id₁))
+    PentagonSESide = (id₂ ⟨⊗⟩ⁿ α) ∘ʳ (preassoc C (Product C C) C ∘F (preassoc C C C ⁂ id₁))

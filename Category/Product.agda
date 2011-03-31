@@ -40,6 +40,19 @@ preassoc C D E = record {
   module D = Category.Category D
   module E = Category.Category E
 
+infixr 2 _※_
+_※_ : ∀ {o ℓ e o′₁ ℓ′₁ e′₁ o′₂ ℓ′₂ e′₂} {C : Category o ℓ e} {D₁ : Category o′₁ ℓ′₁ e′₁} {D₂ : Category o′₂ ℓ′₂ e′₂} → (F : Functor C D₁) → (G : Functor C D₂) → Functor C (Product D₁ D₂)
+F ※ G = record
+        { F₀ = λ x → F.F₀ x , G.F₀ x
+        ; F₁ = λ f → F.F₁ f , G.F₁ f
+        ; identity = F.identity , G.identity
+        ; homomorphism = F.homomorphism , G.homomorphism
+        ; F-resp-≡ = λ f≡g → F.F-resp-≡ f≡g , G.F-resp-≡ f≡g
+        }
+        where
+        module F = Category.Functor.Functor F
+        module G = Category.Functor.Functor G
+
 infixr 2 _⁂_
 _⁂_ : ∀ {o₁ ℓ₁ e₁ o′₁ ℓ′₁ e′₁ o₂ ℓ₂ e₂ o′₂ ℓ′₂ e′₂} {C₁ : Category o₁ ℓ₁ e₁} {D₁ : Category o′₁ ℓ′₁ e′₁} → {C₂ : Category o₂ ℓ₂ e₂} {D₂ : Category o′₂ ℓ′₂ e′₂} → (F₁ : Functor C₁ D₁) → (F₂ : Functor C₂ D₂) → Functor (Product C₁ C₂) (Product D₁ D₂)
 F ⁂ G = record
@@ -52,3 +65,16 @@ F ⁂ G = record
         where
         module F = Category.Functor.Functor F
         module G = Category.Functor.Functor G
+
+open import Category.NaturalTransformation using (NaturalTransformation)
+
+infixr 2 _⁂ⁿ_
+_⁂ⁿ_ : ∀ {o₁ ℓ₁ e₁ o′₁ ℓ′₁ e′₁ o₂ ℓ₂ e₂ o′₂ ℓ′₂ e′₂} {C₁ : Category o₁ ℓ₁ e₁} {D₁ : Category o′₁ ℓ′₁ e′₁} → {C₂ : Category o₂ ℓ₂ e₂} {D₂ : Category o′₂ ℓ′₂ e′₂} → {F₁ G₁ : Functor C₁ D₁} {F₂ G₂ : Functor C₂ D₂} → (α : NaturalTransformation F₁ G₁) → (β : NaturalTransformation F₂ G₂) → NaturalTransformation (F₁ ⁂ F₂) (G₁ ⁂ G₂)
+α ⁂ⁿ β = record -- need lambdas rather than ⟨_,_⟩ because of looping metas :(
+         { η = λ X → (α.η (fst X)) , (β.η (snd X))
+         ; commute = λ f → (α.commute (fst f)) , (β.commute (snd f))
+         }
+         -- { η = ⟨ α.η , β.η ⟩; commute = ⟨ α.commute , β.commute ⟩ }
+         where
+         module α = Category.NaturalTransformation.NaturalTransformation α
+         module β = Category.NaturalTransformation.NaturalTransformation β

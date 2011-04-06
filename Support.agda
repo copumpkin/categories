@@ -222,3 +222,7 @@ data ⊥ : Set where
 record ⊤ {ℓ} : Set ℓ where
   constructor tt
 
+type-signature : ∀ {a} (A : Set a) → A → A
+type-signature A x = x
+
+syntax type-signature A x = x ∶ A

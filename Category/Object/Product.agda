@@ -25,8 +25,14 @@ record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   .η : ⟨ π₁ , π₂ ⟩ ≡ id
   η = universal identityʳ identityʳ
 
-open import Category.Morphisms
+  .⟨⟩-cong₂ : ∀ {C} → {f f′ : Hom C A} {g g′ : Hom C B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
+  ⟨⟩-cong₂ f≡f′ g≡g′ = 
+    universal 
+      (IsEquivalence.trans equiv commute₁ (IsEquivalence.sym equiv f≡f′))
+      (IsEquivalence.trans equiv commute₂ (IsEquivalence.sym equiv g≡g′))
+    
 
+open import Category.Morphisms
 
 Commutative : ∀ {A B} → (p₁ : Product A B) (p₂ : Product B A) → _≅_ C (Product.A×B p₁) (Product.A×B p₂)
 Commutative p₁ p₂ = record 
@@ -321,6 +327,8 @@ Associative p₁ p₂ p₃ p₄ = record
 
 
 record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
+  infix 10 _⁂_
+
   field
     product : ∀ {A B} → Product A B
 
@@ -352,3 +360,111 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   .universal : ∀ {A B C} {f : Hom C A} {g : Hom C B} {i : Hom C (A × B)}
                → π₁ ∘ i ≡ f → π₂ ∘ i ≡ g → ⟨ f , g ⟩ ≡ i
   universal = Product.universal product
+
+  .g-η : ∀ {A B C} {f : Hom C (A × B)} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
+  g-η = Product.g-η product
+
+  .η : ∀ {A B} → ⟨ π₁ , π₂ ⟩ ≡ id {A × B}
+  η = Product.η product
+
+  .⟨⟩-cong₂ : ∀ {A B C} → {f f′ : Hom C A} {g g′ : Hom C B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
+  ⟨⟩-cong₂ = Product.⟨⟩-cong₂ product
+  
+  -- If I _really_ wanted to, I could do this for a specific pair of products like the rest above, but I'll write that one
+  -- when I need it.
+  _⁂_ : ∀ {A B C D} → Hom A B → Hom C D → Hom (A × C) (B × D)
+  f ⁂ g = ⟨ f ∘ π₁ , g ∘ π₂ ⟩
+
+  first : ∀ {A B C} → Hom A B → Hom (A × C) (B × C)
+  first f = f ⁂ id
+
+  second : ∀ {A C D} → Hom C D → Hom (A × C) (A × D)
+  second g = id ⁂ g
+
+  -- Just to make this more obvious
+  .π₁∘⁂ : ∀ {A B C D} → {f : Hom A B} → {g : Hom C D} → π₁ ∘ (f ⁂ g) ≡ f ∘ π₁
+  π₁∘⁂ {f = f} {g} = commute₁
+
+  .π₂∘⁂ : ∀ {A B C D} → {f : Hom A B} → {g : Hom C D} → π₂ ∘ (f ⁂ g) ≡ g ∘ π₂
+  π₂∘⁂ {f = f} {g} = commute₂
+
+  .⁂∘⟨⟩ : ∀ {A B C D E} → {f : Hom B C} {f′ : Hom A B} {g : Hom D E} {g′ : Hom A D} → (f ⁂ g) ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f ∘ f′ , g ∘ g′ ⟩
+  ⁂∘⟨⟩ {f = f} {f′} {g} {g′} = IsEquivalence.sym equiv (universal helper₁ helper₂)
+    where
+    helper₁ : π₁ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩) ≡ f ∘ f′
+    helper₁ = 
+      begin
+        π₁ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩)
+      ≈⟨ sym assoc ⟩
+        (π₁ ∘ (f ⁂ g)) ∘ ⟨ f′ , g′ ⟩
+      ≈⟨ ∘-resp-≡ˡ π₁∘⁂ ⟩
+        (f ∘ π₁) ∘ ⟨ f′ , g′ ⟩
+      ≈⟨ assoc ⟩
+        f ∘ (π₁ ∘ ⟨ f′ , g′ ⟩)
+      ≈⟨ ∘-resp-≡ʳ commute₁ ⟩
+        f ∘ f′
+      ∎
+      where
+      open SetoidReasoning hom-setoid
+      open IsEquivalence equiv 
+
+    helper₂ : π₂ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩) ≡ g ∘ g′
+    helper₂ = 
+      begin
+        π₂ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩)
+      ≈⟨ sym assoc ⟩
+        (π₂ ∘ (f ⁂ g)) ∘ ⟨ f′ , g′ ⟩
+      ≈⟨ ∘-resp-≡ˡ π₂∘⁂ ⟩
+        (g ∘ π₂) ∘ ⟨ f′ , g′ ⟩
+      ≈⟨ assoc ⟩
+        g ∘ (π₂ ∘ ⟨ f′ , g′ ⟩)
+      ≈⟨ ∘-resp-≡ʳ commute₂ ⟩
+        g ∘ g′
+      ∎
+      where
+      open SetoidReasoning hom-setoid
+      open IsEquivalence equiv 
+
+  .first∘⟨⟩ : ∀ {A B C D} → {f : Hom B C} {f′ : Hom A B} {g′ : Hom A D} → first f ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f ∘ f′ , g′ ⟩
+  first∘⟨⟩ {f = f} {f′} {g′} = 
+    begin
+      first f ∘ ⟨ f′ , g′ ⟩
+    ≈⟨ ⁂∘⟨⟩ ⟩
+      ⟨ f ∘ f′ , id ∘ g′ ⟩ 
+    ≈⟨ ⟨⟩-cong₂ refl identityˡ ⟩
+      ⟨ f ∘ f′ , g′ ⟩
+    ∎
+    where
+    open SetoidReasoning hom-setoid
+    open IsEquivalence equiv 
+
+  .second∘⟨⟩ : ∀ {A B D E} → {f′ : Hom A B} {g : Hom D E} {g′ : Hom A D} → second g ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f′ , g ∘ g′ ⟩
+  second∘⟨⟩ {f′ = f′} {g} {g′} = 
+    begin
+      second g ∘ ⟨ f′ , g′ ⟩
+    ≈⟨ ⁂∘⟨⟩ ⟩
+      ⟨ id ∘ f′ , g ∘ g′ ⟩ 
+    ≈⟨ ⟨⟩-cong₂ identityˡ refl ⟩
+      ⟨ f′ , g ∘ g′ ⟩
+    ∎
+    where
+    open SetoidReasoning hom-setoid
+    open IsEquivalence equiv 
+
+  .⁂∘⁂ : ∀ {A B C D E F} → {f : Hom B C} → {f′ : Hom A B} {g : Hom E F} {g′ : Hom D E} → (f ⁂ g) ∘ (f′ ⁂ g′) ≡ (f ∘ f′) ⁂ (g ∘ g′)
+  ⁂∘⁂ {B = B} {E = E} {f = f} {f′} {g} {g′} = 
+    begin
+      (f ⁂ g) ∘ (f′ ⁂ g′)
+    ≈⟨ ⁂∘⟨⟩ ⟩
+      ⟨ f ∘ (f′ ∘ π₁) , g ∘ (g′ ∘ π₂) ⟩
+    ≈⟨ sym (⟨⟩-cong₂ assoc assoc) ⟩
+      (f ∘ f′) ⁂ (g ∘ g′)
+    ∎
+    where
+    open SetoidReasoning hom-setoid
+    open IsEquivalence equiv
+
+  .⟨⟩∘ : ∀ {A B C D} {f : Hom A B} {g : Hom A C} {q : Hom D A} → ⟨ f , g ⟩ ∘ q ≡ ⟨ f ∘ q , g ∘ q ⟩
+  ⟨⟩∘ = IsEquivalence.sym equiv (universal 
+    (IsEquivalence.trans equiv (IsEquivalence.sym equiv assoc) (∘-resp-≡ˡ commute₁)) 
+    (IsEquivalence.trans equiv (IsEquivalence.sym equiv assoc) (∘-resp-≡ˡ commute₂)))

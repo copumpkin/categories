@@ -13,8 +13,8 @@ record Terminal : Set (o ⊔ ℓ ⊔ e) where
     ! : ∀ {A} → Hom A ⊤
     !-unique : ∀ {A} → (f : Hom A ⊤) → ! ≡ f
 
-  .⊥-id : (f : Hom ⊤ ⊤) → f ≡ id
-  ⊥-id f = 
+  .⊤-id : (f : Hom ⊤ ⊤) → f ≡ id
+  ⊤-id f = 
       begin
         f
       ≈⟨ sym (!-unique f) ⟩
@@ -25,3 +25,5 @@ record Terminal : Set (o ⊔ ℓ ⊔ e) where
     where
     open IsEquivalence equiv
     open SetoidReasoning hom-setoid
+
+  

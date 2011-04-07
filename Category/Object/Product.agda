@@ -361,6 +361,12 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
                → π₁ ∘ i ≡ f → π₂ ∘ i ≡ g → ⟨ f , g ⟩ ≡ i
   universal = Product.universal product
 
+  assocˡ : ∀ {A B C} → Hom ((A × B) × C) (A × (B × C))
+  assocˡ = _≅_.g C ×-assoc
+
+  assocʳ : ∀ {A B C} → Hom (A × (B × C)) ((A × B) × C)
+  assocʳ = _≅_.f C ×-assoc
+
   .g-η : ∀ {A B C} {f : Hom C (A × B)} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
   g-η = Product.g-η product
 

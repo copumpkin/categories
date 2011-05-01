@@ -227,3 +227,26 @@ type-signature : ∀ {a} (A : Set a) → A → A
 type-signature A x = x
 
 syntax type-signature A x = x ∶ A
+
+data Either {l r : Level} (L : Set l) (R : Set r) : Set (l ⊔ r) where
+  inl : L → Either L R
+  inr : R → Either L R
+
+either₀ : ∀ {l r ℓ : Level} {L : Set l} {R : Set r} {A : Set ℓ} (f : L → A) (g : R → A) (v : Either L R) → A
+either₀ f _ (inl x) = f x
+either₀ _ g (inr y) = g y
+
+either : ∀ {l r ℓ} {L : Set l} {R : Set r} {L′ : L → Set ℓ} {R′ : R → Set ℓ} (f : (x : L) → L′ x) (g : (y : R) → R′ y) (v : Either L R) → either₀ L′ R′ v
+either f _ (inl x) = f x
+either _ g (inr y) = g y
+
+left : ∀ {l l′ r} {L : Set l} {R : Set r} {L′ : Set l′} (f : L → L′) (v : Either L R) → Either L′ R
+left f (inl x) = inl (f x)
+left _ (inr y) = inr y
+
+right : ∀ {l r r′} {L : Set l} {R : Set r} {R′ : Set r′} (g : R → R′) (v : Either L R) → Either L R′
+right _ (inl x) = inl x
+right g (inr y) = inr (g y)
+
+uncurry₀ : ∀ {x y z} {X : Set x} {Y : Set y} {Z : Set z} (f : X → Y → Z) → X × Y → Z
+uncurry₀ f (x , y) = f x y

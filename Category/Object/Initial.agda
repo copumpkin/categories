@@ -10,10 +10,10 @@ open Category.Category C
 record Initial : Set (o ⊔ ℓ ⊔ e) where
   field
     ⊥ : Obj
-    ! : ∀ {A} → Hom ⊥ A
-    !-unique : ∀ {A} → (f : Hom ⊥ A) → ! ≡ f
+    ! : ∀ {A} → (⊥ ⇒ A)
+    !-unique : ∀ {A} → (f : ⊥ ⇒ A) → ! ≡ f
  
-  .⊥-id : (f : Hom ⊥ ⊥) → f ≡ id
+  .⊥-id : (f : ⊥ ⇒ ⊥) → f ≡ id
   ⊥-id f = 
       begin
         f

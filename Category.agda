@@ -3,36 +3,46 @@ module Category where
 
 open import Support
 
-
 record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where 
   infixr 9 _∘_
   infix  4 _≡_
 
   field
     Obj : Set o
-    Hom : Rel Obj ℓ
-    _≡_ : ∀ {A B} → Rel (Hom A B) e
+    _⇒_ : Rel Obj ℓ
+    _≡_ : ∀ {A B} → Rel (A ⇒ B) e
 
-    _∘_ : ∀ {A B C} → Hom B C → Hom A B → Hom A C
-    id  : ∀ {A} → Hom A A
+    id  : ∀ {A} → (A ⇒ A)
+    _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
 
   field
-    .assoc     : ∀ {A B C D} {f : Hom A B} {g : Hom B C} {h : Hom C D} → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
-    .identityˡ : ∀ {A B} {f : Hom A B} → id ∘ f ≡ f
-    .identityʳ : ∀ {A B} {f : Hom A B} → f ∘ id ≡ f
+    .assoc     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
+    .identityˡ : ∀ {A B} {f : A ⇒ B} → id ∘ f ≡ f
+    .identityʳ : ∀ {A B} {f : A ⇒ B} → f ∘ id ≡ f
     .equiv     : ∀ {A B} → IsEquivalence (_≡_ {A} {B})
-    .∘-resp-≡  : ∀ {A B C} {f h : Hom B C} {g i : Hom A B} → f ≡ h → g ≡ i → f ∘ g ≡ h ∘ i
+    .∘-resp-≡  : ∀ {A B C} {f h : B ⇒ C} {g i : A ⇒ B} → f ≡ h → g ≡ i → f ∘ g ≡ h ∘ i
 
-  .∘-resp-≡ˡ : ∀ {A B C} {f h : Hom B C} {g : Hom A B} → f ≡ h → f ∘ g ≡ h ∘ g
-  ∘-resp-≡ˡ pf = ∘-resp-≡ pf (IsEquivalence.refl equiv)
+  module Equiv where
+    .refl : ∀ {A B} → {f : A ⇒ B} → f ≡ f
+    refl = IsEquivalence.refl equiv
 
-  .∘-resp-≡ʳ : ∀ {A B C} {f h : Hom A B} {g : Hom B C} → f ≡ h → g ∘ f ≡ g ∘ h
-  ∘-resp-≡ʳ pf = ∘-resp-≡ (IsEquivalence.refl equiv) pf
+    .sym : ∀ {A B} → {f g : A ⇒ B} → f ≡ g → g ≡ f
+    sym = IsEquivalence.sym equiv
 
+    .trans : ∀ {A B} → {f g h : A ⇒ B} → f ≡ g → g ≡ h → f ≡ h
+    trans = IsEquivalence.trans equiv
+
+  private open Equiv
+
+  .∘-resp-≡ˡ : ∀ {A B C} {f h : B ⇒ C} {g : A ⇒ B} → f ≡ h → f ∘ g ≡ h ∘ g
+  ∘-resp-≡ˡ pf = ∘-resp-≡ pf refl
+
+  .∘-resp-≡ʳ : ∀ {A B C} {f h : A ⇒ B} {g : B ⇒ C} → f ≡ h → g ∘ f ≡ g ∘ h
+  ∘-resp-≡ʳ pf = ∘-resp-≡ refl pf
 
   hom-setoid : ∀ {A B} → Setoid _ _
   hom-setoid {A} {B} = record 
-    { Carrier = Hom A B
+    { Carrier = A ⇒ B
     ; _≈_ = _≡_
     ; isEquivalence = equiv
     }
@@ -40,36 +50,39 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
   op : Category o ℓ e
   op = record 
     { Obj = Obj
-    ; Hom = λ x y → Hom y x
+    ; _⇒_ = λ x y → y ⇒ x
     ; _≡_ = _≡_
     ; _∘_ = λ x y → y ∘ x
     ; id = id
-    ; assoc = IsEquivalence.sym equiv assoc
+    ; assoc = sym assoc
     ; identityˡ = identityʳ
     ; identityʳ = identityˡ
     ; equiv = record 
-      { refl = IsEquivalence.refl equiv
-      ; sym = IsEquivalence.sym equiv
-      ; trans = IsEquivalence.trans equiv
+      { refl = refl
+      ; sym = sym
+      ; trans = trans
       }
     ; ∘-resp-≡ = λ f≡h g≡i → ∘-resp-≡ g≡i f≡h
     }
 
-  CommutativeSquare : ∀ {A B C D} → (f : Hom A B) (g : Hom A C) (h : Hom B D) (i : Hom C D) → Set _
+  CommutativeSquare : ∀ {A B C D} → (f : A ⇒ B) (g : A ⇒ C) (h : B ⇒ D) (i : C ⇒ D) → Set _
   CommutativeSquare f g h i = h ∘ f ≡ i ∘ g
 
 
-  .identity-unique : ∀ {o} (f : Hom o o) 
-                   → (∀ g → _≡_ {o} (f ∘ g) g) → (∀ g → g ∘ f ≡ g)
-                   → f ≡ id
-  identity-unique f f∘g≡g g∘f≡g = trans (sym identityˡ) (g∘f≡g id)
-    where open IsEquivalence equiv
+  .id-unique : ∀ {o} {f : o ⇒ o} → (∀ g → g ∘ f ≡ g) → f ≡ id
+  id-unique g∘f≡g = trans (sym identityˡ) (g∘f≡g id)
 
-  .identity-commutative : ∀ {a b} (f : Hom a b) → f ∘ id ≡ id ∘ f
-  identity-commutative f = trans identityʳ (sym identityˡ)
-    where open IsEquivalence equiv
+  .id-comm : ∀ {a b} {f : a ⇒ b} → f ∘ id ≡ id ∘ f
+  id-comm = trans identityʳ (sym identityˡ)
 
+_[_,_] : ∀ {o ℓ e} → (C : Category o ℓ e) → (X : Category.Obj C) → (Y : Category.Obj C) → Set ℓ
+_[_,_] = Category._⇒_
 
+_[_≡_] : ∀ {o ℓ e} → (C : Category o ℓ e) → ∀ {X Y} (f g : C [ X , Y ]) → Set e
+_[_≡_] = Category._≡_
+
+_[_∘_] : ∀ {o ℓ e} → (C : Category o ℓ e) → ∀ {X Y Z} (f : C [ Y , Z ]) → (g : C [ X , Y ]) → C [ X , Z ]
+_[_∘_] = Category._∘_
 
 {-
 

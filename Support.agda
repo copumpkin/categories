@@ -115,9 +115,10 @@ flip f = λ x y → f y x
 Rel : ∀ {a} → Set a → (ℓ : Level) → Set (a ⊔ suc ℓ)
 Rel A ℓ = A → A → Set ℓ
 
-_⇒_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
-      Rel A ℓ₁ → Rel A ℓ₂ → Set _
-P ⇒ Q = ∀ {i j} → P i j → Q i j
+private
+  _⇒_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} →
+       Rel A ℓ₁ → Rel A ℓ₂ → Set _
+  P ⇒ Q = ∀ {i j} → P i j → Q i j
 
 _Respects_ : ∀ {a ℓ₁ ℓ₂} {A : Set a} → (A → Set ℓ₁) → Rel A ℓ₂ → Set _
 P Respects _∼_ = ∀ {x y} → x ∼ y → P x → P y

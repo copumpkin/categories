@@ -22,7 +22,7 @@ _∘ˡ_ {C = C} {D} {E} {F} {G} H η′ = record
   open D
   open E
 
-  .commute′ : ∀ {X Y} (f : C.Hom X Y) →
+  .commute′ : ∀ {X Y} (f : C [ X , Y ]) →
       Functor.F₁ H (NaturalTransformation.η η′ Y) ∘E Functor.F₁ H (Functor.F₁ F f) ≡E
       Functor.F₁ H (Functor.F₁ G f) ∘E Functor.F₁ H (NaturalTransformation.η η′ X)
   commute′ {X} {Y} f = 

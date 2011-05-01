@@ -5,6 +5,7 @@ open import Support hiding (⊤; ⟨_,_⟩) renaming (_×_ to _×′_)
 open import Category
 open import Category.Monoidal
 open import Category.Object.Product
+open import Category.Object.BinaryProducts
 open import Category.Object.Products
 open import Category.Object.Terminal
 open import Category.Bifunctor using (Bifunctor)
@@ -38,17 +39,17 @@ Cartesian C Ps = record
       ; commute = λ f → F⇐G-commuteʳ
       }
     ; iso = λ X → record 
-      { isoˡ = {!!}
+      { isoˡ = identityʳ-isoˡ
       ; isoʳ = commute₁
       }
     }
   ; assoc = record 
     { F⇒G = record 
-      { η = λ X → _≅_.g C ×-assoc
+      { η = λ X → assocˡ
       ; commute = {!!}
       }
     ; F⇐G = record 
-      { η = λ X → _≅_.f C ×-assoc
+      { η = λ X → assocʳ
       ; commute = {!!}
       }
     ; iso = λ X → record 
@@ -56,8 +57,8 @@ Cartesian C Ps = record
       ; isoʳ = Iso.isoˡ C (_≅_.iso C ×-assoc)
       }
     }
-  ; triangle = λ {X} → triangle {X}
-  ; pentagon = {!!}
+  ; triangle = {!!} -- λ {X} → triangle {X}
+  ; pentagon = λ {X} → pentagon {X}
   }
   where
   open Category.Category C
@@ -89,7 +90,7 @@ Cartesian C Ps = record
     open SetoidReasoning hom-setoid
     open IsEquivalence equiv
 
-  .identityˡ-isoˡ : ∀ {X} → ⟨ ! , id {X} ⟩ ∘ π₂ ≡ id
+  .identityˡ-isoˡ : ∀ {X} → ⟨ ! , id ⟩ ∘ π₂ ≡ id
   identityˡ-isoˡ {X} = 
     begin
       ⟨ ! , id {X} ⟩ ∘ π₂
@@ -120,10 +121,72 @@ Cartesian C Ps = record
       ⟨ f ∘ id , ! ⟩
     ≈⟨ sym first∘⟨⟩ ⟩
       first f ∘ ⟨ id , ! ⟩
-    ∎ 
+    ∎
     where
     open SetoidReasoning hom-setoid
     open IsEquivalence equiv
   
-  .triangle : {x : Obj ×′ Obj} → first π₁ ≡ second π₂ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ 
-  triangle = {!!}
+  .identityʳ-isoˡ : ∀ {X} → ⟨ id , ! ⟩ ∘ π₁ ≡ id
+  identityʳ-isoˡ {X} = 
+    begin
+      ⟨ id {X} , ! ⟩ ∘ π₁
+    ≈⟨ ⟨⟩∘ ⟩
+      ⟨ id ∘ π₁ , ! ∘ π₁ ⟩
+    ≈⟨ sym (⟨⟩-cong₂ (IsEquivalence.sym equiv identityˡ) (!-unique (! ∘ π₁))) ⟩
+      ⟨ π₁ , ! ⟩
+    ≈⟨ ⟨⟩-cong₂ (IsEquivalence.refl equiv) (!-unique (! ∘ π₂)) ⟩
+      ⟨ π₁ , ! ∘ π₂ ⟩
+    ≈⟨ ⟨⟩-cong₂ (IsEquivalence.refl equiv) (∘-resp-≡ˡ (⊤-id !)) ⟩
+      ⟨ π₁ , id ∘ π₂ ⟩
+    ≈⟨ ⟨⟩-cong₂ (IsEquivalence.refl equiv) identityˡ ⟩
+      ⟨ π₁ , π₂ ⟩
+    ≈⟨ η ⟩
+      id
+    ∎
+    where
+    open SetoidReasoning hom-setoid
+    open IsEquivalence equiv
+
+{-
+  -- The implicit x is actually used implicitly by the rest of the expression, so don't take it out,
+  -- or Agda will complain about something referring to something to which it has no access.
+  -- The connection between the mentioned x and the rest of the type is given by the caller way up
+  -- there, so if that were not using these the triangle and pentagon laws would be yellow.
+  .triangle : ∀ {x} → first π₁ ≡ second π₂ ∘ assocˡ
+  triangle = 
+    begin
+      first π₁
+    ≈⟨ ⟨⟩-cong₂ (IsEquivalence.refl equiv) identityˡ ⟩
+      ⟨ π₁ ∘ π₁ , π₂ ⟩
+    ≈⟨ sym (⟨⟩-cong₂ (IsEquivalence.refl equiv) commute₂) ⟩
+      ⟨ π₁ ∘ π₁ , π₂ ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
+    ≈⟨ sym second∘⟨⟩ ⟩
+      second π₂ ∘ assocˡ
+    ∎
+    where
+    open SetoidReasoning hom-setoid
+    open IsEquivalence equiv    
+
+  .pentagon : ∀ {x} → assocˡ ∘ assocˡ ≡ second assocˡ ∘ (assocˡ ∘ first assocˡ)
+  pentagon =
+    begin
+      assocˡ ∘ assocˡ
+    ≈⟨ ⟨⟩∘ ⟩
+      ⟨ (π₁ ∘ π₁) ∘ assocˡ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ assocˡ ⟩
+    ≈⟨ ⟨⟩-cong₂ assoc ⟨⟩∘ ⟩
+      ⟨ π₁ ∘ (π₁ ∘ assocˡ) , ⟨ (π₂ ∘ π₁) ∘ assocˡ , π₂ ∘ assocˡ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ʳ commute₁) (⟨⟩-cong₂ assoc commute₂) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₂ ∘ (π₁ ∘ assocˡ) , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (IsEquivalence.refl equiv) (⟨⟩-cong₂ (∘-resp-≡ʳ commute₁) (IsEquivalence.refl equiv)) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩
+    ≈⟨ {!!} ⟩
+      {!!}
+    ≈⟨ {!!} ⟩
+      second assocˡ ∘ (assocˡ ∘ first assocˡ)
+    ∎
+    where
+    open SetoidReasoning hom-setoid
+    open IsEquivalence equiv
+-}
+  .pentagon : ∀ {x} → assocˡ ∘ assocˡ ≡ second assocˡ ∘ (assocˡ ∘ first assocˡ)
+  pentagon {x} = ?

@@ -11,13 +11,13 @@ open Category.Category C
 record Coproduct (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     A+B : Obj
-    i₁ : Hom A A+B
-    i₂ : Hom B A+B
-    [_,_] : ∀ {C} → Hom A C → Hom B C → Hom A+B C
+    i₁ : A ⇒ A+B
+    i₂ : B ⇒ A+B
+    [_,_] : ∀ {C} → (A ⇒ C) → (B ⇒ C) → (A+B ⇒ C)
 
-    .commute₁ : ∀ {C} (f : Hom A C) (g : Hom B C) → [ f , g ] ∘ i₁ ≡ f
-    .commute₂ : ∀ {C} (f : Hom A C) (g : Hom B C) → [ f , g ] ∘ i₂ ≡ g
-    .universal : ∀ {C} (f : Hom A C) (g : Hom B C) (h : Hom A+B C)
+    .commute₁ : ∀ {C} (f : A ⇒ C) (g : B ⇒ C) → [ f , g ] ∘ i₁ ≡ f
+    .commute₂ : ∀ {C} (f : A ⇒ C) (g : B ⇒ C) → [ f , g ] ∘ i₂ ≡ g
+    .universal : ∀ {C} (f : A ⇒ C) (g : B ⇒ C) (h : A+B ⇒ C)
                → [ f , g ] ∘ i₁ ≡ f
                → [ f , g ] ∘ i₂ ≡ g
                → [ f , g ] ≡ h

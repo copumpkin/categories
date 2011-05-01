@@ -9,7 +9,7 @@ open import Category.NaturalTransformation
 Functors : ∀ {o ℓ e} {o′ ℓ′ e′} → Category o ℓ e → Category o′ ℓ′ e′ → Category _ _ _
 Functors C D = record
   { Obj = Functor C D
-  ; Hom = NaturalTransformation
+  ; _⇒_ = NaturalTransformation
   ; _≡_ = _≡_
   ; _∘_ = _∘₁_
   ; id = id

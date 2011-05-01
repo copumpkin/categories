@@ -8,7 +8,7 @@ open import Category.Functor
 Categories : ∀ o ℓ e → Category (suc (o ⊔ ℓ ⊔ e)) (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 Categories o ℓ e = record 
   { Obj = Category o ℓ e
-  ; Hom = Functor
+  ; _⇒_ = Functor
   ; _≡_ = _≡_
   ; _∘_ = _∘_
   ; id = id

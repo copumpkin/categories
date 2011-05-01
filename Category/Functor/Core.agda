@@ -8,17 +8,15 @@ module Category.Functor.Core where
 record Functor {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
   private module C = Category.Category C
   private module D = Category.Category D
-  open C renaming (_∘_ to _∘C_; _≡_ to _≡C_)
-  open D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
 
   field
     F₀ : C.Obj → D.Obj
-    F₁ : ∀ {A B} → C.Hom A B → D.Hom (F₀ A) (F₀ B)
+    F₁ : ∀ {A B} → C [ A , B ] → D [ F₀ A , F₀ B ]
 
-    .identity : ∀ {A} → F₁ (C.id {A}) ≡D D.id
-    .homomorphism : ∀ {A B C} {f : C.Hom A B} {g : C.Hom B C}
-                  → F₁ (g ∘C f) ≡D F₁ g ∘D F₁ f
-    .F-resp-≡ : ∀ {A B} {F G : C.Hom A B} → F ≡C G → F₁ F ≡D F₁ G
+    .identity : ∀ {A} → D [ F₁ (C.id {A}) ≡ D.id ]
+    .homomorphism : ∀ {X Y Z} {f : C [ X , Y ]} {g : C [ Y , Z ]}
+                  → D [ F₁ (C [ g ∘ f ]) ≡ D [ F₁ g ∘ F₁ f ] ]
+    .F-resp-≡ : ∀ {A B} {F G : C [ A , B ]} → C [ F ≡ G ] → D [ F₁ F ≡ F₁ G ]
 
 
 Endofunctor : ∀ {o ℓ e} → Category o ℓ e → Set _
@@ -32,10 +30,11 @@ id : ∀ {o ℓ e} {C : Category o ℓ e} → Endofunctor C
 id {C = C} = record 
   { F₀ = λ x → x
   ; F₁ = λ x → x
-  ; identity = IsEquivalence.refl (Category.equiv C)
-  ; homomorphism = IsEquivalence.refl (Category.equiv C)
+  ; identity = refl
+  ; homomorphism = refl
   ; F-resp-≡ = λ x → x
   }
+  where open Category.Equiv C
 
 infixr 9 _∘_
 
@@ -52,15 +51,12 @@ _∘_ {C = C} {D = D} {E = E} F G = record
   module C = Category.Category C
   module D = Category.Category D
   module E = Category.Category E
-  open C renaming (_∘_ to _∘C_; _≡_ to _≡C_)
-  open D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
-  open E renaming (_∘_ to _∘E_; _≡_ to _≡E_)
   module F = Functor F
   module G = Functor G
   open F
   open G renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
 
-  .identity′ : ∀ {A} → F₁ (G₁ (C.id {A})) ≡E E.id
+  .identity′ : ∀ {A} → E [ F₁ (G₁ (C.id {A})) ≡ E.id ]
   identity′ = begin
                 F₁ (G₁ C.id)
               ≈⟨ F-resp-≡ G.identity ⟩
@@ -71,18 +67,18 @@ _∘_ {C = C} {D = D} {E = E} F G = record
     where
     open SetoidReasoning E.hom-setoid
 
-  .homomorphism′ : ∀ {X Y Z} {f : C.Hom X Y} {g : C.Hom Y Z}
-                 → F₁ (G₁ (g ∘C f)) ≡E F₁ (G₁ g) ∘E F₁ (G₁ f)
+  .homomorphism′ : ∀ {X Y Z} {f : C [ X , Y ]} {g : C [ Y , Z ]}
+                 → E [ F₁ (G₁ (C [ g ∘ f ])) ≡ E [ F₁ (G₁ g) ∘ F₁ (G₁ f) ] ]
   homomorphism′ {f = f} {g = g} = begin
-                                    F₁ (G₁ (g ∘C f))
+                                    F₁ (G₁ (C [ g ∘ f ]))
                                   ≈⟨ F-resp-≡ G.homomorphism ⟩
-                                    F₁ ((G₁ g) ∘D (G₁ f))
+                                    F₁ (D [ G₁ g ∘ G₁ f ])
                                   ≈⟨ F.homomorphism ⟩
-                                    (F₁ (G₁ g) ∘E F₁ (G₁ f))
+                                    (E [ F₁ (G₁ g) ∘ F₁ (G₁ f) ])
                                   ∎
     where
     open SetoidReasoning E.hom-setoid
 
-  .∘-resp-≡′ : ∀ {A B} {F G : C.Hom A B} 
-            → F ≡C G → F₁ (G₁ F) ≡E F₁ (G₁ G)
+  .∘-resp-≡′ : ∀ {A B} {F G : C [ A , B ]} 
+            → C [ F ≡ G ] → E [ F₁ (G₁ F) ≡ F₁ (G₁ G) ]
   ∘-resp-≡′ = λ x → F-resp-≡ (G-resp-≡ x)

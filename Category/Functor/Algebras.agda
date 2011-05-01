@@ -3,13 +3,23 @@ module Category.Functor.Algebras where
 
 open import Support hiding (⊥)
 open import Category
-open import Category.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡)
+open import Category.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡; refl)
 open import Category.Functor.Algebra
+
+record F-Algebra-Morphism {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (X Y : F-Algebra F) : Set (ℓ ⊔ e) where
+  constructor _,_
+  open Category.Category C
+  module X = F-Algebra X
+  module Y = F-Algebra Y
+  open Functor F
+  field
+    f : X.A ⇒ Y.A
+    .commutes : f ∘ X.α ≡ Y.α ∘ F₁ f
 
 F-Algebras : ∀ {o ℓ e} {C : Category o ℓ e} → Endofunctor C → Category (ℓ ⊔ o) (e ⊔ ℓ) e
 F-Algebras {C = C} F = record 
   { Obj = Obj′
-  ; Hom = Hom′
+  ; _⇒_ = Hom′
   ; _≡_ = _≡′_
   ; _∘_ = _∘′_
   ; id = id′
@@ -17,54 +27,53 @@ F-Algebras {C = C} F = record
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
   ; equiv = record
-    { refl = IsEquivalence.refl equiv
-    ; sym = IsEquivalence.sym equiv
-    ; trans = IsEquivalence.trans equiv
+    { refl = refl
+    ; sym = sym
+    ; trans = trans
     }
   ; ∘-resp-≡ = ∘-resp-≡
   }
   where
   open Category.Category C
+  open Equiv
   open Functor F
 
   Obj′ = F-Algebra F
 
   Hom′ : (A B : Obj′) → Set _
-  Hom′ (A , α) (B , β) = Σ′ (Hom A B) (λ m → m ∘ α ≡ β ∘ F₁ m)
+  Hom′ = F-Algebra-Morphism
 
   _≡′_ : ∀ {A B} (f g : Hom′ A B) → Set _
-  f ≡′ g = proj₁′ f ≡ proj₁′ g
+  (f , _) ≡′ (g , _) = f ≡ g
 
-  -- FIXME: this proj₁′ stuff is fugly, but Agda won't let me pattern match on the constructor :/
   _∘′_ : ∀ {A B C} → Hom′ B C → Hom′ A B → Hom′ A C
-  _∘′_ {A} {B} {C} f g = proj₁′ f ∘ proj₁′ g , pf
+  _∘′_ {A} {B} {C} (f , pf₁) (g , pf₂) = _,_ {X = A} {C} (f ∘ g) pf -- TODO: find out why the hell I need to provide these implicits
     where
     module A = F-Algebra A
     module B = F-Algebra B
     module C = F-Algebra C
 
-    .pf : (proj₁′ f ∘ proj₁′ g) ∘ A.α ≡ C.α ∘ (F₁ (proj₁′ f ∘ proj₁′ g))
+    .pf : (f ∘ g) ∘ A.α ≡ C.α ∘ (F₁ (f ∘ g))
     pf = begin
-           (proj₁′ f ∘ proj₁′ g) ∘ A.α
+           (f ∘ g) ∘ A.α
          ≈⟨ assoc ⟩
-           proj₁′ f ∘ (proj₁′ g ∘ A.α)
-         ≈⟨ ∘-resp-≡ʳ (proj₂′ g) ⟩
-           proj₁′ f ∘ (B.α ∘ F₁ (proj₁′ g))
+           f ∘ (g ∘ A.α)
+         ≈⟨ ∘-resp-≡ʳ pf₂ ⟩
+           f ∘ (B.α ∘ F₁ g)
          ≈⟨ sym assoc ⟩
-           (proj₁′ f ∘ B.α) ∘ F₁ (proj₁′ g)
-         ≈⟨ ∘-resp-≡ˡ (proj₂′ f) ⟩
-           (C.α ∘ F₁ (proj₁′ f)) ∘ F₁ (proj₁′ g)
+           (f ∘ B.α) ∘ F₁ g
+         ≈⟨ ∘-resp-≡ˡ pf₁ ⟩
+           (C.α ∘ F₁ f) ∘ F₁ g
          ≈⟨ assoc ⟩
-           C.α ∘ (F₁ (proj₁′ f) ∘ F₁ (proj₁′ g))
+           C.α ∘ (F₁ f ∘ F₁ g)
          ≈⟨ sym (∘-resp-≡ʳ homomorphism) ⟩
-           C.α ∘ (F₁ (proj₁′ f ∘ proj₁′ g))
+           C.α ∘ (F₁ (f ∘ g))
          ∎
       where
-      open IsEquivalence equiv
       open SetoidReasoning hom-setoid
 
   id′ : ∀ {A} → Hom′ A A
-  id′ {A} = id , pf
+  id′ {A} = _,_ {X = A} {A} id pf
     where
     module A = F-Algebra A
 
@@ -79,15 +88,14 @@ F-Algebras {C = C} F = record
            A.α ∘ F₁ id
          ∎
       where
-      open IsEquivalence equiv
       open SetoidReasoning hom-setoid
-
 
 
 open import Category.Object.Initial
 
 module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial (F-Algebras F)) where
-  module C = Category.Category C
+  open Category.Category C
+  open Equiv
   module FA = Category.Category (F-Algebras F) renaming (_∘_ to _∘FA_; _≡_ to _≡FA_)
   open Functor F
   import Category.Morphisms as Morphisms
@@ -102,10 +110,10 @@ module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial 
     ; iso = iso′
     }
     where
-    f′ : C.Hom A (F₀ A)
-    f′ = proj₁′ (! {lift ⊥}) 
+    f′ : A ⇒ F₀ A
+    f′ = F-Algebra-Morphism.f (! {lift ⊥}) 
 
-    g′ : C.Hom (F₀ A) A
+    g′ : F₀ A ⇒ A
     g′ = α
 
     .iso′ : Iso f′ g′
@@ -113,7 +121,7 @@ module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial 
       { isoˡ = isoˡ′
       ; isoʳ = begin
                  f′ ∘ g′
-               ≈⟨ proj₂′ (! {lift ⊥}) ⟩
+               ≈⟨ F-Algebra-Morphism.commutes (! {lift ⊥}) ⟩
                  F₁ g′ ∘ F₁ f′
                ≈⟨ sym homomorphism ⟩
                  F₁ (g′ ∘ f′)
@@ -124,11 +132,9 @@ module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial 
                ∎
       }
       where
-      open C
-      open FA hiding (id)
-      open IsEquivalence C.equiv
-      open SetoidReasoning C.hom-setoid
+      open FA hiding (id; hom-setoid)
+      open SetoidReasoning hom-setoid
 
-      isoˡ′ = ⊥-id ((g′ , IsEquivalence.refl C.equiv) ∘FA !)
+      isoˡ′ = ⊥-id ((_,_ {C = C} {F} g′ refl) ∘FA !)
 
 open Lambek public

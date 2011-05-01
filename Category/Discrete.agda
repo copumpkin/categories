@@ -7,7 +7,7 @@ open import Category
 Discrete : ∀ {o} (A : Set o) → Category o o zero
 Discrete A = record 
   { Obj = A
-  ; Hom = _≣_
+  ; _⇒_ = _≣_
   ; _≡_ = λ _ _ → ⊤
   ; _∘_ = ≣-trans
   ; id = ≣-refl

@@ -6,11 +6,28 @@ open import Category
 module Category.Arrow {o ℓ e} (C : Category o ℓ e) where
 
 open Category.Category C
+open Category.Equiv C
+
+record ArrowObj : Set (o ⊔ ℓ) where
+  constructor arrobj
+  field
+    {A} : Obj
+    {B} : Obj
+    arr : A ⇒ B
+
+record Arrow⇒ (X Y : ArrowObj) : Set (ℓ ⊔ e) where
+  constructor arrarr
+  module X = ArrowObj X
+  module Y = ArrowObj Y
+  field
+    {f} : X.A ⇒ Y.A
+    {g} : X.B ⇒ Y.B
+    .square : CommutativeSquare X.arr f g Y.arr
 
 arrow : Category _ _ _
 arrow = record 
   { Obj = Obj′ 
-  ; Hom = Hom′
+  ; _⇒_ = _⇒′_
   ; _≡_ = _≡′_
   ; _∘_ = _∘′_
   ; id = id′
@@ -18,26 +35,26 @@ arrow = record
   ; identityˡ = identityˡ , identityˡ
   ; identityʳ = identityʳ , identityʳ
   ; equiv = record 
-    { refl = IsEquivalence.refl equiv , IsEquivalence.refl equiv
-    ; sym = λ f → IsEquivalence.sym equiv (fst f) , IsEquivalence.sym equiv (snd f)
-    ; trans = λ f g → IsEquivalence.trans equiv (fst f) (fst g) , IsEquivalence.trans equiv (snd f) (snd g)
+    { refl = refl , refl
+    ; sym = λ f → sym (fst f) , sym (snd f)
+    ; trans = λ f g → trans (fst f) (fst g) , trans (snd f) (snd g)
     }
   ; ∘-resp-≡ = λ f≡h g≡i → ∘-resp-≡ (fst f≡h) (fst g≡i) , ∘-resp-≡ (snd f≡h) (snd g≡i)
   }
   where
-  Obj′ = ∃₂ Hom
+  Obj′ = ArrowObj
 
-  Hom′ : Rel Obj′ _
-  Hom′ (a , b , f) (c , d , g) = ∃₂′ (λ h i → CommutativeSquare f h i g)
+  _⇒′_ : Rel Obj′ _
+  _⇒′_ = Arrow⇒
 
   infixr 9 _∘′_
   infix  4 _≡′_
 
-  _≡′_ : {A B : Obj′} → (f g : Hom′ A B) → Set _
-  (f , h , pf₁) ≡′ (i , g , pf₂) = f ≡ i × h ≡ g
+  _≡′_ : ∀ {A B} → (f g : A ⇒′ B) → Set _
+  (arrarr {f} {h} _) ≡′ (arrarr {i} {g} _) = f ≡ i × h ≡ g
 
-  _∘′_ : {A B C : Obj′} → Hom′ B C → Hom′ A B → Hom′ A C
-  _∘′_ {a , a′ , x} {b , b′ , y} {c , c′ , z} (f , h , pf₁) (i , g , pf₂) = f ∘ i , h ∘ g , pf
+  _∘′_ : ∀ {A B C} → (B ⇒′ C) → (A ⇒′ B) → (A ⇒′ C)
+  _∘′_ {arrobj x} {arrobj y} {arrobj z} (arrarr {f} {h} pf₁) (arrarr {i} {g} pf₂) = arrarr pf
     where
     .pf : (h ∘ g) ∘ x ≡ z ∘ (f ∘ i)
     pf = begin
@@ -54,23 +71,10 @@ arrow = record
            z ∘ (f ∘ i)
          ∎
       where 
-      open IsEquivalence equiv
       open SetoidReasoning hom-setoid
 
-  id′ : ∀ {A} → Hom′ A A
-  id′ {_ , _ , f} = id , id , pf
-    where
-    .pf : id ∘ f ≡ f ∘ id
-    pf = begin
-           id ∘ f
-         ≈⟨ identityˡ ⟩
-           f
-         ≈⟨ sym identityʳ ⟩
-           f ∘ id
-         ∎
-      where 
-      open IsEquivalence equiv
-      open SetoidReasoning hom-setoid
+  id′ : ∀ {A} → A ⇒′ A
+  id′ = arrarr (sym id-comm)
 
-  .assoc′ : ∀ {A B C D} {f : Hom′ A B} {g : Hom′ B C} {h : Hom′ C D} → (h ∘′ g) ∘′ f ≡′ h ∘′ (g ∘′ f)
+  .assoc′ : ∀ {A B C D} {f : A ⇒′ B} {g : B ⇒′ C} {h : C ⇒′ D} → (h ∘′ g) ∘′ f ≡′ h ∘′ (g ∘′ f)
   assoc′ = assoc , assoc

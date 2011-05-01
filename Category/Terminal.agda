@@ -16,7 +16,7 @@ One : Terminal
 One = record 
   { ⊤ = record 
     { Obj = ⊤
-    ; Hom = λ _ _ → ⊤
+    ; _⇒_ = λ _ _ → ⊤
     ; _≡_ = λ _ _ → ⊤
     ; _∘_ = λ _ _ → tt
     ; id = tt

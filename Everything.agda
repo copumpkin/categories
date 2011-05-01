@@ -114,6 +114,9 @@ import Category.Monad.Free
 -- The Kleisli category for any monad
 import Category.Monad.Kleisli
 
+{-
+-- These are commented out because they make this file impossible to typecheck without half a terabyte of RAM
+
 -- Monoidal categories, with an associative bi(endo)functor and an identity object
 import Category.Monoidal
 
@@ -130,6 +133,7 @@ import Category.Monoidal.Closed
 -- Both of the above. Separated into its own module because we can do many
 -- interesting things with them.
 import Category.Monoidal.CartesianClosed
+-}
 
 -- Simple definitions about morphisms, such as mono, epi, and iso
 import Category.Morphisms
@@ -180,6 +184,9 @@ import Category.Preorder
 
 -- A presheaf (functor from C^op to V)
 import Category.Presheaf
+
+-- The category of presheaves (a specific functor category)
+import Category.Presheaves
 
 -- The product of two categories
 import Category.Product

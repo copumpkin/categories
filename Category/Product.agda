@@ -7,9 +7,9 @@ open import Category
 Product : ∀ {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) → Category (o ⊔ o′) (ℓ ⊔ ℓ′) (e ⊔ e′)
 Product C D = record 
   { Obj = C.Obj × D.Obj
-  ; Hom = λ x y → C.Hom (fst x) (fst y) × D.Hom (snd x) (snd y)
-  ; _≡_ = λ f g → C._≡_ (fst f) (fst g) × D._≡_ (snd f) (snd g)
-  ; _∘_ = λ f g → C._∘_ (fst f) (fst g) , D._∘_ (snd f) (snd g)
+  ; _⇒_ = λ x y → C [ fst x , fst y ] × D [ snd x , snd y ]
+  ; _≡_ = λ f g → C [ fst f ≡ fst g ] × D [ snd f ≡ snd g ]
+  ; _∘_ = λ f g → C [ fst f ∘ fst g ] , D [ snd f ∘ snd g ]
   ; id = C.id , D.id
   ; assoc = C.assoc , D.assoc
   ; identityˡ = C.identityˡ , D.identityˡ

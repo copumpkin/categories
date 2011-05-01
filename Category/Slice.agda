@@ -6,38 +6,53 @@ open import Category
 module Category.Slice {o ℓ e} (C : Category o ℓ e) where
 
 open Category.Category C
+open Category.Equiv C
+
+record SliceObj (X : Obj) : Set (o ⊔ ℓ) where
+  constructor sliceobj
+  field
+    {Y} : Obj
+    arr : Y ⇒ X
+
+record Slice⇒ {A : Obj} (X Y : SliceObj A) : Set (ℓ ⊔ e) where
+  constructor slicearr
+  module X = SliceObj X
+  module Y = SliceObj Y
+  field
+    {h} : X.Y ⇒ Y.Y
+    .triangle : Y.arr ∘ h ≡ X.arr
 
 slice : Obj → Category _ _ _
 slice x = record 
   { Obj = Obj′
-  ; Hom = Hom′
+  ; _⇒_ = _⇒′_
   ; _≡_ = _≡′_
   ; _∘_ = _∘′_
-  ; id = id′
+  ; id = slicearr identityʳ
   ; assoc = λ {_} {_} {_} {_} {f} {g} {h} → assoc′ {f = f} {g} {h}
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
   ; equiv = record 
-    { refl = IsEquivalence.refl equiv
-    ; sym = IsEquivalence.sym equiv
-    ; trans = IsEquivalence.trans equiv
+    { refl = refl
+    ; sym = sym
+    ; trans = trans
     }
   ; ∘-resp-≡ = λ {_} {_} {_} {f} {h} {g} {i} → ∘-resp-≡′ {f = f} {h} {g} {i}
   }
   where
-  Obj′ = ∃ (λ y → Hom y x)
+  Obj′ = SliceObj x
 
-  Hom′ : Rel Obj′ _
-  Hom′ (b , f) (c , g) = ∃′ (λ h → g ∘ h ≡ f)
+  _⇒′_ : Rel Obj′ _
+  _⇒′_ = Slice⇒
 
   infixr 9 _∘′_
   infix  4 _≡′_
 
-  _≡′_ : ∀ {A B} → Rel (Hom′ A B) _
-  (f , pf₁) ≡′ (g , pf₂) = f ≡ g
+  _≡′_ : ∀ {A B} → Rel (A ⇒′ B) _
+  slicearr {f} _ ≡′ slicearr {g} _ = f ≡ g
 
-  _∘′_ : ∀ {a b c} → Hom′ b c → Hom′ a b → Hom′ a c
-  _∘′_ {a , a⇒x} {b , b⇒x} {c , c⇒x} (b⇒c , pf₁) (a⇒b , pf₂) = b⇒c ∘ a⇒b , pf
+  _∘′_ : ∀ {A B C} → (B ⇒′ C) → (A ⇒′ B) → (A ⇒′ C)
+  _∘′_ {sliceobj a⇒x} {sliceobj b⇒x} {sliceobj c⇒x} (slicearr {b⇒c} pf₁) (slicearr {a⇒b} pf₂) = slicearr pf
     where
     .pf : c⇒x ∘ (b⇒c ∘ a⇒b) ≡ a⇒x
     pf = begin
@@ -50,17 +65,14 @@ slice x = record
            a⇒x
          ∎
       where 
-      open IsEquivalence equiv
       open SetoidReasoning hom-setoid
 
-  id′ : {A : Obj′} -> Hom′ A A
-  id′ = id , identityʳ
 
-  .assoc′ : {A B C D : Obj′} {f : Hom′ A B} {g : Hom′ B C} {h : Hom′ C D}
+  .assoc′ : ∀ {A B C D} {f : A ⇒′ B} {g : B ⇒′ C} {h : C ⇒′ D}
          → (h ∘′ g) ∘′ f ≡′ h ∘′ (g ∘′ f)
   assoc′ = assoc
 
-  .∘-resp-≡′ :  {A B C : Obj′} {f h : Hom′ B C} {g i : Hom′ A B}
+  .∘-resp-≡′ : ∀ {A B C} {f h : B ⇒′ C} {g i : A ⇒′ B}
            → f ≡′ h 
            → g ≡′ i 
            → f ∘′ g ≡′ h ∘′ i

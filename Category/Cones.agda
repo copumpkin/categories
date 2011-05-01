@@ -13,13 +13,13 @@ record ConeMorphism {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Cat
   module J = Category.Category J
   open C
   field
-    f : C.Hom c₁.N c₂.N
+    f : C [ c₁.N , c₂.N ]
     .commute : ∀ {X} → c₁.ψ X ≡ c₂.ψ X ∘ f
 
 Cones : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) → Category (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) (ℓ ⊔ e ⊔ o′ ⊔ ℓ′) e
 Cones {C = C} F = record 
   { Obj = Obj′
-  ; Hom = Hom′
+  ; _⇒_ = Hom′
   ; _≡_ = _≡′_
   ; _∘_ = _∘′_
   ; id = record { f = id; commute = IsEquivalence.sym equiv identityʳ }

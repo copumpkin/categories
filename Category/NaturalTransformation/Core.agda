@@ -18,8 +18,8 @@ record NaturalTransformation {o ℓ e o′ ℓ′ e′}
   open G renaming (F₀ to G₀; F₁ to G₁)
 
   field
-    η : ∀ X → D.Hom (F₀ X) (G₀ X)
-    .commute : ∀ {X Y} (f : C.Hom X Y) → D.CommutativeSquare (F₁ f) (η X) (η Y) (G₁ f)
+    η : ∀ X → D [ F₀ X , G₀ X ]
+    .commute : ∀ {X Y} (f : C [ X , Y ]) → D.CommutativeSquare (F₁ f) (η X) (η Y) (G₁ f)
 
 id : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F : Functor C D} → NaturalTransformation F F
 id {C = C} {D} {F} = record 
@@ -30,17 +30,15 @@ id {C = C} {D} {F} = record
   module C = Category.Category C
   module D = Category.Category D
   module F = Functor F
-  open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)
-  open D renaming (_≡_ to _≡D_; _∘_ to _∘D_)
   open F
 
-  .commute′ : ∀ {X Y} (f : C.Hom X Y) → (D.id ∘D (F₁ f)) ≡D (F₁ f ∘D D.id)
+  .commute′ : ∀ {X Y} (f : C [ X , Y ]) → D [ D [ D.id ∘ F₁ f ] ≡ D [ F₁ f ∘ D.id ] ]
   commute′ f = begin
-                 D.id ∘D (F₁ f)
+                 D [ D.id ∘ F₁ f ]
                ≈⟨ D.identityˡ ⟩
                  F₁ f
                ≈⟨ sym D.identityʳ ⟩
-                 F₁ f ∘D D.id
+                 D [ F₁ f ∘ D.id ]
                ∎
     where 
     open IsEquivalence D.equiv
@@ -52,7 +50,7 @@ _∘₁_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁}
         {F G H : Functor C D}
     → NaturalTransformation G H → NaturalTransformation F G → NaturalTransformation F H
 _∘₁_ {C = C} {D} {F} {G} {H} X Y = record 
-  { η = λ q → X.η q ∘D Y.η q
+  { η = λ q → D [ X.η q ∘ Y.η q ]
   ; commute = commute′
   }
   where
@@ -63,29 +61,27 @@ _∘₁_ {C = C} {D} {F} {G} {H} X Y = record
   module H = Functor H
   module X = NaturalTransformation X
   module Y = NaturalTransformation Y
-  open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)
-  open D renaming (_≡_ to _≡D_; _∘_ to _∘D_)
   open F
   open G renaming (F₀ to G₀; F₁ to G₁)
   open H renaming (F₀ to H₀; F₁ to H₁)
 
-  .commute′ : ∀ {A B} (f : C.Hom A B) → ((X.η B ∘D Y.η B) ∘D F₁ f) ≡D (H₁ f ∘D (X.η A ∘D Y.η A))
+  .commute′ : ∀ {A B} (f : C [ A , B ]) → D [ D [ D [ X.η B ∘ Y.η B ] ∘ F₁ f ] ≡ D [ H₁ f ∘ D [ X.η A ∘  Y.η A ] ] ]
   commute′ {A} {B} f = 
            begin
-             (X.η B ∘D Y.η B) ∘D F₁ f
+             D [ D [ X.η B ∘ Y.η B ] ∘ F₁ f ]
            ≈⟨ D.assoc ⟩
-             X.η B ∘D (Y.η B ∘D F₁ f)
+             D [ X.η B ∘ D [ Y.η B ∘ F₁ f ] ]
            ≈⟨ D.∘-resp-≡ʳ (Y.commute f) ⟩
-             X.η B ∘D (G₁ f ∘D Y.η A)
+             D [ X.η B ∘ D [ G₁ f ∘ Y.η A ] ]
            ≈⟨ sym D.assoc ⟩
-             (X.η B ∘D G₁ f) ∘D Y.η A
+             D [ D [ X.η B ∘ G₁ f ] ∘ Y.η A ]
            ≈⟨ D.∘-resp-≡ˡ (X.commute f) ⟩
-             (H₁ f ∘D X.η A) ∘D Y.η A
+             D [ D [ H₁ f ∘ X.η A ] ∘ Y.η A ]
            ≈⟨ D.assoc ⟩
-             H₁ f ∘D (X.η A ∘D Y.η A)
+             D [ H₁ f ∘ D [ X.η A ∘ Y.η A ] ]
            ∎
     where
-    open IsEquivalence D.equiv
+    open Category.Equiv D
     open SetoidReasoning D.hom-setoid
 
 -- "Horizontal composition"
@@ -94,7 +90,7 @@ _∘₀_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
         {F G : Functor C D} {H I : Functor D E}
     → NaturalTransformation H I → NaturalTransformation F G → NaturalTransformation (H ∘F F) (I ∘F G)
 _∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record 
-  { η = λ q → I₁ (X.η q) ∘E Y.η (F₀ q)
+  { η = λ q → E [ I₁ (X.η q) ∘ Y.η (F₀ q) ]
   ; commute = commute′
   }
   where
@@ -107,51 +103,48 @@ _∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record
   module I = Functor I
   module X = NaturalTransformation X
   module Y = NaturalTransformation Y
-  open C renaming (_≡_ to _≡C_; _∘_ to _∘C_)
-  open D renaming (_≡_ to _≡D_; _∘_ to _∘D_)
-  open E renaming (_≡_ to _≡E_; _∘_ to _∘E_)
   open F
   open G renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
   open H renaming (F₀ to H₀; F₁ to H₁; F-resp-≡ to H-resp-≡)
   open I renaming (F₀ to I₀; F₁ to I₁; F-resp-≡ to I-resp-≡)
 
-  .commute′ : ∀ {A B} (f : C.Hom A B) → ((I₁ (X.η B) ∘E Y.η (F₀ B)) ∘E H₁ (F₁ f)) ≡E (I₁ (G₁ f) ∘E (I₁ (X.η A) ∘E Y.η (F₀ A)))
+  .commute′ : ∀ {A B} (f : C [ A , B ]) → E [ E [ E [ I₁ (X.η B) ∘ Y.η (F₀ B) ] ∘ H₁ (F₁ f) ] ≡ E [ I₁ (G₁ f) ∘ E [ I₁ (X.η A) ∘ Y.η (F₀ A) ] ] ]
   commute′ {A} {B} f = 
            begin
-             (I₁ (X.η B) ∘E Y.η (F₀ B)) ∘E H₁ (F₁ f)
+             E [ E [ I₁ (X.η B) ∘ Y.η (F₀ B) ] ∘ H₁ (F₁ f) ]
            ≈⟨ E.assoc ⟩
-             I₁ (X.η B) ∘E (Y.η (F₀ B) ∘E H₁ (F₁ f))
+             E [ I₁ (X.η B) ∘ E [ Y.η (F₀ B) ∘ H₁ (F₁ f) ] ]
            ≈⟨ E.∘-resp-≡ʳ (Y.commute (F₁ f)) ⟩
-             I₁ (X.η B) ∘E (I₁ (F₁ f) ∘E Y.η (F₀ A))
+             E [ I₁ (X.η B) ∘ E [ I₁ (F₁ f) ∘ Y.η (F₀ A) ] ]
            ≈⟨ sym E.assoc ⟩
-             (I₁ (X.η B) ∘E I₁ (F₁ f)) ∘E Y.η (F₀ A)
-           ≈⟨ E.∘-resp-≡ˡ (IsEquivalence.sym E.equiv I.homomorphism) ⟩
-             I₁ (X.η B ∘D F₁ f) ∘E Y.η (F₀ A)
+             E [ E [ I₁ (X.η B) ∘ I₁ (F₁ f) ] ∘ Y.η (F₀ A) ]
+           ≈⟨ E.∘-resp-≡ˡ (sym I.homomorphism) ⟩
+             E [ I₁ (D [ X.η B ∘ F₁ f ]) ∘ Y.η (F₀ A) ]
            ≈⟨ E.∘-resp-≡ˡ (I-resp-≡ (X.commute f)) ⟩
-             I₁ (G₁ f ∘D X.η A) ∘E Y.η (F₀ A)
+             E [ I₁ (D [ G₁ f ∘ X.η A ]) ∘ Y.η (F₀ A) ]
            ≈⟨ E.∘-resp-≡ˡ I.homomorphism ⟩
-             (I₁ (G₁ f) ∘E I₁ (X.η A)) ∘E Y.η (F₀ A)
+             E [ E [ I₁ (G₁ f) ∘ I₁ (X.η A) ] ∘ Y.η (F₀ A) ]
            ≈⟨ E.assoc ⟩
-             I₁ (G₁ f) ∘E (I₁ (X.η A) ∘E Y.η (F₀ A))
+             E [ I₁ (G₁ f) ∘ E [ I₁ (X.η A) ∘ Y.η (F₀ A) ] ]
            ∎
     where
-    open IsEquivalence E.equiv
+    open Category.Equiv E
     open SetoidReasoning E.hom-setoid
 
 
 infix 4 _≡_
 
 _≡_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → Rel (NaturalTransformation F G) (o ⊔ e′)
-_≡_ {D = D} X Y = ∀ {x} → NaturalTransformation.η X x ≡D NaturalTransformation.η Y x
-  where open Category.Category D renaming (_≡_ to _≡D_)
+_≡_ {D = D} X Y = ∀ {x} → D [ NaturalTransformation.η X x ≡ NaturalTransformation.η Y x ]
 
 .equiv : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → IsEquivalence (_≡_ {F = F} {G})
 equiv {C = C} {D} {F} {G} = record 
-  { refl = IsEquivalence.refl D.equiv
-  ; sym = λ x → IsEquivalence.sym D.equiv x -- N.B: η expansion is needed here!
-  ; trans = λ x y → IsEquivalence.trans D.equiv x y
+  { refl = refl
+  ; sym = λ f → sym f
+  ; trans = λ f g → trans f g
   }
   where
+  open Category.Equiv D
   module C = Category.Category C
   module D = Category.Category D
 

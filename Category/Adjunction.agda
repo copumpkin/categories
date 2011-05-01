@@ -3,14 +3,14 @@ module Category.Adjunction where
 
 open import Support
 open import Category
-open import Category.Functor renaming (id to idF; _≡_ to _≡F_)
+open import Category.Functor renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Category.NaturalTransformation
 open import Category.Monad
 
 record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} (F : Functor D C) (G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o₁ ⊔ ℓ₁ ⊔ e₁) where
   field
-    unit   : NaturalTransformation idF (G ∘ F)
-    counit : NaturalTransformation (F ∘ G) idF
+    unit   : NaturalTransformation idF (G ∘F F)
+    counit : NaturalTransformation (F ∘F G) idF
 
     .zig : id ≡ (counit ∘ʳ F) ∘₁ (F ∘ˡ unit)
     .zag : id ≡ (G ∘ˡ counit) ∘₁ (unit ∘ʳ G)
@@ -28,10 +28,9 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
   private module unit   = NaturalTransformation unit
   private module counit = NaturalTransformation counit
 
-
   monad : Monad D
   monad = record 
-    { F = G ∘ F
+    { F = G ∘F F
     ; η = unit
     ; μ = G ∘ˡ (counit ∘ʳ F)
     ; assoc = assoc′
@@ -74,3 +73,15 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
     .identityʳ′ : ∀ {x} → G₁ (counit.η (F₀ x)) ∘D unit.η (G₀ (F₀ x)) ≡D D.id
     identityʳ′ = IsEquivalence.sym D.equiv zag
 
+
+{-
+_∘_ : ∀ {o ℓ e} {o₁ ℓ₁ e₁} {o₂ ℓ₂ e₂} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂} 
+      {F : Functor D C} {G : Functor C D} {H : Functor E D} {I : Functor D E} → 
+      Adjunction F G → Adjunction H I → Adjunction (F ∘F H) (I ∘F G)
+_∘_ X Y = record 
+  { unit = {!!} ∘₀ {!!}
+  ; counit = {!!}
+  ; zig = {!!}
+  ; zag = {!!}
+  }
+-}

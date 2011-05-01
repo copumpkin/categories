@@ -5,31 +5,30 @@ module Category.Object.Product {o ℓ e} (C : Category o ℓ e) where
 
 open import Support hiding (_×_; ⟨_,_⟩)
 open Category.Category C
+open Equiv
 
 -- Borrowed from Dan Doel's definition of products
 record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     A×B : Obj
-    π₁ : Hom A×B A
-    π₂ : Hom A×B B
-    ⟨_,_⟩ : ∀ {C} → Hom C A → Hom C B → Hom C A×B
+    π₁ : A×B ⇒ A
+    π₂ : A×B ⇒ B
+    ⟨_,_⟩ : ∀ {C} → (C ⇒ A) → (C ⇒ B) → (C ⇒ A×B)
 
-    .commute₁ : ∀ {C} {f : Hom C A} {g : Hom C B} → π₁ ∘ ⟨ f , g ⟩ ≡ f
-    .commute₂ : ∀ {C} {f : Hom C A} {g : Hom C B} → π₂ ∘ ⟨ f , g ⟩ ≡ g
-    .universal : ∀ {C} {f : Hom C A} {g : Hom C B} {i : Hom C A×B}
+    .commute₁ : ∀ {C} {f : C ⇒ A} {g : C ⇒ B} → π₁ ∘ ⟨ f , g ⟩ ≡ f
+    .commute₂ : ∀ {C} {f : C ⇒ A} {g : C ⇒ B} → π₂ ∘ ⟨ f , g ⟩ ≡ g
+    .universal : ∀ {C} {f : C ⇒ A} {g : C ⇒ B} {i : C ⇒ A×B}
                → π₁ ∘ i ≡ f → π₂ ∘ i ≡ g → ⟨ f , g ⟩ ≡ i
 
-  .g-η : ∀ {C} {f : Hom C A×B} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
-  g-η = universal (IsEquivalence.refl equiv) (IsEquivalence.refl equiv)
+  .g-η : ∀ {C} {f : C ⇒ A×B} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
+  g-η = universal refl refl
 
   .η : ⟨ π₁ , π₂ ⟩ ≡ id
   η = universal identityʳ identityʳ
 
-  .⟨⟩-cong₂ : ∀ {C} → {f f′ : Hom C A} {g g′ : Hom C B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
+  .⟨⟩-cong₂ : ∀ {C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
   ⟨⟩-cong₂ f≡f′ g≡g′ = 
-    universal 
-      (IsEquivalence.trans equiv commute₁ (IsEquivalence.sym equiv f≡f′))
-      (IsEquivalence.trans equiv commute₂ (IsEquivalence.sym equiv g≡g′))
+    universal (trans commute₁ (sym f≡f′)) (trans commute₂ (sym g≡g′))
     
 
 open import Category.Morphisms
@@ -49,10 +48,10 @@ Commutative p₁ p₂ = record
   open Product p₁
   open Product p₂ renaming (A×B to B×A; π₁ to π′₁; π₂ to π′₂; ⟨_,_⟩ to ⟨_,_⟩′)
 
-  idˡ : Hom A×B A×B
+  idˡ : A×B ⇒ A×B
   idˡ = ⟨ π′₂ , π′₁ ⟩ ∘ ⟨ π₂ , π₁ ⟩′
 
-  idʳ : Hom B×A B×A
+  idʳ : B×A ⇒ B×A
   idʳ = ⟨ π₂ , π₁ ⟩′ ∘ ⟨ π′₂ , π′₁ ⟩
 
   .idˡ-commutes₁ : π₁ ∘ idˡ ≡ π₁
@@ -67,7 +66,6 @@ Commutative p₁ p₂ = record
                   ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .idˡ-commutes₂ : π₂ ∘ idˡ ≡ π₂
   idˡ-commutes₂ = begin
@@ -81,7 +79,6 @@ Commutative p₁ p₂ = record
                   ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .isoˡ : idˡ ≡ id
   isoˡ = begin
@@ -93,7 +90,6 @@ Commutative p₁ p₂ = record
          ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
 
   .idʳ-commutes₁ : π′₁ ∘ idʳ ≡ π′₁
@@ -108,7 +104,6 @@ Commutative p₁ p₂ = record
                   ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .idʳ-commutes₂ : π′₂ ∘ idʳ ≡ π′₂
   idʳ-commutes₂ = begin
@@ -122,7 +117,6 @@ Commutative p₁ p₂ = record
                   ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .isoʳ : idʳ ≡ id
   isoʳ = begin
@@ -134,7 +128,6 @@ Commutative p₁ p₂ = record
          ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
 
 Associative : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → _≅_ C (Product.A×B p₃) (Product.A×B p₄)
@@ -156,16 +149,16 @@ Associative p₁ p₂ p₃ p₄ = record
   open Product p₃ renaming (A×B to A×[B×C])
   open Product p₄ renaming (A×B to [A×B]×C; π₁ to π′₁; π₂ to π′₂; ⟨_,_⟩ to ⟨_,_⟩′)
   
-  f : Hom A×[B×C] [A×B]×C
+  f : A×[B×C] ⇒ [A×B]×C
   f = ⟨ ⟨ π₁ , p₂.π₁ ∘ π₂ ⟩p₁ , p₂.π₂ ∘ π₂ ⟩′
 
-  g : Hom [A×B]×C A×[B×C]
+  g : [A×B]×C ⇒ A×[B×C]
   g = ⟨ p₁.π₁ ∘ π′₁ , ⟨ p₁.π₂ ∘ π′₁ , π′₂ ⟩p₂ ⟩
   
-  idˡ : Hom A×[B×C] A×[B×C]
+  idˡ : A×[B×C] ⇒ A×[B×C]
   idˡ = g ∘ f
 
-  idʳ : Hom [A×B]×C [A×B]×C
+  idʳ : [A×B]×C ⇒ [A×B]×C
   idʳ = f ∘ g
 
   .cmˡ₁ : π₁ ∘ idˡ ≡ π₁
@@ -184,7 +177,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .cmˡ₂₁ : p₂.π₁ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f) ≡ p₂.π₁ ∘ p₃.π₂
   cmˡ₂₁ = begin
@@ -202,7 +194,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where
       open SetoidReasoning hom-setoid
-      open IsEquivalence equiv  
 
   .cmˡ₂₂ : p₂.π₂ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f) ≡ p₂.π₂ ∘ p₃.π₂
   cmˡ₂₂ = begin
@@ -216,7 +207,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where
       open SetoidReasoning hom-setoid
-      open IsEquivalence equiv  
 
   .cmˡ₂ : π₂ ∘ idˡ ≡ π₂
   cmˡ₂ = begin
@@ -232,7 +222,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv      
 
   .isoˡ : idˡ ≡ id
   isoˡ = begin
@@ -244,7 +233,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .cmʳ₁₁ : p₁.π₁ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g) ≡ p₁.π₁ ∘ p₄.π₁
   cmʳ₁₁ = begin
@@ -258,7 +246,6 @@ Associative p₁ p₂ p₃ p₄ = record
           ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .cmʳ₁₂ : p₁.π₂ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g) ≡ p₁.π₂ ∘ p₄.π₁
   cmʳ₁₂ = begin
@@ -276,7 +263,6 @@ Associative p₁ p₂ p₃ p₄ = record
           ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
 
   .cmʳ₁ : π′₁ ∘ idʳ ≡ π′₁
@@ -293,7 +279,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
 
   .cmʳ₂ : π′₂ ∘ idʳ ≡ π′₂
   cmʳ₂ = begin
@@ -311,7 +296,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where 
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
     
   .isoʳ : idʳ ≡ id
   isoʳ = begin
@@ -323,4 +307,3 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv

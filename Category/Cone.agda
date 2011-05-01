@@ -11,5 +11,5 @@ record Cone {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o�
   open Functor F
   field
     N : Obj
-    ψ : ∀ X → Hom N (F₀ X)
-    .commute : ∀ {X Y} (f : J.Hom X Y) → F₁ f ∘ ψ X ≡ ψ Y
+    ψ : ∀ X → (N ⇒ (F₀ X))
+    .commute : ∀ {X Y} (f : J [ X , Y ]) → F₁ f ∘ ψ X ≡ ψ Y

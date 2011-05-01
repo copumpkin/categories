@@ -7,7 +7,7 @@ open import Category
 Sets : ∀ o → Category _ _ _
 Sets o = record
   { Obj = Set o
-  ; Hom = λ d c → d → c
+  ; _⇒_ = λ d c → d → c
   ; _≡_ = λ f g → ∀ {x} → f x ≣ g x
 
   ; _∘_ = λ f g x → f (g x)
@@ -35,7 +35,7 @@ Sets o = record
 Setoids : ∀ c ℓ → Category (suc (ℓ ⊔ c)) (ℓ ⊔ c) (ℓ ⊔ c)
 Setoids c ℓ = record
   { Obj = Setoid c ℓ
-  ; Hom = Hom′
+  ; _⇒_ = Hom′
   ; _≡_ = λ {X} {Y} → _≡′_ {X} {Y}
   ; _∘_ = λ {A} {B} {C} → _∘′_ {A} {B} {C}
   ; id = record { F = λ x → x ; cong = λ pf → pf }

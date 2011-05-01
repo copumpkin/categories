@@ -179,6 +179,9 @@ import Category.Object.Terminal
 -- Zero object (initial and terminal)
 import Category.Object.Zero
 
+-- A category containing n copies of objects/morphisms/equalities of another category
+import Category.Power
+
 -- A preorder gives rise to a category
 import Category.Preorder
 

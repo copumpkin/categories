@@ -8,23 +8,24 @@ open import Category
 
 Power : ∀ {o ℓ e} (C : Category o ℓ e) (n : ℕ) → Category o ℓ e
 Power C n = record 
-  { Obj = Fin n → C.Obj
-  ; Hom = λ x y → (m : Fin n) → C.Hom (x m) (y m)
-  ; _≡_ = λ f g → (m : Fin n) → C._≡_ (f m) (g m)
-  ; _∘_ = λ f g m → C._∘_ (f m) (g m)
-  ; id = λ {x} m → C.id
-  ; assoc = λ {A} {B} {C'} {D} {f} {g} {h} m → C.assoc
-  ; identityˡ = λ {A} {B} {f} m → C.identityˡ
-  ; identityʳ = λ {A} {B} {f} m → C.identityʳ
+  { Obj = Fin n → Obj
+  ; _⇒_ = λ x y → (m : Fin n) → (x m ⇒ y m)
+  ; _≡_ = λ f g → (m : Fin n) → (f m ≡ g m)
+  ; _∘_ = λ f g m → f m ∘ g m
+  ; id = λ {x} m → id
+  ; assoc = λ {A} {B} {C'} {D} {f} {g} {h} m → assoc
+  ; identityˡ = λ {A} {B} {f} m → identityˡ
+  ; identityʳ = λ {A} {B} {f} m → identityʳ
   ; equiv = record 
-    { refl = λ {x} m → IsEquivalence.refl C.equiv
-    ; sym = λ f m → IsEquivalence.sym C.equiv (f m)
-    ; trans = λ f g m → IsEquivalence.trans C.equiv (f m) (g m)
+    { refl = λ {x} m → refl
+    ; sym = λ f m → sym (f m)
+    ; trans = λ f g m → trans (f m) (g m)
     }          
-  ; ∘-resp-≡ = λ f≡g h≡i m → C.∘-resp-≡ (f≡g m) (h≡i m)
+  ; ∘-resp-≡ = λ f≡g h≡i m → ∘-resp-≡ (f≡g m) (h≡i m)
   }
   where
-  module C = Category.Category C
+  open Category.Category C
+  open Equiv
 
 open import Category.Functor using (Functor)
 

@@ -93,6 +93,9 @@ import Category.FunctorCategory
 -- The Grothendieck construction on categories (taking a Sets-valued functor and building a category containing all values)
 import Category.Grothendieck
 
+-- The globe category, used for defining globular sets (with a presheaf on it)
+import Category.Globe
+
 -- Limits
 import Category.Limit
 

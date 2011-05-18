@@ -26,6 +26,10 @@ suc n + m = suc (n + m)
 <-trans Z<Sn (raise< n<m) = Z<Sn
 <-trans (raise< n<m) (raise< n<m') = raise< (<-trans n<m n<m')
 
+<-trans-assoc : ∀ {a b c d} → {a<b : a < b} {b<c : b < c} {c<d : c < d} → <-trans a<b (<-trans b<c c<d) ≣ <-trans (<-trans a<b b<c) c<d
+<-trans-assoc {a<b = Z<Sn} {raise< b<c} {raise< c<d} = ≣-refl
+<-trans-assoc {a<b = raise< a<b} {raise< b<c} {raise< c<d} = ≣-cong raise< <-trans-assoc
+
 <-unsucʳ : ∀ {m n} → m < suc n → Either (m ≣ n) (m < n)
 <-unsucʳ (Z<Sn {zero}) = inl ≣-refl
 <-unsucʳ (Z<Sn {suc y}) = inr Z<Sn

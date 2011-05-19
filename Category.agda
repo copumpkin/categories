@@ -50,9 +50,9 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
   op : Category o ℓ e
   op = record 
     { Obj = Obj
-    ; _⇒_ = λ x y → y ⇒ x
+    ; _⇒_ = flip _⇒_
     ; _≡_ = _≡_
-    ; _∘_ = λ x y → y ∘ x
+    ; _∘_ = flip _∘_
     ; id = id
     ; assoc = sym assoc
     ; identityˡ = identityʳ
@@ -62,7 +62,7 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
       ; sym = sym
       ; trans = trans
       }
-    ; ∘-resp-≡ = λ f≡h g≡i → ∘-resp-≡ g≡i f≡h
+    ; ∘-resp-≡ = flip ∘-resp-≡
     }
 
   CommutativeSquare : ∀ {A B C D} → (f : A ⇒ B) (g : A ⇒ C) (h : B ⇒ D) (i : C ⇒ D) → Set _

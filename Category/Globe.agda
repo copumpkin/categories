@@ -15,8 +15,8 @@ _⊚_ : ∀ {l m n} → GlobeHom m n → GlobeHom l m → GlobeHom l n
 I ⊚ y = y
 x ⊚ I = x
 σ n<m ⊚ σ m<l = σ (<-trans m<l n<m)
-σ n<m ⊚ τ m<l = σ (<-trans m<l n<m)
-τ n<m ⊚ σ m<l = τ (<-trans m<l n<m)
+σ n<m ⊚ τ m<l = τ (<-trans m<l n<m)
+τ n<m ⊚ σ m<l = σ (<-trans m<l n<m)
 τ n<m ⊚ τ m<l = τ (<-trans m<l n<m)
 
 
@@ -50,18 +50,18 @@ Globe = record
   assoc {f = σ _} {I} {τ _} = ≣-refl
   assoc {f = σ _} {σ _} {I} = ≣-refl
   assoc {f = σ _} {σ _} {σ _} = ≣-cong σ <-trans-assoc
-  assoc {f = σ _} {σ _} {τ _} = ≣-cong τ <-trans-assoc
+  assoc {f = σ _} {σ _} {τ _} = ≣-cong σ <-trans-assoc
   assoc {f = σ _} {τ _} {I} = ≣-refl
   assoc {f = σ _} {τ _} {σ _} = ≣-cong σ <-trans-assoc
-  assoc {f = σ _} {τ _} {τ _} = ≣-cong τ <-trans-assoc
+  assoc {f = σ _} {τ _} {τ _} = ≣-cong σ <-trans-assoc
   assoc {f = τ n<m} {I} {I} = ≣-refl
   assoc {f = τ n<m} {I} {σ _} = ≣-refl
   assoc {f = τ n<m} {I} {τ _} = ≣-refl
   assoc {f = τ n<m} {σ _} {I} = ≣-refl
-  assoc {f = τ n<m} {σ _} {σ _} = ≣-cong σ <-trans-assoc
+  assoc {f = τ n<m} {σ _} {σ _} = ≣-cong τ <-trans-assoc
   assoc {f = τ n<m} {σ _} {τ _} = ≣-cong τ <-trans-assoc
   assoc {f = τ n<m} {τ _} {I} = ≣-refl
-  assoc {f = τ n<m} {τ _} {σ _} = ≣-cong σ <-trans-assoc
+  assoc {f = τ n<m} {τ _} {σ _} = ≣-cong τ <-trans-assoc
   assoc {f = τ n<m} {τ _} {τ _} = ≣-cong τ <-trans-assoc
 
   -- this is necessary because Agda lies...

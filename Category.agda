@@ -32,6 +32,9 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
     .trans : ∀ {A B} → {f g h : A ⇒ B} → f ≡ g → g ≡ h → f ≡ h
     trans = IsEquivalence.trans equiv
 
+    .prop : ∀ {A B} {f g : A ⇒ B} → f ≣ g → f ≡ g
+    prop ≣-refl = refl
+
   private open Equiv
 
   .∘-resp-≡ˡ : ∀ {A B C} {f h : B ⇒ C} {g : A ⇒ B} → f ≡ h → f ∘ g ≡ h ∘ g

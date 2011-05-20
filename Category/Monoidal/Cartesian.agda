@@ -88,7 +88,7 @@ Cartesian C Ps = record
   ; identityˡ = record
     { F⇒G = record
       { η = λ X → π₂
-      ; commute = λ f → Equiv.trans (prop (≣-cong (_∘_ π₂) (⁂-convert id (f zero)))) commute₂
+      ; commute = λ f → Equiv.trans (∘-resp-≡ʳ (Equiv.prop (⁂-convert id (f zero)))) commute₂
       }
     ; F⇐G = record
       { η = λ X → ⟨ ! , id ⟩
@@ -102,7 +102,7 @@ Cartesian C Ps = record
   ; identityʳ = record
     { F⇒G = record
       { η = λ X → π₁
-      ; commute = λ f → Equiv.trans (prop (≣-cong (_∘_ π₁) (⁂-convert (f zero) id))) commute₁
+      ; commute = λ f → Equiv.trans (∘-resp-≡ʳ (Equiv.prop (⁂-convert (f zero) id))) commute₁
       }
     ; F⇐G = record
       { η = λ X → ⟨ id , ! ⟩
@@ -134,9 +134,6 @@ Cartesian C Ps = record
   open Category.Category C
   open AbstractProducts C Ps
 
-  .prop : ∀ {A B : Obj} {f g : A ⇒ B} → f ≣ g → f ≡ g
-  prop ≣-refl = Equiv.refl
-
   ⊗ : Bifunctor C C C
   ⊗ = record
     { F₀ = λ p → fst p × snd p
@@ -150,7 +147,7 @@ Cartesian C Ps = record
     identity =
       begin
         id ⁂ id
-      ≈⟨ prop (⁂-convert id id) ⟩
+      ≣⟨ ⁂-convert id id ⟩
         ⟨ id ∘ π₁ , id ∘ π₂ ⟩
       ≈⟨ universal (id-comm {f = π₁}) (id-comm {f = π₂}) ⟩
         Category.id C
@@ -160,11 +157,11 @@ Cartesian C Ps = record
     F-resp-≡ {F = F} {G} x = 
       begin
         fst F ⁂ snd F
-      ≈⟨ prop (⁂-convert (fst F) (snd F)) ⟩
+      ≣⟨ ⁂-convert (fst F) (snd F) ⟩
         ⟨ fst F ∘ π₁ , snd F ∘ π₂ ⟩
       ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ˡ (fst x)) (∘-resp-≡ˡ (snd x)) ⟩
         ⟨ fst G ∘ π₁ , snd G ∘ π₂ ⟩
-      ≈⟨ prop (≣-sym (⁂-convert (fst G) (snd G))) ⟩
+      ≣⟨ ≣-sym (⁂-convert (fst G) (snd G)) ⟩
         fst G ⁂ snd G
       ∎
       where open SetoidReasoning hom-setoid
@@ -278,15 +275,15 @@ Cartesian C Ps = record
   triangle = 
     begin
       first π₁
-    ≈⟨ prop (⁂-convert π₁ id) ⟩
+    ≣⟨ ⁂-convert π₁ id ⟩
       ⟨ π₁ ∘ π₁ , id ∘ π₂ ⟩
-    ≈⟨ ⟨⟩-cong₂ (IsEquivalence.refl equiv) identityˡ ⟩
+    ≈⟨ ⟨⟩-cong₂ (Equiv.refl) identityˡ ⟩
       ⟨ π₁ ∘ π₁ , π₂ ⟩
-    ≈⟨ sym (⟨⟩-cong₂ (IsEquivalence.refl equiv) commute₂) ⟩
+    ≈⟨ sym (⟨⟩-cong₂ (Equiv.refl) commute₂) ⟩
       ⟨ π₁ ∘ π₁ , π₂ ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
     ≈⟨ sym second∘⟨⟩ ⟩
       (id ⁂ π₂) ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
-    ≈⟨ sym (prop (≣-cong (_∘_ (second π₂)) assocˡ-convert)) ⟩
+    ≈⟨ sym (∘-resp-≡ʳ (Equiv.prop assocˡ-convert)) ⟩
       second π₂ ∘ assocˡ
     ∎
     where

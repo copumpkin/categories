@@ -38,7 +38,7 @@ reduceN′ H {I} {F} {F′} φ {J} {G} {G′} γ = record
   module H = Category.Functor.Functor H
   module L = Category.Functor.Functor (reduce′ H F G)
   module R = Category.Functor.Functor (reduce′ H F′ G′)
-  my-η : ∀ Xs → C.Hom (L.F₀ Xs) (R.F₀ Xs)
+  my-η : ∀ Xs → C [ L.F₀ Xs , R.F₀ Xs ]
   my-η Xs = H.F₁ ((φ.η (Xs ∙ inl)) , (γ.η (Xs ∙ inr)))
   .my-commute : ∀ Xs Ys fs → C.CommutativeSquare (L.F₁ fs) (my-η Xs) (my-η Ys) (R.F₁ fs)
   my-commute Xs Ys fs = begin

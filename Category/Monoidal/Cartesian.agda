@@ -47,6 +47,9 @@ module AbstractProducts {o ℓ e : Level} (C : Category o ℓ e) (Ps : Products 
       assocʳ : ∀ {A B C} → ((A × (B × C)) ⇒ ((A × B) × C))
       assocʳ = P₀.assocʳ
 
+      assocʳ-convert : ∀ {A B C} → assocʳ {A} {B} {C} ≣ ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ , π₂ ∘ π₂ ⟩
+      assocʳ-convert = ≣-refl
+
       .assoc-iso : ∀ {A B C′} → Iso C (assocʳ {A} {B} {C′}) assocˡ
       assoc-iso = _≅_.iso C P₀.×-assoc
 
@@ -55,6 +58,12 @@ module AbstractProducts {o ℓ e : Level} (C : Category o ℓ e) (Ps : Products 
 
       .⁂∘⟨⟩ : ∀ {A B C D E} → {f : B ⇒ C} {f′ : A ⇒ B} {g : D ⇒ E} {g′ : A ⇒ D} → (f ⁂ g) ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f ∘ f′ , g ∘ g′ ⟩
       ⁂∘⟨⟩ = P₀.⁂∘⟨⟩
+
+      .π₁∘⁂ : ∀ {A B C D} → {f : A ⇒ B} → {g : C ⇒ D} → π₁ ∘ (f ⁂ g) ≡ f ∘ π₁
+      π₁∘⁂ = P₀.π₁∘⁂
+
+      .π₂∘⁂ : ∀ {A B C D} → {f : A ⇒ B} → {g : C ⇒ D} → π₂ ∘ (f ⁂ g) ≡ g ∘ π₂
+      π₂∘⁂ = P₀.π₂∘⁂
 
       .⟨⟩-cong₂ : ∀ {A B C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
       ⟨⟩-cong₂ = P₀.⟨⟩-cong₂
@@ -120,7 +129,7 @@ Cartesian C Ps = record
       }
     ; F⇐G = record
       { η = λ X → assocʳ
-      ; commute = {!!}
+      ; commute = λ f → assocʳ-commute
       }
     ; iso = λ X → record
       { isoˡ = Iso.isoʳ C assoc-iso
@@ -243,25 +252,60 @@ Cartesian C Ps = record
     begin
       assocˡ ∘ ((f ⁂ g) ⁂ h)
     ≈⟨ ∘-resp-≡ˡ (prop assocˡ-convert) ⟩
-       ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ∘ ((f ⁂ g) ⁂ h)
-    ≈⟨ {!!} ⟩
-      {!!}
-    ≈⟨ {!!} ⟩
-      {!!}
-    ≈⟨ {!!} ⟩
-      {!!}
-    ≈⟨ {!!} ⟩
-      {!!}
-    ≈⟨ {!!} ⟩
-      {!!}
-    ≈⟨ {!!} ⟩
+      ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ∘ ((f ⁂ g) ⁂ h)
+    ≈⟨ ⟨⟩∘ ⟩
+      ⟨ (π₁ ∘ π₁) ∘ ((f ⁂ g) ⁂ h) , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ ((f ⁂ g) ⁂ h) ⟩
+    ≈⟨ ⟨⟩-cong₂ assoc refl ⟩
+      ⟨ π₁ ∘ (π₁ ∘ ((f ⁂ g) ⁂ h)) , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ ((f ⁂ g) ⁂ h) ⟩
+    ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ʳ π₁∘⁂) ⟨⟩∘ ⟩
+      ⟨ π₁ ∘ ((f ⁂ g) ∘ π₁) , ⟨ (π₂ ∘ π₁) ∘ ((f ⁂ g) ⁂ h) , π₂ ∘ ((f ⁂ g) ⁂ h) ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (sym assoc) (⟨⟩-cong₂ assoc π₂∘⁂) ⟩
+      ⟨ (π₁ ∘ (f ⁂ g)) ∘ π₁ , ⟨ π₂ ∘ (π₁ ∘ ((f ⁂ g) ⁂ h)) , h ∘ π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ˡ π₁∘⁂) (⟨⟩-cong₂ (∘-resp-≡ʳ π₁∘⁂) refl) ⟩
+      ⟨ (f ∘ π₁) ∘ π₁ , ⟨ π₂ ∘ ((f ⁂ g) ∘ π₁) , h ∘ π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ (sym assoc) refl) ⟩
+      ⟨ (f ∘ π₁) ∘ π₁ , ⟨ (π₂ ∘ (f ⁂ g)) ∘ π₁ , h ∘ π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ (∘-resp-≡ˡ π₂∘⁂) refl) ⟩
+      ⟨ (f ∘ π₁) ∘ π₁ , ⟨ (g ∘ π₂) ∘ π₁ , h ∘ π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ assoc refl) ⟩
       ⟨ (f ∘ π₁) ∘ π₁ , ⟨ g ∘ (π₂ ∘ π₁) , h ∘ π₂ ⟩ ⟩
-    ≈⟨ ⟨⟩-cong₂ (Category.assoc C) (sym ⁂∘⟨⟩) ⟩
+    ≈⟨ ⟨⟩-cong₂ assoc (sym ⁂∘⟨⟩) ⟩
       ⟨ f ∘ (π₁ ∘ π₁) , (g ⁂ h) ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
     ≈⟨ sym ⁂∘⟨⟩ ⟩
       (f ⁂ (g ⁂ h)) ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
     ≈⟨ sym (∘-resp-≡ʳ (prop assocˡ-convert)) ⟩
       (f ⁂ (g ⁂ h)) ∘ assocˡ
+    ∎
+    where
+    open SetoidReasoning hom-setoid
+    open Equiv
+
+  .assocʳ-commute : ∀ {X₀ Y₀ X₁ Y₁ X₂ Y₂} {f : X₀ ⇒ Y₀} {g : X₁ ⇒ Y₁} {h : X₂ ⇒ Y₂} → assocʳ ∘ (f ⁂ (g ⁂ h)) ≡ ((f ⁂ g) ⁂ h) ∘ assocʳ
+  assocʳ-commute {f = f} {g} {h} =
+    begin
+      assocʳ ∘ (f ⁂ (g ⁂ h))
+    ≈⟨ ∘-resp-≡ˡ (prop assocʳ-convert) ⟩
+      ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ , π₂ ∘ π₂ ⟩ ∘ (f ⁂ (g ⁂ h))
+    ≈⟨ ⟨⟩∘ ⟩
+      ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ ∘ (f ⁂ (g ⁂ h)) , (π₂ ∘ π₂) ∘ (f ⁂ (g ⁂ h)) ⟩
+    ≈⟨ ⟨⟩-cong₂ ⟨⟩∘ assoc ⟩
+      ⟨ ⟨ π₁ ∘ (f ⁂ (g ⁂ h)) , (π₁ ∘ π₂) ∘ (f ⁂ (g ⁂ h)) ⟩ , π₂ ∘ (π₂ ∘ (f ⁂ (g ⁂ h))) ⟩
+    ≈⟨ ⟨⟩-cong₂ (⟨⟩-cong₂ π₁∘⁂ assoc) (∘-resp-≡ʳ π₂∘⁂) ⟩
+      ⟨ ⟨ f ∘ π₁ , π₁ ∘ (π₂ ∘ (f ⁂ (g ⁂ h))) ⟩ , π₂ ∘ ((g ⁂ h) ∘ π₂) ⟩
+    ≈⟨ ⟨⟩-cong₂ (⟨⟩-cong₂ refl (∘-resp-≡ʳ π₂∘⁂)) (sym assoc) ⟩
+      ⟨ ⟨ f ∘ π₁ , π₁ ∘ ((g ⁂ h) ∘ π₂) ⟩ , (π₂ ∘ (g ⁂ h)) ∘ π₂ ⟩
+    ≈⟨ ⟨⟩-cong₂ (⟨⟩-cong₂ refl (sym assoc)) (∘-resp-≡ˡ π₂∘⁂) ⟩
+      ⟨ ⟨ f ∘ π₁ , (π₁ ∘ (g ⁂ h)) ∘ π₂ ⟩ , (h ∘ π₂) ∘ π₂ ⟩
+    ≈⟨ ⟨⟩-cong₂ (⟨⟩-cong₂ refl (∘-resp-≡ˡ π₁∘⁂)) refl ⟩
+      ⟨ ⟨ f ∘ π₁ , (g ∘ π₁) ∘ π₂ ⟩ , (h ∘ π₂) ∘ π₂ ⟩
+    ≈⟨ ⟨⟩-cong₂ (⟨⟩-cong₂ refl assoc) assoc ⟩
+      ⟨ ⟨ f ∘ π₁ , g ∘ (π₁ ∘ π₂) ⟩ , h ∘ (π₂ ∘ π₂) ⟩
+    ≈⟨ ⟨⟩-cong₂ (sym ⁂∘⟨⟩) refl ⟩
+      ⟨ (f ⁂ g) ∘ ⟨ π₁ , π₁ ∘ π₂ ⟩ , h ∘ (π₂ ∘ π₂) ⟩
+    ≈⟨ sym ⁂∘⟨⟩ ⟩
+      ((f ⁂ g) ⁂ h) ∘ ⟨ ⟨ π₁ , (π₁ ∘ π₂) ⟩ , (π₂ ∘ π₂) ⟩
+    ≈⟨ sym (∘-resp-≡ʳ (prop assocʳ-convert)) ⟩
+      ((f ⁂ g) ⁂ h) ∘ assocʳ
     ∎
     where
     open SetoidReasoning hom-setoid

@@ -19,7 +19,6 @@ x ⊚ I = x
 τ n<m ⊚ σ m<l = τ (<-trans m<l n<m)
 τ n<m ⊚ τ m<l = τ (<-trans m<l n<m)
 
-
 Globe : Category zero zero zero
 Globe = record 
   { Obj = ℕ
@@ -72,6 +71,70 @@ Globe = record
 
   ∘-resp-≡ : ∀ {A B C} {f h : GlobeHom B C} {g i : GlobeHom A B} → f ≣ h → g ≣ i → f ⊚ g ≣ h ⊚ i
   ∘-resp-≡ ≣-refl ≣-refl = ≣-refl
+
+infixl 30 _σ′
+infixl 30 _τ′
+
+data GlobeHom′ : (m n : ℕ) → Set where
+  I : ∀ {place : ℕ} → GlobeHom′ place place
+  _σ′ : ∀ {n m : ℕ} → GlobeHom′ (suc n) m → GlobeHom′ n m
+  _τ′ : ∀ {n m : ℕ} → GlobeHom′ (suc n) m → GlobeHom′ n m
+
+data GlobeEq′ : {m n : ℕ} → GlobeHom′ m n → GlobeHom′ m n → Set where
+  both-I : ∀ {m} → GlobeEq′ {m} {m} I I
+  both-σ : ∀ {m n x y} → GlobeEq′ {m} {n} (x σ′) (y σ′)
+  both-τ : ∀ {m n x y} → GlobeEq′ {m} {n} (x τ′) (y τ′)
+
+GlobeEquiv : ∀ {m n} → IsEquivalence (GlobeEq′ {m} {n})
+GlobeEquiv = record { refl = refl; sym = sym; trans = trans }
+  where
+  refl : ∀ {m n} {x : GlobeHom′ m n} → GlobeEq′ x x
+  refl {x = I} = both-I
+  refl {x = y σ′} = both-σ
+  refl {x = y τ′} = both-τ
+  sym : ∀ {m n} {x y : GlobeHom′ m n} → GlobeEq′ x y → GlobeEq′ y x
+  sym both-I = both-I
+  sym both-σ = both-σ
+  sym both-τ = both-τ
+  trans : ∀ {m n} {x y z : GlobeHom′ m n} → GlobeEq′ x y → GlobeEq′ y z → GlobeEq′ x z
+  trans both-I y∼z = y∼z
+  trans both-σ both-σ = both-σ
+  trans both-τ both-τ = both-τ
+
+_⊚′_ : ∀ {l m n} → GlobeHom′ m n → GlobeHom′ l m → GlobeHom′ l n
+x ⊚′ I = x
+x ⊚′ y σ′ = (x ⊚′ y) σ′
+x ⊚′ y τ′ = (x ⊚′ y) τ′
+
+Globe′ : Category zero zero zero
+Globe′ = record 
+  { Obj = ℕ
+  ; _⇒_ = GlobeHom′
+  ; _≡_ = GlobeEq′
+  ; id = I
+  ; _∘_ = _⊚′_
+  ; assoc = λ {_ _ _ _ f g h} → assoc {f = f} {g} {h}
+  ; identityˡ = identityˡ
+  ; identityʳ = identityʳ
+  ; equiv = GlobeEquiv
+  ; ∘-resp-≡ = ∘-resp-≡
+  }
+  where
+  assoc : ∀ {A B C D} {f : GlobeHom′ A B} {g : GlobeHom′ B C} {h : GlobeHom′ C D} → GlobeEq′ ((h ⊚′ g) ⊚′ f) (h ⊚′ (g ⊚′ f))
+  assoc {f = I} = refl
+    where open IsEquivalence GlobeEquiv
+  assoc {f = y σ′} = both-σ
+  assoc {f = y τ′} = both-τ
+  identityˡ : ∀ {A B} {f : GlobeHom′ A B} → GlobeEq′ (I ⊚′ f) f
+  identityˡ {f = I} = both-I
+  identityˡ {f = y σ′} = both-σ
+  identityˡ {f = y τ′} = both-τ
+  identityʳ : ∀ {A B} {f : GlobeHom′ A B} → GlobeEq′ (f ⊚′ I) f
+  identityʳ = IsEquivalence.refl GlobeEquiv
+  ∘-resp-≡ : ∀ {A B C} {f h : GlobeHom′ B C} {g i : GlobeHom′ A B} → GlobeEq′ f h → GlobeEq′ g i → GlobeEq′ (f ⊚′ g) (h ⊚′ i)
+  ∘-resp-≡ f∼h both-I = f∼h
+  ∘-resp-≡ f∼h both-σ = both-σ
+  ∘-resp-≡ f∼h both-τ = both-τ
 
 -- Fix this
 {-

@@ -334,27 +334,61 @@ Cartesian C Ps = record
     open SetoidReasoning hom-setoid
     open IsEquivalence equiv    
 
-{-
   .pentagon : ∀ {x} → assocˡ ∘ assocˡ ≡ second assocˡ ∘ (assocˡ ∘ first assocˡ)
-  pentagon =
+  pentagon {x} = 
     begin
       assocˡ ∘ assocˡ
+    ≈⟨ ∘-resp-≡ (prop assocˡ-convert) (prop assocˡ-convert) ⟩
+      ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
     ≈⟨ ⟨⟩∘ ⟩
-      ⟨ (π₁ ∘ π₁) ∘ assocˡ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ assocˡ ⟩
+      ⟨ (π₁ ∘ π₁) ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩
     ≈⟨ ⟨⟩-cong₂ assoc ⟨⟩∘ ⟩
-      ⟨ π₁ ∘ (π₁ ∘ assocˡ) , ⟨ (π₂ ∘ π₁) ∘ assocˡ , π₂ ∘ assocˡ ⟩ ⟩
+      ⟨ π₁ ∘ (π₁ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩) , ⟨ (π₂ ∘ π₁) ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ , π₂ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩ ⟩
     ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ʳ commute₁) (⟨⟩-cong₂ assoc commute₂) ⟩
-      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₂ ∘ (π₁ ∘ assocˡ) , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩
-    ≈⟨ ⟨⟩-cong₂ (IsEquivalence.refl equiv) (⟨⟩-cong₂ (∘-resp-≡ʳ commute₁) (IsEquivalence.refl equiv)) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₂ ∘ (π₁ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩) , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ (∘-resp-≡ʳ commute₁) refl) ⟩
       ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩
-    ≈⟨ {!!} ⟩
-      {!!}
-    ≈⟨ {!!} ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ (sym assoc) (⟨⟩-cong₂ (sym commute₂) refl)) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ (π₂ ∘ π₁) ∘ π₁ , ⟨ π₂ ∘ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ (sym commute₁) (⟨⟩-cong₂ (∘-resp-≡ʳ (sym commute₁)) refl)) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₁ ∘ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , ⟨ π₂ ∘ (π₁ ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩) , π₂ ⟩ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ (∘-resp-≡ʳ (sym commute₁)) (⟨⟩-cong₂ (sym assoc) (sym commute₂))) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₁ ∘ (π₁ ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩) , ⟨ (π₂ ∘ π₁) ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩ , π₂ ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩ ⟩ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (⟨⟩-cong₂ (sym assoc) (sym ⟨⟩∘)) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ (π₁ ∘ π₁) ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (sym ⟨⟩∘) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (∘-resp-≡ˡ (sym (prop assocˡ-convert))) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , assocˡ ∘ ⟨ ⟨ (π₂ ∘ π₁) ∘ π₁ , π₂ ∘ π₁ ⟩ , π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ refl (∘-resp-≡ʳ (⟨⟩-cong₂ (sym ⟨⟩∘) refl)) ⟩
+      ⟨ π₁ ∘ π₁ ∘ π₁ , assocˡ ∘ ⟨ ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ π₁ , π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (sym assoc) (∘-resp-≡ʳ (⟨⟩-cong₂ (∘-resp-≡ˡ (sym commute₂)) refl)) ⟩
+      ⟨ (π₁ ∘ π₁) ∘ π₁ , assocˡ ∘ ⟨ (π₂ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩) ∘ π₁ , π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ˡ (sym commute₁)) (∘-resp-≡ʳ (⟨⟩-cong₂ (∘-resp-≡ˡ (∘-resp-≡ʳ (sym (prop assocˡ-convert)))) refl)) ⟩
+      ⟨ (π₁ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩) ∘ π₁ , assocˡ ∘ ⟨ (π₂ ∘ assocˡ) ∘ π₁ , π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ˡ (∘-resp-≡ʳ (sym (prop assocˡ-convert)))) (∘-resp-≡ʳ (⟨⟩-cong₂ assoc refl)) ⟩
+      ⟨ (π₁ ∘ assocˡ) ∘ π₁ , assocˡ ∘ ⟨ π₂ ∘ (assocˡ ∘ π₁) , π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ assoc (∘-resp-≡ʳ (⟨⟩-cong₂ (∘-resp-≡ʳ (sym π₁∘⁂)) (sym identityˡ))) ⟩
+      ⟨ π₁ ∘ (assocˡ ∘ π₁) , assocˡ ∘ ⟨ π₂ ∘ (π₁ ∘ first assocˡ) , id ∘ π₂ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ʳ (sym π₁∘⁂)) (∘-resp-≡ʳ (⟨⟩-cong₂ (sym assoc) (sym π₂∘⁂))) ⟩
+      ⟨ π₁ ∘ (π₁ ∘ first assocˡ) , assocˡ ∘ ⟨ (π₂ ∘ π₁) ∘ first assocˡ , π₂ ∘ first assocˡ ⟩ ⟩
+    ≈⟨ ⟨⟩-cong₂ (sym assoc) (∘-resp-≡ʳ (sym ⟨⟩∘)) ⟩
+      ⟨ (π₁ ∘ π₁) ∘ first assocˡ , assocˡ ∘ (⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ first assocˡ) ⟩
+    ≈⟨ ⟨⟩-cong₂ (∘-resp-≡ˡ (sym identityˡ)) (sym assoc) ⟩    
+      ⟨ (id ∘ (π₁ ∘ π₁)) ∘ first assocˡ , (assocˡ ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩) ∘ first assocˡ ⟩
+    ≈⟨ sym ⟨⟩∘ ⟩
+      ⟨ id ∘ (π₁ ∘ π₁) , assocˡ ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ∘ first assocˡ
+    ≈⟨ ∘-resp-≡ˡ (⟨⟩-cong₂ (∘-resp-≡ʳ (sym commute₁)) (∘-resp-≡ʳ (sym commute₂))) ⟩
+      ⟨ id ∘ (π₁ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩) , assocˡ ∘ (π₂ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩) ⟩ ∘ first assocˡ
+    ≈⟨ ∘-resp-≡ˡ (⟨⟩-cong₂ (sym assoc) (sym assoc)) ⟩
+      ⟨ (id ∘ π₁) ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ , (assocˡ ∘ π₂) ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩ ⟩ ∘ first assocˡ
+    ≈⟨ ∘-resp-≡ˡ (sym ⟨⟩∘) ⟩
+      (⟨ id ∘ π₁ , assocˡ ∘ π₂ ⟩ ∘ ⟨ π₁ ∘ π₁ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩) ∘ first assocˡ
+    ≈⟨ ∘-resp-≡ˡ (∘-resp-≡ (sym (prop (⁂-convert id assocˡ))) (sym (prop assocˡ-convert))) ⟩
+      (second assocˡ ∘ assocˡ) ∘ first assocˡ
+    ≈⟨ assoc ⟩ 
       second assocˡ ∘ (assocˡ ∘ first assocˡ)
     ∎
     where
     open SetoidReasoning hom-setoid
-    open IsEquivalence equiv
--}
-  .pentagon : ∀ {x} → assocˡ ∘ assocˡ ≡ second assocˡ ∘ (assocˡ ∘ first assocˡ)
-  pentagon {x} = {!!}
+    open Equiv

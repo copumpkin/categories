@@ -57,6 +57,9 @@ import Category.Discrete
 -- Ends
 import Category.End
 
+-- Enriched categories
+import Category.Enriched
+
 -- Equalizers
 import Category.Equalizer
 
@@ -95,6 +98,9 @@ import Category.Grothendieck
 
 -- The globe category, used for defining globular sets (with a presheaf on it)
 import Category.Globe
+
+-- Globular sets
+import Category.GlobularSet
 
 -- Limits
 import Category.Limit

@@ -43,7 +43,7 @@ reduceN′ H {I} {F} {F′} φ {J} {G} {G′} γ = record
   .my-commute : ∀ Xs Ys fs → C.CommutativeSquare (L.F₁ fs) (my-η Xs) (my-η Ys) (R.F₁ fs)
   my-commute Xs Ys fs = begin
       my-η Ys ∘ L.F₁ fs
-    ≈⟨ IsEquivalence.sym C.equiv H.homomorphism ⟩
+    ≈⟨ sym H.homomorphism ⟩
       H.F₁ ((φ.η (Ys ∙ inl) ∘ F.F₁ (fs ∙ inl)) , (γ.η (Ys ∙ inr) ∘ G.F₁ (fs ∙ inr)))
     ≈⟨ H.F-resp-≡ ((φ.commute (fs ∙ inl)) , (γ.commute (fs ∙ inr))) ⟩
       H.F₁ ((F′.F₁ (fs ∙ inl) ∘ φ.η (Xs ∙ inl)) , (G′.F₁ (fs ∙ inr) ∘ γ.η (Xs ∙ inr)))
@@ -52,6 +52,7 @@ reduceN′ H {I} {F} {F′} φ {J} {G} {G′} γ = record
     ∎
     where
     open C using (_∘_; _≡_)
+    open C.Equiv
     open SetoidReasoning C.hom-setoid
 
 reduceN : ∀ (H : Bifunctor C C C) {n} {F F′ : Powerendo n} (φ : NaturalTransformation F F′) {m} {G G′ : Powerendo m} (γ : NaturalTransformation G G′) → NaturalTransformation (reduce H F G) (reduce H F′ G′)

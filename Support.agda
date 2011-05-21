@@ -192,6 +192,9 @@ record IsEquivalence {a ℓ} {A : Set a}
     sym   : ∀ {x y} → x ≈ y → y ≈ x
     trans : ∀ {x y z} → x ≈ y → y ≈ z → x ≈ z
 
+  -- a helper to promote propositional equality to equivalence
+  .prop : ∀ {x y} → x ≣ y → x ≈ y
+  prop ≣-refl = refl
 
 record IsPreorder {a ℓ₁ ℓ₂} {A : Set a}
                   (_≈_ : Rel A ℓ₁) -- The underlying equality.
@@ -241,6 +244,7 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   infix  4 _IsRelatedTo_
   infix  2 _∎
   infixr 2 _≈⟨_⟩_
+  infixr 2 _≣⟨_⟩_
   infix  1 begin_
 
   -- This seemingly unnecessary type is used to make it possible to
@@ -255,6 +259,9 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   ._≈⟨_⟩_ : ∀ x {y z} → x ≈ y → y IsRelatedTo z → x IsRelatedTo z
   _ ≈⟨ x∼y ⟩ relTo y∼z = relTo (trans x∼y y∼z)
     where open IsEquivalence isEquivalence
+
+  ._≣⟨_⟩_ : ∀ x {y z} → x ≣ y → y IsRelatedTo z → x IsRelatedTo z
+  _ ≣⟨ ≣-refl ⟩ y∼z = y∼z
 
   ._∎ : ∀ x → x IsRelatedTo x
   _∎ _ = relTo refl

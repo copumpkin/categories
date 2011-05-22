@@ -244,7 +244,11 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   infix  4 _IsRelatedTo_
   infix  2 _∎
   infixr 2 _≈⟨_⟩_
-  infixr 2 _≣⟨_⟩_
+  infixr 2 _↓⟨_⟩_
+  infixr 2 _↑⟨_⟩_
+  infixr 2 _↓≣⟨_⟩_
+  infixr 2 _↑≣⟨_⟩_
+  infixr 2 _↕_
   infix  1 begin_
 
   -- This seemingly unnecessary type is used to make it possible to
@@ -256,12 +260,26 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   .begin_ : ∀ {x y} → x IsRelatedTo y → x ≈ y
   begin relTo x∼y = x∼y
 
-  ._≈⟨_⟩_ : ∀ x {y z} → x ≈ y → y IsRelatedTo z → x IsRelatedTo z
-  _ ≈⟨ x∼y ⟩ relTo y∼z = relTo (trans x∼y y∼z)
+  ._↓⟨_⟩_ : ∀ x {y z} → x ≈ y → y IsRelatedTo z → x IsRelatedTo z
+  _ ↓⟨ x∼y ⟩ relTo y∼z = relTo (trans x∼y y∼z)
     where open IsEquivalence isEquivalence
 
-  ._≣⟨_⟩_ : ∀ x {y z} → x ≣ y → y IsRelatedTo z → x IsRelatedTo z
-  _ ≣⟨ ≣-refl ⟩ y∼z = y∼z
+  ._↑⟨_⟩_ : ∀ x {y z} → y ≈ x → y IsRelatedTo z → x IsRelatedTo z
+  _ ↑⟨ y∼x ⟩ relTo y∼z = relTo (trans (sym y∼x) y∼z)
+    where open IsEquivalence isEquivalence
+
+  -- the syntax of the ancients, for compatibility
+  ._≈⟨_⟩_ : ∀ x {y z} → x ≈ y → y IsRelatedTo z → x IsRelatedTo z
+  _≈⟨_⟩_ = _↓⟨_⟩_
+
+  ._↓≣⟨_⟩_ : ∀ x {y z} → x ≣ y → y IsRelatedTo z → x IsRelatedTo z
+  _ ↓≣⟨ ≣-refl ⟩ y∼z = y∼z
+
+  ._↑≣⟨_⟩_ : ∀ x {y z} → y ≣ x → y IsRelatedTo z → x IsRelatedTo z
+  _ ↑≣⟨ ≣-refl ⟩ y∼z = y∼z
+
+  ._↕_ : ∀ x {z} → x IsRelatedTo z → x IsRelatedTo z
+  _ ↕ x∼z = x∼z
 
   ._∎ : ∀ x → x IsRelatedTo x
   _∎ _ = relTo refl
@@ -281,6 +299,9 @@ module ≣-reasoning {ℓ} (S : Set ℓ) where
   infix  4 _IsRelatedTo_
   infix  2 _∎
   infixr 2 _≈⟨_⟩_
+  infixr 2 _↓⟨_⟩_
+  infixr 2 _↑⟨_⟩_
+  infixr 2 _↕_
   infix  1 begin_
 
   -- This seemingly unnecessary type is used to make it possible to
@@ -292,8 +313,18 @@ module ≣-reasoning {ℓ} (S : Set ℓ) where
   begin_ : ∀ {x y} → x IsRelatedTo y → x ≣ y
   begin relTo x∼y = x∼y
 
+  -- the syntax of the ancients, for compatibility
   _≈⟨_⟩_ : ∀ x {y z} → x ≣ y → y IsRelatedTo z → x IsRelatedTo z
   _ ≈⟨ x∼y ⟩ relTo y∼z = relTo (≣-trans y∼z x∼y)
+
+  _↓⟨_⟩_ : ∀ x {y z} → x ≣ y → y IsRelatedTo z → x IsRelatedTo z
+  _ ↓⟨ x∼y ⟩ relTo y∼z = relTo (≣-trans y∼z x∼y)
+
+  _↑⟨_⟩_ : ∀ x {y z} → y ≣ x → y IsRelatedTo z → x IsRelatedTo z
+  _ ↑⟨ y∼x ⟩ relTo y∼z = relTo (≣-trans y∼z (≣-sym y∼x))
+
+  _↕_ : ∀ x {z} → x IsRelatedTo z → x IsRelatedTo z
+  _ ↕ x∼z = x∼z
 
   _∎ : ∀ x → x IsRelatedTo x
   _∎ _ = relTo ≣-refl

@@ -82,3 +82,10 @@ module AbstractBinaryProducts {o ℓ e : Level} (C : Category o ℓ e) (BP : Bin
       .universal : ∀ {A B C} {f : C ⇒ A} {g : C ⇒ B} {i : C ⇒ (A × B)}
                    → π₁ ∘ i ≡ f → π₂ ∘ i ≡ g → ⟨ f , g ⟩ ≡ i
       universal = P.universal
+
+  module HomReasoningP {A B : Obj} where
+    open HomReasoning {A} {B} public
+
+    infix 3 ⟨_⟩,⟨_⟩
+    .⟨_⟩,⟨_⟩ : ∀ {A B C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
+    ⟨_⟩,⟨_⟩ x y = ⟨⟩-cong₂ x y

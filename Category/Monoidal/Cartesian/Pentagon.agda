@@ -1,15 +1,10 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Category.Monoidal.Cartesian.Pentagon where
 
-open import Support hiding (⊤; ⟨_,_⟩) renaming (_×_ to _×′_)
-open import Category
-open import Category.Monoidal
+open import Support using (Level; module SetoidReasoning; module IsEquivalence; _≣_; ≣-refl)
+open import Category using (Category)
 open import Category.Object.BinaryProducts using (BinaryProducts)
 open import Category.Object.BinaryProducts.Abstract
-open import Category.Object.Products
-open import Category.Object.Terminal
-open import Category.Bifunctor using (Bifunctor)
-open import Category.Morphisms
 open import Category.Square
 
 module Law {o ℓ e : Level} (C : Category o ℓ e) (P : BinaryProducts C) where

@@ -54,7 +54,7 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
     open SetoidReasoning (hom-setoid {A} {B}) public
 
     infixr 4 _⟩∘⟨_
-    ._⟩∘⟨_ : ∀ {A B C} {f h : B ⇒ C} {g i : A ⇒ B} → f ≡ h → g ≡ i → f ∘ g ≡ h ∘ i
+    ._⟩∘⟨_ : ∀ {M} {f h : M ⇒ B} {g i : A ⇒ M} → f ≡ h → g ≡ i → f ∘ g ≡ h ∘ i
     _⟩∘⟨_ = ∘-resp-≡
 
   op : Category o ℓ e

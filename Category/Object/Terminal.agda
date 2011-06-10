@@ -13,17 +13,17 @@ record Terminal : Set (o ⊔ ℓ ⊔ e) where
     ! : ∀ {A} → (A ⇒ ⊤)
     !-unique : ∀ {A} → (f : A ⇒ ⊤) → ! ≡ f
 
-  .⊤-id : (f : ⊤ ⇒ ⊤) → f ≡ id
-  ⊤-id f = 
-      begin
-        f
-      ≈⟨ sym (!-unique f) ⟩
-        !
-      ≈⟨ !-unique id ⟩
-        id
-      ∎
-    where
-    open IsEquivalence equiv
-    open SetoidReasoning hom-setoid
+  .!-unique₂ : ∀ {A} → (f g : A ⇒ ⊤) → f ≡ g
+  !-unique₂ f g =
+    begin
+      f
+    ↑⟨ !-unique f ⟩
+      !
+    ↓⟨ !-unique g ⟩
+      g
+    ∎
+    where open HomReasoning
 
+  .⊤-id : (f : ⊤ ⇒ ⊤) → f ≡ id
+  ⊤-id f = !-unique₂ f id
   

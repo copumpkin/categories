@@ -86,6 +86,8 @@ module AbstractBinaryProducts {o ℓ e : Level} (C : Category o ℓ e) (BP : Bin
   module HomReasoningP {A B : Obj} where
     open HomReasoning {A} {B} public
 
+    -- sort of a hack, if you specify the codomain for your top-level
+    --   reasoning you will NOT get what you want from the below
     infix 3 ⟨_⟩,⟨_⟩
-    .⟨_⟩,⟨_⟩ : ∀ {A B C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
+    .⟨_⟩,⟨_⟩ : ∀ {C} → {f f′ : A ⇒ B} {g g′ : A ⇒ C} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
     ⟨_⟩,⟨_⟩ x y = ⟨⟩-cong₂ x y

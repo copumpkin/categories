@@ -81,6 +81,9 @@ import Category.Functor.Coalgebra
 -- The category of F-coalgebras of a functor
 import Category.Functor.Coalgebras
 
+-- The diagonal functor (C -> C x C, or same thing with an arbitrary indexed product)
+import Category.Functor.Diagonal
+
 -- The hom functor, mapping pairs of objects to the morphisms between them
 import Category.Functor.Hom
 
@@ -114,7 +117,7 @@ import Category.Monad.Algebra
 -- The category of all algebras of a monad
 import Category.Monad.Algebras
 
--- The Eilenberg-Moore category for any monad
+-- The Eilenberg-Moore category for any monad (isn't this the same as the module above?)
 import Category.Monad.EilenbergMoore
 
 -- Free monad constructions for any functor

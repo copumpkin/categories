@@ -94,7 +94,7 @@ import Categories.Functor.Hom
 import Categories.Functor.Monoidal
 
 -- Products as functors
---import Categories.Functor.Product
+import Categories.Functor.Product
 
 -- Representable functors
 import Categories.Functor.Representable

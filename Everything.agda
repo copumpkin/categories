@@ -132,8 +132,6 @@ import Categories.Monad.Free
 -- The Kleisli category for any monad
 import Categories.Monad.Kleisli
 
--- These are commented out because they make this file impossible to typecheck without half a terabyte of RAM
-
 -- Monoidal categories, with an associative bi(endo)functor and an identity object
 import Categories.Monoidal
 

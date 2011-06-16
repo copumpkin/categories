@@ -20,6 +20,15 @@ record Functor {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o
                   → D [ F₁ (C [ g ∘ f ]) ≡ D [ F₁ g ∘ F₁ f ] ]
     .F-resp-≡ : ∀ {A B} {F G : C [ A , B ]} → C [ F ≡ G ] → D [ F₁ F ≡ F₁ G ]
 
+  op : Functor C.op D.op
+  op = record 
+    { F₀ = F₀
+    ; F₁ = F₁
+    ; identity = identity
+    ; homomorphism = homomorphism
+    ; F-resp-≡ = F-resp-≡
+    }
+
 
 Endofunctor : ∀ {o ℓ e} → Category o ℓ e → Set _
 Endofunctor C = Functor C C

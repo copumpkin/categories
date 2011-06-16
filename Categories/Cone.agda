@@ -1,0 +1,16 @@
+{-# OPTIONS --universe-polymorphism #-}
+module Categories.Cone where
+
+open import Level
+
+open import Categories.Category
+open import Categories.Functor hiding (_≡_; _∘_)
+
+record Cone {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where
+  module J = Category J
+  open Category C
+  open Functor F
+  field
+    N : Obj
+    ψ : ∀ X → (N ⇒ (F₀ X))
+    .commute : ∀ {X Y} (f : J [ X , Y ]) → F₁ f ∘ ψ X ≡ ψ Y

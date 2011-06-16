@@ -1,163 +1,164 @@
 module Everything where
 
 -- Categories
-import Category
+import Categories.Category
 
 -- 2-categories
-import Category.2-Category
+import Categories.2-Category
 
 -- Adjunctions between functors
-import Category.Adjunction
+import Categories.Adjunction
 
 -- The Agda Set category
-import Category.Agda
+import Categories.Agda
 
 -- The arrow category construction on any category
-import Category.Arrow
+import Categories.Arrow
 
 -- Bifunctors (functors from a product category)
-import Category.Bifunctor
+import Categories.Bifunctor
 
 -- The category of (small) categories
-import Category.Categories
+import Categories.Categories
 
 -- Closed categories
-import Category.Closed
+import Categories.Closed
 
 -- Cocones
-import Category.Cocone
+import Categories.Cocone
 
 -- Coends
-import Category.Coend
+import Categories.Coend
 
 -- Coequalizers
-import Category.Coequalizer
+import Categories.Coequalizer
 
 -- Colimits
-import Category.Colimit
+import Categories.Colimit
 
 -- Comma categories
-import Category.Comma
+import Categories.Comma
 
 -- Comonads, defined directly (not as monads on the opposite category)
-import Category.Comonad
+import Categories.Comonad
 
 -- The cofree construction that gives a comonad for any functor
-import Category.Comonad.Cofree
+import Categories.Comonad.Cofree
 
 -- Cones
-import Category.Cone
+import Categories.Cone
 
 -- The category of cones over a diagram (functor)
-import Category.Cones
+import Categories.Cones
 
 -- Discrete categories (they only have objects and identity morphisms)
-import Category.Discrete
+import Categories.Discrete
 
 -- Ends
-import Category.End
+import Categories.End
 
 -- Enriched categories
-import Category.Enriched
+import Categories.Enriched
 
 -- Equalizers
-import Category.Equalizer
+import Categories.Equalizer
 
 -- Fibrations
-import Category.Fibration
+import Categories.Fibration
 
 -- Functors
-import Category.Functor
+import Categories.Functor
 
 -- F-algebra (TODO: maybe the module should be renamed)
-import Category.Functor.Algebra
+import Categories.Functor.Algebra
 
 -- The category of F-algebras of a functor
-import Category.Functor.Algebras
+import Categories.Functor.Algebras
 
 -- An F-coalgebra
-import Category.Functor.Coalgebra
+import Categories.Functor.Coalgebra
+
+-- Constant functor
+import Categories.Functor.Constant
 
 -- The category of F-coalgebras of a functor
-import Category.Functor.Coalgebras
+import Categories.Functor.Coalgebras
 
 -- The diagonal functor (C -> C x C, or same thing with an arbitrary indexed product)
-import Category.Functor.Diagonal
+import Categories.Functor.Diagonal
 
 -- The hom functor, mapping pairs of objects to the morphisms between them
-import Category.Functor.Hom
+import Categories.Functor.Hom
 
 -- Monoidal functors (similar to Haskell's Applicative class)
-import Category.Functor.Monoidal
+import Categories.Functor.Monoidal
 
 -- Representable functors
-import Category.Functor.Representable
+import Categories.Functor.Representable
 
 -- Functor categories (of functors between two categories and natural transformations between them)
-import Category.FunctorCategory
+import Categories.FunctorCategory
 
 -- The Grothendieck construction on categories (taking a Sets-valued functor and building a category containing all values)
-import Category.Grothendieck
+import Categories.Grothendieck
 
 -- The globe category, used for defining globular sets (with a presheaf on it)
-import Category.Globe
+import Categories.Globe
 
 -- Globular sets
-import Category.GlobularSet
+import Categories.GlobularSet
 
 -- Limits
-import Category.Limit
+import Categories.Limit
 
 -- Monads, defined as simple triples of a functor and two natural transformations
-import Category.Monad
+import Categories.Monad
 
 -- A monad algebra
-import Category.Monad.Algebra
+import Categories.Monad.Algebra
 
 -- The category of all algebras of a monad
-import Category.Monad.Algebras
+import Categories.Monad.Algebras
 
--- The Eilenberg-Moore category for any monad (isn't this the same as the module above?)
-import Category.Monad.EilenbergMoore
+-- The Eilenberg-Moore category for any monad
+import Categories.Monad.EilenbergMoore
 
 -- Free monad constructions for any functor
-import Category.Monad.Free
+import Categories.Monad.Free
 
 -- The Kleisli category for any monad
-import Category.Monad.Kleisli
+import Categories.Monad.Kleisli
 
-{-
 -- These are commented out because they make this file impossible to typecheck without half a terabyte of RAM
 
 -- Monoidal categories, with an associative bi(endo)functor and an identity object
-import Category.Monoidal
+import Categories.Monoidal
 
 -- A braided monoidal category (one that gives you a swap operation, but isn't quite commutative)
-import Category.Monoidal.Braided
+import Categories.Monoidal.Braided
 
 -- A cartesian monoidal category (monoidal category whose monoid is the product with a terminal object)
-import Category.Monoidal.Cartesian
+import Categories.Monoidal.Cartesian
 
 -- Closed monoidal categories, which are simply monoidal categories that are
 -- also closed, such that the laws "fit"
-import Category.Monoidal.Closed
+import Categories.Monoidal.Closed
 
 -- Both of the above. Separated into its own module because we can do many
 -- interesting things with them.
-import Category.Monoidal.CartesianClosed
--}
+import Categories.Monoidal.CartesianClosed
 
 -- Simple definitions about morphisms, such as mono, epi, and iso
-import Category.Morphisms
+import Categories.Morphisms
 
 -- Cartesian morphisms (used mostly for fibrations)
-import Category.Morphism.Cartesian
+import Categories.Morphism.Cartesian
 
 -- Natural isomorphisms, defined as an isomorphism of natural transformations
-import Category.NaturalIsomorphism
+import Categories.NaturalIsomorphism
 
 -- Natural transformations
-import Category.NaturalTransformation
+import Categories.NaturalTransformation
 
 
 --------------------------------------------------------------------------------
@@ -165,58 +166,67 @@ import Category.NaturalTransformation
 --------------------------------------------------------------------------------
 
 -- The coproduct of two objects
-import Category.Object.Coproduct
+import Categories.Object.Coproduct
 
 -- A category has all binary coproducts
-import Category.Object.Coproducts
+import Categories.Object.Coproducts
 
 -- An exponential object
-import Category.Object.Exponential
+import Categories.Object.Exponential
 
 -- An initial object
-import Category.Object.Initial
+import Categories.Object.Initial
 
 -- The product of two objects
-import Category.Object.Product
+import Categories.Object.Product
 
 -- All binary products
-import Category.Object.Products
+import Categories.Object.Products
 
 -- Subobject classifiers (for topoi)
-import Category.Object.SubobjectClassifier
+import Categories.Object.SubobjectClassifier
 
 -- Terminal object
-import Category.Object.Terminal
+import Categories.Object.Terminal
 
 -- Zero object (initial and terminal)
-import Category.Object.Zero
+import Categories.Object.Zero
 
 -- A category containing n copies of objects/morphisms/equalities of another category
-import Category.Power
+import Categories.Power
+
+-- Natural transformations for functors to/from power categories
+import Categories.Power.NaturalTransformation
 
 -- A preorder gives rise to a category
-import Category.Preorder
+import Categories.Preorder
 
 -- A presheaf (functor from C^op to V)
-import Category.Presheaf
+import Categories.Presheaf
 
 -- The category of presheaves (a specific functor category)
-import Category.Presheaves
+import Categories.Presheaves
 
 -- The product of two categories
-import Category.Product
+import Categories.Product
+
+-- Profunctors
+import Categories.Profunctor
 
 -- Pullbacks in a category
-import Category.Pullback
+import Categories.Pullback
 
 -- Pushouts in a category
-import Category.Pushout
+import Categories.Pushout
 
 -- All categories can have a slice category defined on them
-import Category.Slice
+import Categories.Slice
+
+-- Utilities for gluing together commutative squares (and triangles)
+import Categories.Square
 
 -- The terminal category (a terminal object in the category of small categories)
-import Category.Terminal
+import Categories.Terminal
 
 -- A topos
-import Category.Topos
+import Categories.Topos

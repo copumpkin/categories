@@ -1,1 +1,0 @@
-module Category.Topos where

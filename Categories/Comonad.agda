@@ -1,0 +1,1 @@
+module Categories.Comonad where

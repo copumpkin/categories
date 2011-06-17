@@ -103,42 +103,25 @@ _[_≡_] = Category._≡_
 _[_∘_] : ∀ {o ℓ e} → (C : Category o ℓ e) → ∀ {X Y Z} (f : C [ Y , Z ]) → (g : C [ X , Y ]) → C [ X , Z ]
 _[_∘_] = Category._∘_
 
-{-
+-- Should this live in the Category record itself? It doesn't seem terribly useful for most situations
+module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
+  open Category C
+  open Equiv renaming (refl to refl′; sym to sym′; trans to trans′)
 
-module PreorderCategory {o ℓ e} (P : Preorder o e ℓ) where
-  open Preorder P
+  data _∼_ {A B} (f : A ⇒ B) : ∀ {X Y} → (X ⇒ Y) → Set (ℓ ⊔ e) where
+    ≡⇒∼ : {g : A ⇒ B} → .(f≡g : f ≡ g) → f ∼ g
 
-  PreorderCategory : Category o ℓ zero
-  PreorderCategory = record 
-    { Obj = Carrier
-    ; Hom = _∼_
-    ; _≡_ = λ _ _ → ⊤
-    ; _∘_ = λ x y → Preorder.trans P y x
-    ; id = Preorder.refl P
-    ; ∘-assoc = λ _ _ _ → _
-    ; identityˡ = λ _ → _
-    ; identityʳ = λ _ → _
-    ; ≡-equiv = record 
-      { refl = _
-      ; sym = λ _ → _
-      ; trans = λ _ _ → _
-      }
-    ; ∘-resp-≡ = {!!}
-    }
+  refl : ∀ {A B} {f : A ⇒ B} → f ∼ f
+  refl = ≡⇒∼ refl′
 
-  open Category PreorderCategory
-  open Constructs PreorderCategory
+  sym : ∀ {A B} {f : A ⇒ B} {D E} {g : D ⇒ E} → f ∼ g → g ∼ f
+  sym (≡⇒∼ f≡g) = ≡⇒∼ (sym′ f≡g)
 
-  -- FIXME: the univ parameter is too restrictive. It should really take the other two arrows as parameters.
-  PreorderPullback : ∀ {a b c} → ∀ x → x ∼ a → x ∼ b → (∀ y → y ∼ x) → PullbackBuilder a b c
-  PreorderPullback {a} {b} {c} x pf₁ pf₂ univ f g = record 
-    { P = x
-    ; p₁ = pf₁
-    ; p₂ = pf₂
-    ; commutes = _
-    ; universal = λ _ _ _ → univ _
-    ; universal-unique = λ _ _ _ → _
-    ; p₁∘universal≡q₁ = _
-    ; p₂∘universal≡q₂ = _
-    }
--}
+  trans : ∀ {A B} {f : A ⇒ B} 
+             {D E} {g : D ⇒ E}
+             {F G} {h : F ⇒ G}
+          → f ∼ g → g ∼ h → f ∼ h
+  trans (≡⇒∼ f≡g) (≡⇒∼ g≡h) = ≡⇒∼ (trans′ f≡g g≡h)
+
+_[_∼_] : ∀ {o ℓ e} (C : Category o ℓ e) {A B} (f : C [ A , B ]) {X Y} (g : C [ X , Y ]) → Set (ℓ ⊔ e)
+C [ f ∼ g ] = Heterogeneous._∼_ C f g

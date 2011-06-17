@@ -4,7 +4,7 @@ module Categories.Functor.Algebras where
 open import Level hiding (lift)
 
 open import Categories.Category
-open import Categories.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡; refl)
+open import Categories.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Categories.Functor.Algebra
 
 record F-Algebra-Morphism {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (X Y : F-Algebra F) : Set (ℓ ⊔ e) where

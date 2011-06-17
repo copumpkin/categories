@@ -4,7 +4,7 @@ module Categories.Functor.Diagonal where
 open import Data.Product
 
 open import Categories.Category
-open import Categories.Functor hiding (refl)
+open import Categories.Functor
 open import Categories.Product
 
 import Categories.Power as Power

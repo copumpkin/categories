@@ -41,5 +41,5 @@ One = record
     ; homomorphism = unit
     ; F-resp-≡ = λ _ → unit
     }
-  ; !-unique = λ _ _ → refl unit
+  ; !-unique = λ _ _ → Heterogeneous.≡⇒∼ unit
   }

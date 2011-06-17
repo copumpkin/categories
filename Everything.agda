@@ -111,6 +111,9 @@ import Categories.Globe
 -- Globular sets
 import Categories.GlobularSet
 
+-- Left Kan extensions
+import Categories.Lan
+
 -- Limits
 import Categories.Limit
 

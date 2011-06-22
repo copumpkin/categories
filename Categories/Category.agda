@@ -109,7 +109,7 @@ module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
   open Equiv renaming (refl to refl′; sym to sym′; trans to trans′)
 
   data _∼_ {A B} (f : A ⇒ B) : ∀ {X Y} → (X ⇒ Y) → Set (ℓ ⊔ e) where
-    ≡⇒∼ : {g : A ⇒ B} → .(f≡g : f ≡ g) → f ∼ g
+    ≡⇒∼ : {g : A ⇒ B} → .(f ≡ g) → f ∼ g
 
   refl : ∀ {A B} {f : A ⇒ B} → f ∼ f
   refl = ≡⇒∼ refl′

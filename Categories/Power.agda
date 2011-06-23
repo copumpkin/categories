@@ -4,11 +4,12 @@ open import Categories.Category
 module Categories.Power {o ℓ e : Level} (C : Category o ℓ e) where
 
 open import Function using () renaming (id to idf)
-open import Data.Nat using (ℕ; _+_; zero; suc)
+open import Data.Nat using (ℕ; _+_; zero; suc; _≤?_)
 open import Data.Product using (_,_)
-open import Data.Fin using (Fin; inject+; raise; zero; suc)
+open import Data.Fin using (Fin; inject+; raise; zero; suc; #_)
 open import Data.Sum using (_⊎_; inj₁; inj₂; map) renaming ([_,_] to ⟦_,_⟧; [_,_]′ to ⟦_,_⟧′)
 open import Function using () renaming (_∘_ to _∙_)
+open import Relation.Nullary.Decidable using (True)
 
 open import Categories.Bifunctor using (Bifunctor)
 open import Categories.Functor using (Functor; module Functor)
@@ -157,6 +158,58 @@ flattenP-assocʳ {n₁} {n₂} {n₃} F = record
 
 reduce2ʳ : ∀ (G : Bifunctor C C C) {n₁ n₂ n₃} (F₁ : Powerendo n₁) (F₂ : Powerendo n₂) (F₃ : Powerendo n₃) → Powerendo ((n₁ + n₂) + n₃)
 reduce2ʳ G F₁ F₂ F₃ = flattenP-assocʳ (reduce′ G F₁ (reduce′ G F₂ F₃))
+
+overlap : ∀ (H : Bifunctor C C C) {I} (F G : Powerendo′ I) → Powerendo′ I
+overlap H {I} F G = record
+  { F₀ = my-F₀
+  ; F₁ = my-F₁
+  ; identity = λ {As} → my-identity {As}
+  ; homomorphism = λ {As Bs Cs fs gs} → my-homomorphism {fs = fs} {gs}
+  ; F-resp-≡ = λ fs → H.F-resp-≡ (F.F-resp-≡ fs , G.F-resp-≡ fs)
+  }
+  where
+  private module L = Category (Exp I) 
+  private module F = Functor F
+  private module G = Functor G
+  private module H = Functor H
+  open L using () renaming (_≡_ to _≡≡_; _∘_ to _∘∘_)
+  open C using (_≡_; _∘_)
+  my-F₀ = λ As → H.F₀ (F.F₀ As , G.F₀ As)
+  my-F₁ : ∀ {As Bs} → (Exp I) [ As , Bs ] → C [ my-F₀ As , my-F₀ Bs ]
+  my-F₁ {As} {Bs} fs = H.F₁ (F.F₁ fs , G.F₁ fs)
+  .my-identity : ∀ {As} → my-F₁ (L.id {As}) ≡ C.id
+  my-identity {As} = begin
+                        H.F₁ (F.F₁ (λ i → C.id {As i}) , G.F₁ (λ i → C.id {As i}))
+                      ↓⟨ H.F-resp-≡ (F.identity , G.identity) ⟩
+                        H.F₁ (C.id , C.id)
+                      ↓⟨ H.identity ⟩
+                        C.id
+                      ∎
+    where
+    open C.HomReasoning
+  .my-homomorphism : ∀ {As Bs Cs} {fs : (Exp I) [ As , Bs ]} {gs : (Exp I) [ Bs , Cs ]} → my-F₁ (gs ∘∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
+  my-homomorphism {fs = fs} {gs} = 
+    begin
+      my-F₁ (gs ∘∘ fs)
+    ↓⟨ H.F-resp-≡ (F.homomorphism , G.homomorphism) ⟩
+      H.F₁ ((F.F₁ gs ∘ F.F₁ fs) , (G.F₁ gs ∘ G.F₁ fs))
+    ↓⟨ H.homomorphism ⟩
+      my-F₁ gs ∘ my-F₁ fs
+    ∎
+    where
+    open C.HomReasoning
+
+select′ : ∀ {I} (i : I) → Powerendo′ I
+select′ {I} i = record
+  { F₀ = λ xs → xs i
+  ; F₁ = λ fs → fs i
+  ; identity = C.Equiv.refl
+  ; homomorphism = C.Equiv.refl
+  ; F-resp-≡ = {!λ eqs → eqs i!}
+  }
+
+select : ∀ m {n} {m<n : True (suc m ≤? n)} → Powerendo n
+select m {n} {m<n} = select′ (#_ m {n} {m<n})
 
 triv : (n : ℕ) → Hyperendo n n
 triv n = record

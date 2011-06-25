@@ -8,8 +8,9 @@ open import Data.Nat using (ℕ; _+_; zero; suc; _≤?_)
 open import Data.Product using (_,_)
 open import Data.Fin using (Fin; inject+; raise; zero; suc; #_)
 open import Data.Sum using (_⊎_; inj₁; inj₂; map) renaming ([_,_] to ⟦_,_⟧; [_,_]′ to ⟦_,_⟧′)
-open import Function using () renaming (_∘_ to _∙_)
+open import Function using (flip) renaming (_∘_ to _∙_)
 open import Relation.Nullary.Decidable using (True)
+open import Data.Vec.N-ary using (N-ary)
 
 open import Categories.Bifunctor using (Bifunctor)
 open import Categories.Functor using (Functor; module Functor)
@@ -205,7 +206,7 @@ select′ {I} i = record
   ; F₁ = λ fs → fs i
   ; identity = C.Equiv.refl
   ; homomorphism = C.Equiv.refl
-  ; F-resp-≡ = {!λ eqs → eqs i!}
+  ; F-resp-≡ = λ eqs → eqs i
   }
 
 select : ∀ m {n} {m<n : True (suc m ≤? n)} → Powerendo n
@@ -301,3 +302,24 @@ hyp F = record
   }
   where
   module F = Functor F
+
+private
+  curryⁿ : ∀ n {a b} {A : Set a} {B : Set b} → ((Fin n → A) → B) → N-ary n A B
+  curryⁿ zero f = f (λ ())
+  curryⁿ (suc n) {A = A} f = λ x → curryⁿ n (f ∙ addon x)
+    where
+    addon : A → (Fin n → A) → Fin (suc n) → A
+    addon x _ zero = x
+    addon _ g (suc i) = g i
+
+plex′ : ∀ {J I} → (J → Powerendo′ I) → Hyperendo′ I J
+plex′ Fs = record
+  { F₀ = flip (Functor.F₀ ∙ Fs)
+  ; F₁ = flip (λ j → Functor.F₁ (Fs j))
+  ; identity = λ j → Functor.identity (Fs j)
+  ; homomorphism = λ j → Functor.homomorphism (Fs j)
+  ; F-resp-≡ = flip (λ j → Functor.F-resp-≡ (Fs j))
+  }
+
+plex : ∀ {n} {I} → N-ary n (Powerendo′ I) (Hyperendo′ I (Fin n))
+plex {n} = curryⁿ n plex′

@@ -63,6 +63,9 @@ import Categories.Enriched
 -- Equalizers
 import Categories.Equalizer
 
+-- Strong equivalence
+import Categories.Equivalence.Strong
+
 -- Fibrations
 import Categories.Fibration
 
@@ -95,6 +98,9 @@ import Categories.Functor.Monoidal
 
 -- Products as functors
 import Categories.Functor.Product
+
+-- Properties of general functors
+import Categories.Functor.Properties
 
 -- Representable functors
 import Categories.Functor.Representable
@@ -198,6 +204,9 @@ import Categories.Object.Zero
 
 -- A category containing n copies of objects/morphisms/equalities of another category
 import Categories.Power
+
+-- Demonstrations that Power categories are the same as functors from discrete categories
+import Categories.Power.Functorial
 
 -- Natural transformations for functors to/from power categories
 import Categories.Power.NaturalTransformation

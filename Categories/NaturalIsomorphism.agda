@@ -10,7 +10,9 @@ open import Categories.Support.Equivalence
 open import Categories.Category
 open import Categories.Functor hiding (id; equiv) renaming (_∘_ to _∘F_; _≡_ to _≡F_)
 open import Categories.NaturalTransformation.Core hiding (_≡_; equiv; setoid)
+open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_)
 import Categories.Morphisms as Morphisms
+open import Categories.Functor.Properties using (module FunctorsAlways)
 
 record NaturalIsomorphism {o ℓ e o′ ℓ′ e′}
                           {C : Category o ℓ e}
@@ -119,6 +121,31 @@ setoid {C = C} {D} = record
   ; _≈_ = NaturalIsomorphism
   ; isEquivalence = equiv {C = C} {D}
   }
+
+_ⓘˡ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
+     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+     → {F G : Functor C D}
+     → (H : Functor D E) → (η : NaturalIsomorphism F G) → NaturalIsomorphism (H ∘F F) (H ∘F G)
+_ⓘˡ_ {C = C} {D} {E} {F} {G} H η = record
+  { F⇒G = H ∘ˡ η.F⇒G
+  ; F⇐G = H ∘ˡ η.F⇐G
+  ; iso = λ X → FunctorsAlways.resp-Iso H (η.iso X)
+  }
+  where
+  module η = NaturalIsomorphism η
+
+_ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
+     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+     → {F G : Functor C D}
+     → (η : NaturalIsomorphism F G) → (K : Functor E C) → NaturalIsomorphism (F ∘F K) (G ∘F K)
+η ⓘʳ K = record
+  { F⇒G = η.F⇒G ∘ʳ K
+  ; F⇐G = η.F⇐G ∘ʳ K
+  ; iso = λ X → η.iso (K.F₀ X)
+  }
+  where
+  module η = NaturalIsomorphism η
+  module K = Functor K
 
 ≡→iso : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → F ≡F G → NaturalIsomorphism F G
 ≡→iso {C = C} {D} F G F≡G =

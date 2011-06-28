@@ -18,6 +18,9 @@ import Categories.Arrow
 -- Bifunctors (functors from a product category)
 import Categories.Bifunctor
 
+-- Natural transformations between bifunctors
+import Categories.Bifunctor.NaturalTransformation
+
 -- The category of (small) categories
 import Categories.Categories
 

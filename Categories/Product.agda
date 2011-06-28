@@ -74,3 +74,10 @@ _⁂ⁿ_ : ∀ {o₁ ℓ₁ e₁ o′₁ ℓ′₁ e′₁ o₂ ℓ₂ e₂ o′
          where
          module α = NaturalTransformation α
          module β = NaturalTransformation β
+
+infixr 2 _※ⁿ_
+_※ⁿ_ : ∀ {o ℓ e o′₁ ℓ′₁ e′₁} {C : Category o ℓ e} {D₁ : Category o′₁ ℓ′₁ e′₁} {F₁ G₁ : Functor C D₁} (α : NaturalTransformation F₁ G₁) → ∀ {o′₂ ℓ′₂ e′₂} {D₂ : Category o′₂ ℓ′₂ e′₂} {F₂ G₂ : Functor C D₂} (β : NaturalTransformation F₂ G₂) → NaturalTransformation (F₁ ※ F₂) (G₁ ※ G₂)
+α ※ⁿ β = record { η = < α.η , β.η >; commute = < α.commute , β.commute > }
+         where
+         module α = NaturalTransformation α
+         module β = NaturalTransformation β

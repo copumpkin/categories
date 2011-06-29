@@ -160,8 +160,8 @@ flattenP-assocʳ {n₁} {n₂} {n₃} F = record
 reduce2ʳ : ∀ (G : Bifunctor C C C) {n₁ n₂ n₃} (F₁ : Powerendo n₁) (F₂ : Powerendo n₂) (F₃ : Powerendo n₃) → Powerendo ((n₁ + n₂) + n₃)
 reduce2ʳ G F₁ F₂ F₃ = flattenP-assocʳ (reduce′ G F₁ (reduce′ G F₂ F₃))
 
-overlap : ∀ (H : Bifunctor C C C) {I} (F G : Powerendo′ I) → Powerendo′ I
-overlap H {I} F G = record
+overlap : ∀ {D E} (H : Bifunctor D D E) {I} (F G : Powerfunctor′ D I) → Powerfunctor′ E I
+overlap {D} {E} H {I} F G = record
   { F₀ = my-F₀
   ; F₁ = my-F₁
   ; identity = λ {As} → my-identity {As}
@@ -173,32 +173,38 @@ overlap H {I} F G = record
   private module F = Functor F
   private module G = Functor G
   private module H = Functor H
+  private module D = Category D
+  private module E = Category E
   open L using () renaming (_≡_ to _≡≡_; _∘_ to _∘∘_)
-  open C using (_≡_; _∘_)
+  open E using (_≡_; _∘_)
+  open D using () renaming (_∘_ to _∘D_)
   my-F₀ = λ As → H.F₀ (F.F₀ As , G.F₀ As)
-  my-F₁ : ∀ {As Bs} → (Exp I) [ As , Bs ] → C [ my-F₀ As , my-F₀ Bs ]
+  my-F₁ : ∀ {As Bs} → (Exp I) [ As , Bs ] → E [ my-F₀ As , my-F₀ Bs ]
   my-F₁ {As} {Bs} fs = H.F₁ (F.F₁ fs , G.F₁ fs)
-  .my-identity : ∀ {As} → my-F₁ (L.id {As}) ≡ C.id
+  .my-identity : ∀ {As} → my-F₁ (L.id {As}) ≡ E.id
   my-identity {As} = begin
                         H.F₁ (F.F₁ (λ i → C.id {As i}) , G.F₁ (λ i → C.id {As i}))
                       ↓⟨ H.F-resp-≡ (F.identity , G.identity) ⟩
-                        H.F₁ (C.id , C.id)
+                        H.F₁ (D.id , D.id)
                       ↓⟨ H.identity ⟩
-                        C.id
+                        E.id
                       ∎
     where
-    open C.HomReasoning
+    open E.HomReasoning
   .my-homomorphism : ∀ {As Bs Cs} {fs : (Exp I) [ As , Bs ]} {gs : (Exp I) [ Bs , Cs ]} → my-F₁ (gs ∘∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
   my-homomorphism {fs = fs} {gs} = 
     begin
       my-F₁ (gs ∘∘ fs)
     ↓⟨ H.F-resp-≡ (F.homomorphism , G.homomorphism) ⟩
-      H.F₁ ((F.F₁ gs ∘ F.F₁ fs) , (G.F₁ gs ∘ G.F₁ fs))
+      H.F₁ ((F.F₁ gs ∘D F.F₁ fs) , (G.F₁ gs ∘D G.F₁ fs))
     ↓⟨ H.homomorphism ⟩
       my-F₁ gs ∘ my-F₁ fs
     ∎
     where
-    open C.HomReasoning
+    open E.HomReasoning
+
+overlap2ʳ : ∀ (G : Bifunctor C C C) {n} (F₁ F₂ F₃ : Powerendo n) → Powerendo n
+overlap2ʳ G F₁ F₂ F₃ = (overlap {C} G F₁ (overlap {C} G F₂ F₃))
 
 select′ : ∀ {I} (i : I) → Powerendo′ I
 select′ {I} i = record

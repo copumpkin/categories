@@ -2,7 +2,7 @@
 module Categories.Product where
 
 open import Level
-open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>)
+open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>; swap)
 
 open import Categories.Category
 
@@ -81,3 +81,15 @@ _※ⁿ_ : ∀ {o ℓ e o′₁ ℓ′₁ e′₁} {C : Category o ℓ e} {D₁ 
          where
          module α = NaturalTransformation α
          module β = NaturalTransformation β
+
+Swap : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product D C) (Product C D)
+Swap {C = C} {D = D} = (record
+  { F₀ = swap
+  ; F₁ = swap
+  ; identity = C.Equiv.refl , D.Equiv.refl
+  ; homomorphism = C.Equiv.refl , D.Equiv.refl
+  ; F-resp-≡ = swap
+  })
+  where
+  module C = Category C
+  module D = Category D

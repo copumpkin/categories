@@ -329,3 +329,27 @@ plex′ Fs = record
 
 plex : ∀ {n} {I} → N-ary n (Powerendo′ I) (Hyperendo′ I (Fin n))
 plex {n} = curryⁿ n plex′
+
+widenˡ : ∀ (l : ℕ) {n} (F : Powerendo n) → Powerendo (l + n)
+widenˡ l F = record
+  { F₀ = λ As → F.F₀ (As ∙ pack)
+  ; F₁ = λ {As Bs} fs → F.F₁ (fs ∙ pack)
+  ; identity = λ {As} → F.identity
+  ; homomorphism = λ {As Bs Cs fs gs} → F.homomorphism
+  ; F-resp-≡ = λ {As Bs fs gs} fs≡gs → F.F-resp-≡ (fs≡gs ∙ pack)
+  }
+  where
+  private module F = Functor F
+  pack = raise l
+
+widenʳ : ∀ (r : ℕ) {n} (F : Powerendo n) → Powerendo (n + r)
+widenʳ r F = record
+  { F₀ = λ As → F.F₀ (As ∙ pack)
+  ; F₁ = λ {As Bs} fs → F.F₁ (fs ∙ pack)
+  ; identity = λ {As} → F.identity
+  ; homomorphism = λ {As Bs Cs fs gs} → F.homomorphism
+  ; F-resp-≡ = λ {As Bs fs gs} fs≡gs → F.F-resp-≡ (fs≡gs ∙ pack)
+  }
+  where
+  private module F = Functor F
+  pack = inject+ r

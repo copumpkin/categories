@@ -184,7 +184,8 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
     my-η : ∀ X → D [ F.F₀ X , G.F₀ X ]
     my-η X with F.F₀ X | G.F₀ X | same-Objs X
     my-η X | _ | ._ | ≣-refl = D.id
-    my-commute : ∀ {X Y} (f : C [ X , Y ]) → D [ D [ my-η Y ∘ F.F₁ f ] ≡ D [ G.F₁ f ∘ my-η X ] ]
+
+    .my-commute : ∀ {X Y} (f : C [ X , Y ]) → D [ D [ my-η Y ∘ F.F₁ f ] ≡ D [ G.F₁ f ∘ my-η X ] ]
     my-commute {X} {Y} f with helper₃
       where
       helper₁ : D [ my-η Y ∘ F.F₁ f ] ∼ F.F₁ f 
@@ -195,7 +196,7 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
       helper₂ | _ | ._ | ≣-refl | f′ = ≡⇒∼ (D.Equiv.sym D.identityʳ)
       helper₃ : D [ my-η Y ∘ F.F₁ f ] ∼ D [ G.F₁ f ∘ my-η X ]
       helper₃ = trans helper₁ (trans (F≡G f) helper₂)
-    my-commute f | Heterogeneous.≡⇒∼ y = y
+    my-commute f | Heterogeneous.≡⇒∼ pf = irr pf
 
   open Heterogeneous D
 

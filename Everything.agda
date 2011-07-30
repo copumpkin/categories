@@ -138,9 +138,6 @@ import Categories.Monad.Algebras
 -- The Eilenberg-Moore category for any monad
 import Categories.Monad.EilenbergMoore
 
--- Free monad constructions for any functor
-import Categories.Monad.Free
-
 -- The Kleisli category for any monad
 import Categories.Monad.Kleisli
 
@@ -173,6 +170,7 @@ import Categories.NaturalIsomorphism
 -- Natural transformations
 import Categories.NaturalTransformation
 
+import Categories.DinaturalTransformation
 
 --------------------------------------------------------------------------------
 -- Objects

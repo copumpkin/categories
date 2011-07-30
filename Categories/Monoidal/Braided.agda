@@ -2,6 +2,7 @@
 module Categories.Monoidal.Braided where
 
 open import Level
+open import Level using (_⊔_)
 
 open import Categories.Category
 
@@ -26,7 +27,7 @@ record Braided {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) : Set (o ⊔ �
   field
     braid : NaturalIsomorphism x⊗y y⊗x
     
-  open Braiding assoc braid
+  open Braiding identityˡ identityʳ assoc braid
 
   field
     -- NB: Triangle is redundant, proof coming soon...

@@ -16,12 +16,4 @@ record Lan {o₀ ℓ₀ e₀} {o₁ ℓ₁ e₁} {o₂ ℓ₂ e₂}
     σ : (M : Functor B C) → (α : NaturalTransformation X (M ∘ F)) → NaturalTransformation L M
 
     .σ-unique : (M : Functor B C) → (α : NaturalTransformation X (M ∘ F)) → (σ′ : NaturalTransformation L M) → σ′ ≡ σ M α
-
-  σ′ : (M : Functor B C) → (α : NaturalTransformation X (M ∘ F)) → NaturalTransformation (L ∘ F) (M ∘ F)
-  σ′ M α = record 
-    { η = λ a → NaturalTransformation.η (σ M α) (Functor.F₀ F a)
-    ; commute = λ f → NaturalTransformation.commute (σ M α) (Functor.F₁ F f)
-    }
-
-  field
-    .commutes : (M : Functor B C) → (α : NaturalTransformation X (M ∘ F)) → α ≡ σ′ M α ∘₁ ε
+    .commutes : (M : Functor B C) → (α : NaturalTransformation X (M ∘ F)) → α ≡ (σ M α ∘ʳ F) ∘₁ ε

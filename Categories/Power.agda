@@ -1,5 +1,5 @@
 {-# OPTIONS --universe-polymorphism #-}
-open import Level
+open import Level hiding (suc; zero)
 open import Categories.Category
 module Categories.Power {o ℓ e : Level} (C : Category o ℓ e) where
 

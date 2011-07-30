@@ -12,7 +12,7 @@ import Categories.Power
 module Pow = Categories.Power C
 open Pow public
 open import Categories.Bifunctor using (Bifunctor)
-open import Categories.NaturalTransformation renaming (id to idⁿ; _≡_ to _≡ⁿ_)
+open import Categories.Bifunctor.NaturalTransformation renaming (id to idⁿ; _≡_ to _≡ⁿ_)
 open import Categories.Functor using (module Functor)
 
 flattenPⁿ : ∀ {D : Category o ℓ e} {n m} {F G : Powerfunctor′ D (Fin n ⊎ Fin m)} (η : NaturalTransformation F G) → NaturalTransformation (flattenP F) (flattenP G)
@@ -58,3 +58,5 @@ reduceN′ H {I} {F} {F′} φ {J} {G} {G′} γ = record
 reduceN : ∀ (H : Bifunctor C C C) {n} {F F′ : Powerendo n} (φ : NaturalTransformation F F′) {m} {G G′ : Powerendo m} (γ : NaturalTransformation G G′) → NaturalTransformation (reduce H F G) (reduce H F′ G′)
 reduceN H F G = flattenPⁿ (reduceN′ H F G)
 
+overlapN : ∀ (H : Bifunctor C C C) {n} {F F′ : Powerendo n} (φ : NaturalTransformation F F′) {G G′ : Powerendo n} (γ : NaturalTransformation G G′) → NaturalTransformation (overlap {C} {C} H F G) (overlap {C} {C} H F′ G′)
+overlapN H F G = overlapN-× {D₁ = C} {D₂ = C} H F G

@@ -4,10 +4,10 @@ module Categories.Functor where
 open import Level
 open import Relation.Binary using (IsEquivalence)
 open import Relation.Nullary using (¬_)
-open import Data.Product using (Σ; _×_)
+open import Data.Product using (Σ; _×_; ∃)
 open import Categories.Category
 open import Categories.Functor.Core public
-open import Categories.Morphisms
+import Categories.Morphisms as Morphisms
 
 infix  4 _≡_
 
@@ -77,3 +77,9 @@ FullyFaithful F = Full F × Faithful F
 [02:27:53 AM] <ddarius> For example, let f : 2/= -> 2/~ (where True ~ False).  Then, we need g(True) and g(False) and we could use g = not, even though True /= False and f(g(y)) /= y (assuming say f is id on the carrier), because it is still the case that f(g(y)) ~ y.
 [02:28:55 AM] <ddarius> So g isn't an inverse on the carrier sets, and g isn't a setoid function inverse because it's not even a setoid function.
 -}
+
+EssentiallySurjective : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor C D → Set _
+EssentiallySurjective {D = D} F = ∀ d → ∃ (λ c → F₀ c ≅ d)
+  where
+  open Functor F
+  open Morphisms D

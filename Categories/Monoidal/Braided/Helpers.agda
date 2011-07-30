@@ -46,9 +46,8 @@ module BraidedHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifun
     B-over : ∀ {n} (F₁ F₂ : Powerendo n) → NaturalTransformation (F₁ ⊗₂ F₂) (F₂ ⊗₂ F₁)
     B-over F₁ F₂ = B ∘ʳ plex {2} F₁ F₂
 
-
-    -- BTriangleTop   : NaturalTransformation id⊗x x⊗id
-    -- BTriangleTop   = B-over (id↑) (select 0)
+    BTriangleTop   : NaturalTransformation id⊗x x⊗id
+    BTriangleTop   = B-over (widenˡ 1 id↑) x
 
     BTriangleLeft  : NaturalTransformation id⊗x x
     BTriangleLeft  = υˡ

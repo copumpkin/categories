@@ -84,7 +84,7 @@ import Categories.Functor.Constant
 -- The category of F-coalgebras of a functor
 import Categories.Functor.Coalgebras
 
--- The diagonal functor (C -> C x C, or same thing with an arbitrary indexed product)
+-- The diagonal functor (C → C × C, or same thing with an arbitrary indexed product)
 import Categories.Functor.Diagonal
 
 -- The hom functor, mapping pairs of objects to the morphisms between them
@@ -234,3 +234,6 @@ import Categories.Terminal
 
 -- A topos
 import Categories.Topos
+
+-- The Yoneda lemma
+import Categories.Yoneda

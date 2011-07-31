@@ -13,9 +13,9 @@ open import Relation.Nullary.Decidable using (True)
 open import Data.Vec.N-ary using (N-ary)
 
 open import Categories.Bifunctor using (Bifunctor)
-open import Categories.Functor using (Functor; module Functor)
+open import Categories.Functor using (Functor; module Functor) renaming (_∘_ to _∘F_)
 
-module C = Category C
+private module C = Category C
 
 Exp : (I : Set) → Category o ℓ e
 Exp I = record
@@ -330,6 +330,13 @@ plex′ Fs = record
 plex : ∀ {n} {I} → N-ary n (Powerendo′ I) (Hyperendo′ I (Fin n))
 plex {n} = curryⁿ n plex′
 
+plex₂ : ∀ {I} (F G : Powerendo′ I) → (Hyperendo′ I (Fin 2))
+plex₂ {I} F G = plex′ switch
+  where
+  switch : Fin 2 → Powerendo′ I
+  switch zero = F
+  switch (suc zero) = G
+
 widenˡ : ∀ (l : ℕ) {n} (F : Powerendo n) → Powerendo (l + n)
 widenˡ l F = record
   { F₀ = λ As → F.F₀ (As ∙ pack)
@@ -353,3 +360,8 @@ widenʳ r F = record
   where
   private module F = Functor F
   pack = inject+ r
+
+open import Categories.Support.PropositionalEquality
+
+.overlap-∘ : ∀ {D E} (H : Bifunctor D D E) {I} (F G : Powerfunctor′ D I) {J} (K : Hyperendo′ J I) → (overlap {D} {E} H F G) ∘F K ≣ overlap {D} {E} H (F ∘F K) (G ∘F K)
+overlap-∘ H F G K = ≣-refl

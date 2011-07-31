@@ -54,7 +54,10 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifu
   x⊗[y⊗z] : Powerendo 3
   x⊗[y⊗z] = x ⊗ x⊗y
 
+  open import Categories.Support.PropositionalEquality
 
+  test : [x⊗y]⊗z ≣ (select 0 ⊗₂ select 1) ⊗₂ select 2
+  test = ≣-refl
   
   [y⊗z]⊗x : Powerendo 3
   [y⊗z]⊗x = (select 1 ⊗₂ select 2) ⊗₂ select 0
@@ -127,6 +130,9 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifu
 
   id₂ : NaturalTransformation x x
   id₂ = idⁿ
+
+  id2 : (F : Powerendo 2) → NaturalTransformation F F
+  id2 _ = idⁿ
 
   id3 : {F : Powerendo 3} → NaturalTransformation F F
   id3 = idⁿ

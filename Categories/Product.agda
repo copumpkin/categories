@@ -3,7 +3,7 @@ module Categories.Product where
 
 open import Level
 open import Function using () renaming (_∘_ to _∙_)
-open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>)
+open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>; swap)
 
 open import Categories.Category
 
@@ -118,3 +118,15 @@ assocʳ C₁ C₂ C₃ = record
 πʳ {D = D} = record { F₀ = proj₂; F₁ = proj₂; identity = refl
                     ; homomorphism = refl; F-resp-≡ = proj₂ }
   where open Category.Equiv D using (refl)
+
+Swap : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product D C) (Product C D)
+Swap {C = C} {D = D} = (record
+  { F₀ = swap
+  ; F₁ = swap
+  ; identity = C.Equiv.refl , D.Equiv.refl
+  ; homomorphism = C.Equiv.refl , D.Equiv.refl
+  ; F-resp-≡ = swap
+  })
+  where
+  module C = Category C
+  module D = Category D

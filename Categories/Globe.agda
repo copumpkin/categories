@@ -1,7 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Globe where
 
-open import Level
+import Level 
 open import Relation.Binary using (IsEquivalence; module IsEquivalence)
 open import Relation.Binary.PropositionalEquality using (isEquivalence)
 open import Data.Nat using (ℕ; zero; suc; _<_; _≤_; z≤n; s≤s)
@@ -29,7 +29,7 @@ x ⊚ I = x
 τ n<m ⊚ σ m<l = σ (<-trans m<l n<m)
 τ n<m ⊚ τ m<l = τ (<-trans m<l n<m)
 
-Globe : Category zero zero zero
+Globe : Category Level.zero Level.zero Level.zero
 Globe = record 
   { Obj = ℕ
   ; _⇒_ = GlobeHom
@@ -116,7 +116,7 @@ x ⊚′ I = x
 x ⊚′ y σ′ = (x ⊚′ y) σ′
 x ⊚′ y τ′ = (x ⊚′ y) τ′
 
-Globe′ : Category zero zero zero
+Globe′ : Category Level.zero Level.zero Level.zero
 Globe′ = record 
   { Obj = ℕ
   ; _⇒_ = GlobeHom′

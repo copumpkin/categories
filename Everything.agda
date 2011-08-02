@@ -90,7 +90,7 @@ import Categories.Functor.Constant
 -- The category of F-coalgebras of a functor
 import Categories.Functor.Coalgebras
 
--- The diagonal functor (C -> C x C, or same thing with an arbitrary indexed product)
+-- The diagonal functor (C → C × C, or same thing with an arbitrary indexed product)
 import Categories.Functor.Diagonal
 
 -- The hom functor, mapping pairs of objects to the morphisms between them
@@ -138,9 +138,6 @@ import Categories.Monad.Algebras
 -- The Eilenberg-Moore category for any monad
 import Categories.Monad.EilenbergMoore
 
--- Free monad constructions for any functor
-import Categories.Monad.Free
-
 -- The Kleisli category for any monad
 import Categories.Monad.Kleisli
 
@@ -173,6 +170,7 @@ import Categories.NaturalIsomorphism
 -- Natural transformations
 import Categories.NaturalTransformation
 
+import Categories.DinaturalTransformation
 
 --------------------------------------------------------------------------------
 -- Objects
@@ -246,3 +244,6 @@ import Categories.Terminal
 
 -- A topos
 import Categories.Topos
+
+-- The Yoneda lemma
+import Categories.Yoneda

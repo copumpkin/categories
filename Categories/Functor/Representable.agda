@@ -10,8 +10,9 @@ open import Categories.Functor.Hom
 open import Categories.NaturalIsomorphism
 
 record Representable {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ suc ℓ ⊔ suc e) where
-  module C = Category C
+  open Category C
+  open Hom C
   field
-    F : Functor C (ISetoids ℓ e)
-    A : C.Obj
-    Iso : NaturalIsomorphism F (Hom[_,-] {C = C} A)
+    F : Functor C (ISetoids ℓ e) -- should this be a parameter to the record?
+    A : Obj
+    Iso : NaturalIsomorphism F Hom[ A ,-]

@@ -8,6 +8,9 @@ open import Function using (flip)
 open import Categories.Support.Equivalence
 open import Categories.Support.EqReasoning
 
+postulate
+  .irr : ∀ {a} {A : Set a} → .A → A
+
 record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where 
   infixr 9 _∘_
   infix  4 _≡_

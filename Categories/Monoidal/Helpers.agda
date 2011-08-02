@@ -2,6 +2,7 @@
 module Categories.Monoidal.Helpers where
 
 open import Data.Nat using (_+_)
+open import Function using (flip)
 
 open import Categories.Category
 import Categories.Functor
@@ -9,12 +10,14 @@ import Categories.Functor
 open import Categories.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Categories.NaturalIsomorphism
 open import Categories.NaturalTransformation using (_∘₀_; _∘₁_; _∘ˡ_; _∘ʳ_; NaturalTransformation) renaming (_≡_ to _≡ⁿ_; id to idⁿ)
-import Categories.Power.NaturalTransformation
 
 module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifunctor C C C) (id : Category.Obj C) where
   private module C = Category C
   open C hiding (id; identityˡ; identityʳ)
-  open Categories.Power.NaturalTransformation C
+
+  import Categories.Power.NaturalTransformation
+  private module PowNat = Categories.Power.NaturalTransformation C
+  open PowNat
 
   private module ⊗ = Functor —⊗— renaming (F₀ to ⊗₀; F₁ to ⊗₁; F-resp-≡ to ⊗-resp-≡)
   open ⊗
@@ -22,6 +25,9 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifu
   infix 2 _⊗_
   _⊗_ : ∀ {n m} (F : Powerendo n) (G : Powerendo m) → Powerendo (n + m)
   _⊗_ = reduce —⊗—
+
+  _⊗₂_ : ∀ {m} (F G : Powerendo m) → Powerendo m
+  _⊗₂_ = overlap {C} —⊗— -- reduce (flip-bifunctor {C = C} {C} —⊗—)
 
   id↑ : Powerendo 0
   id↑ = nullary id
@@ -38,11 +44,55 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifu
   x⊗y : Powerendo 2
   x⊗y = binary —⊗—
 
+  y⊗x : Powerendo 2
+  y⊗x = binary (flip-bifunctor {C = C} {C} —⊗—)
+
+
   [x⊗y]⊗z : Powerendo 3
   [x⊗y]⊗z = x⊗y ⊗ x
 
   x⊗[y⊗z] : Powerendo 3
   x⊗[y⊗z] = x ⊗ x⊗y
+
+
+  
+  [y⊗z]⊗x : Powerendo 3
+  [y⊗z]⊗x = (select 1 ⊗₂ select 2) ⊗₂ select 0
+
+  [y⊗x]⊗z : Powerendo 3
+  [y⊗x]⊗z = (select 1 ⊗₂ select 0) ⊗₂ select 2
+
+  y⊗[x⊗z] : Powerendo 3
+  y⊗[x⊗z] = select 1 ⊗₂ (select 0 ⊗₂ select 2)
+
+  y⊗[z⊗x] : Powerendo 3
+  y⊗[z⊗x] = select 1 ⊗₂ (select 2 ⊗₂ select 0)
+
+
+
+  z⊗[x⊗y] : Powerendo 3
+  z⊗[x⊗y] = select 2 ⊗₂ (select 0 ⊗₂ select 1)
+
+  x⊗[z⊗y] : Powerendo 3
+  x⊗[z⊗y] = select 0 ⊗₂ (select 2 ⊗₂ select 1)
+
+  [x⊗z]⊗y : Powerendo 3
+  [x⊗z]⊗y = (select 0 ⊗₂ select 2) ⊗₂ select 1
+
+  [z⊗x]⊗y : Powerendo 3
+  [z⊗x]⊗y = (select 2 ⊗₂ select 0) ⊗₂ select 1
+  
+
+
+
+
+
+
+
+
+
+
+
 
   [x⊗id]⊗y : Powerendo 2
   [x⊗id]⊗y = x⊗id ⊗ x
@@ -65,12 +115,21 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifu
   [x⊗[y⊗z]]⊗w : Powerendo 4
   [x⊗[y⊗z]]⊗w = x⊗[y⊗z] ⊗ x
 
+
   infix 2 _⊗ⁿ_
   _⊗ⁿ_ : ∀ {n} {F F′ : Powerendo n} (φ : NaturalTransformation F F′) {m} {G G′ : Powerendo m} (γ : NaturalTransformation G G′) → NaturalTransformation (F ⊗ G) (F′ ⊗ G′)
   _⊗ⁿ_ = reduceN —⊗—
 
+  infix 2 _⊗ⁿ′_
+  _⊗ⁿ′_ : ∀ {n} {F F′ : Powerendo n} (φ : NaturalTransformation F F′) {G G′ : Powerendo n} (γ : NaturalTransformation G G′) → NaturalTransformation (F ⊗₂ G) (F′ ⊗₂ G′)
+  _⊗ⁿ′_ = overlapN —⊗—
+
+
   id₂ : NaturalTransformation x x
   id₂ = idⁿ
+
+  id3 : {F : Powerendo 3} → NaturalTransformation F F
+  id3 = idⁿ
 
   module Coherence (identityˡ : NaturalIsomorphism id⊗x x)
                    (identityʳ : NaturalIsomorphism x⊗id x)

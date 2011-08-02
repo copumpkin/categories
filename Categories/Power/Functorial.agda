@@ -146,7 +146,7 @@ exp≅functor ext id-propositionally-unique {I} =
     where open Heterogeneous C
 
   .∼-unsubst : ∀ {o ℓ e} {C : Category o ℓ e} {A B A′ B′ : Obj C} (f : C [ A , B ]) (g : C [ A′ , B′ ]) (A′≣A : A′ ≣ A) (B′≣B : B′ ≣ B) → C [ g ∼ f ] → C [ ≣-subst (λ X → C [ X , B ]) A′≣A (≣-subst (λ Y → C [ A′ , Y ]) B′≣B g) ≡ f ]
-  ∼-unsubst f g ≣-refl ≣-refl (Heterogeneous.≡⇒∼ eq) = eq
+  ∼-unsubst f g ≣-refl ≣-refl (Heterogeneous.≡⇒∼ eq) = irr eq
     where open Heterogeneous C
 
   ≣-subst-irrel : ∀ {a p} {A : Set a} (P : A → Set p) {x y : A} → (eq₁ eq₂ : x ≣ y) → ∀ {it} → ≣-subst P eq₁ it ≣ ≣-subst P eq₂ it

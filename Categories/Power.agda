@@ -10,7 +10,8 @@ open import Data.Fin using (Fin; inject+; raise; zero; suc; #_)
 open import Data.Sum using (_⊎_; inj₁; inj₂; map) renaming ([_,_] to ⟦_,_⟧; [_,_]′ to ⟦_,_⟧′)
 open import Function using (flip) renaming (_∘_ to _∙_)
 open import Relation.Nullary.Decidable using (True)
-open import Data.Vec.N-ary using (N-ary)
+open import Data.Vec.N-ary using (N-ary; curryⁿ)
+open import Data.Vec using (lookup)
 
 open import Categories.Bifunctor using (Bifunctor)
 open import Categories.Functor using (Functor; module Functor) renaming (_∘_ to _∘F_)
@@ -56,20 +57,8 @@ Hyperendo n m = Functor (Power n) (Power m)
 Hyperendo′ : (I J : Set) → Set (e ⊔ ℓ ⊔ o)
 Hyperendo′ I J = Functor (Exp I) (Exp J)
 
-_par_ : ∀ {I I′ J J′} (F : Hyperendo′ I I′) (G : Hyperendo′ J J′) → Hyperendo′ (I ⊎ J) (I′ ⊎ J′)
-F par G = record
-  { F₀ = λ xs → ⟦ F.F₀ (xs ∙ inj₁) , G.F₀ (xs ∙ inj₂) ⟧′
-  ; F₁ = λ {A B} fs → ⟦ F.F₁ (fs ∙ inj₁) , G.F₁ (fs ∙ inj₂) ⟧
-  ; identity = λ {A} → ⟦ F.identity , G.identity ⟧
-  ; homomorphism = λ {A B C fs gs} → ⟦ F.homomorphism , G.homomorphism ⟧
-  ; F-resp-≡ = λ {A B fs gs} fs≡gs → ⟦ F.F-resp-≡ (fs≡gs ∙ inj₁) , G.F-resp-≡ (fs≡gs ∙ inj₂) ⟧
-  }
-  where
-  private module F = Functor F
-  private module G = Functor G
-
-flattenP : ∀ {D : Category o ℓ e} {n m} (F : Powerfunctor′ D (Fin n ⊎ Fin m)) → Powerfunctor′ D (Fin (n + m))
-flattenP {n = n} {m = m} F = record
+rebase : ∀ {I J D} (pack : I → J) (F : Powerfunctor′ D I) → Powerfunctor′ D J
+rebase pack F = record
   { F₀ = λ As → F.F₀ (As ∙ pack)
   ; F₁ = λ {As Bs} fs → F.F₁ (fs ∙ pack)
   ; identity = λ {As} → F.identity
@@ -78,7 +67,15 @@ flattenP {n = n} {m = m} F = record
   }
   where
   private module F = Functor F
-  pack = ⟦ inject+ m , raise n ⟧′
+
+flattenP : ∀ {D : Category o ℓ e} {n m} (F : Powerfunctor′ D (Fin n ⊎ Fin m)) → Powerfunctor′ D (Fin (n + m))
+flattenP {n = n} {m = m} = rebase ⟦ inject+ m , raise n ⟧′
+
+private
+  chops : (n : ℕ) → ∀ {m} (k : Fin (n + m)) → Fin n ⊎ Fin m
+  chops 0 k = inj₂ k
+  chops (suc n) zero = inj₁ zero
+  chops (suc n) (suc k) = map suc idf (chops n k)
 
 flattenHʳ : ∀ {I} {n m} (F : Hyperendo′ I (Fin n ⊎ Fin m)) → Hyperendo′ I (Fin (n + m))
 flattenHʳ {n = n} {m} F = record
@@ -90,75 +87,30 @@ flattenHʳ {n = n} {m} F = record
   }
   where
   private module F = Functor F
-  chops : (n : ℕ) → ∀ {m} (k : Fin (n + m)) → Fin n ⊎ Fin m
-  chops 0 k = inj₂ k
-  chops (suc n) zero = inj₁ zero
-  chops (suc n) (suc k) = map suc idf (chops n k)
-
 
 flattenH : ∀ {n m n′ m′} (F : Hyperendo′ (Fin n ⊎ Fin m) (Fin n′ ⊎ Fin m′)) → Hyperendo (n + m) (n′ + m′)
 flattenH = flattenHʳ ∙ flattenP
 
-_∥_ : ∀ {n n′ m m′} (F : Hyperendo n n′) (G : Hyperendo m m′) → Hyperendo (n + m) (n′ + m′)
-F ∥ G = flattenH (F par G)
-
-reduce′ : ∀ (H : Bifunctor C C C) {I J} (F : Powerendo′ I) (G : Powerendo′ J) → Powerendo′ (I ⊎ J)
-reduce′ H {I} {J} F G = record
-  { F₀ = my-F₀
-  ; F₁ = my-F₁
-  ; identity = λ {As} → my-identity {As}
-  ; homomorphism = λ {As Bs Cs fs gs} → my-homomorphism {fs = fs} {gs}
-  ; F-resp-≡ = λ fs → H.F-resp-≡ (F.F-resp-≡ (fs ∙ inj₁) , G.F-resp-≡ (fs ∙ inj₂))
+_lap_ : ∀ {I I′ J′} (F : Hyperendo′ I I′) (G : Hyperendo′ I J′) → Hyperendo′ I (I′ ⊎ J′)
+F lap G = record
+  { F₀ = λ xs → ⟦ F.F₀ xs , G.F₀ xs ⟧′
+  ; F₁ = λ {A B} fs → ⟦ F.F₁ fs , G.F₁ fs ⟧
+  ; identity = λ {A} → ⟦ F.identity , G.identity ⟧
+  ; homomorphism = λ {A B C fs gs} → ⟦ F.homomorphism , G.homomorphism ⟧
+  ; F-resp-≡ = λ {A B fs gs} fs≡gs → ⟦ F.F-resp-≡ fs≡gs , G.F-resp-≡ fs≡gs ⟧
   }
   where
-  private module L = Category (Exp (I ⊎ J)) 
   private module F = Functor F
   private module G = Functor G
-  private module H = Functor H
-  open L using () renaming (_≡_ to _≡≡_; _∘_ to _∘∘_)
-  open C using (_≡_; _∘_)
-  my-F₀ = λ As → H.F₀ ((F.F₀ (As ∙ inj₁)) , (G.F₀ (As ∙ inj₂)))
-  my-F₁ : ∀ {As Bs} → L._⇒_ As Bs → C [ my-F₀ As , my-F₀ Bs ]
-  my-F₁ {As} {Bs} fs = H.F₁ (F.F₁ (fs ∙ inj₁) , G.F₁ (fs ∙ inj₂))
-  .my-identity : ∀ {As} → my-F₁ (L.id {As}) ≡ C.id
-  my-identity {As} = begin
-                        H.F₁ (F.F₁ (λ i → C.id {As (inj₁ i)}) , G.F₁ (λ i → C.id {As (inj₂ i)}))
-                      ↓⟨ H.F-resp-≡ (F.identity , G.identity) ⟩
-                        H.F₁ (C.id , C.id)
-                      ↓⟨ H.identity ⟩
-                        C.id
-                      ∎
-    where
-    open C.HomReasoning
-  .my-homomorphism : ∀ {As Bs Cs} {fs : L._⇒_ As Bs} {gs : L._⇒_ Bs Cs} → my-F₁ (gs ∘∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
-  my-homomorphism {fs = fs} {gs} = 
-    begin
-      my-F₁ (gs ∘∘ fs)
-    ↓⟨ H.F-resp-≡ (F.homomorphism , G.homomorphism) ⟩
-      H.F₁ ((F.F₁ (gs ∙ inj₁) ∘ F.F₁ (fs ∙ inj₁)) , (G.F₁ (gs ∙ inj₂) ∘ G.F₁ (fs ∙ inj₂)))
-    ↓⟨ H.homomorphism ⟩
-      my-F₁ gs ∘ my-F₁ fs
-    ∎
-    where
-    open C.HomReasoning
 
-reduce : ∀ (H : Bifunctor C C C) {n m} (F : Powerendo n) (G : Powerendo m) → Powerendo (n + m)
-reduce H F G = flattenP (reduce′ H F G)
+_par_ : ∀ {I I′ J J′} (F : Hyperendo′ I I′) (G : Hyperendo′ J J′) → Hyperendo′ (I ⊎ J) (I′ ⊎ J′)
+F par G = (rebase inj₁ F) lap (rebase inj₂ G)
 
-flattenP-assocʳ : ∀ {n₁ n₂ n₃} (F : Powerendo′ (Fin n₁ ⊎ (Fin n₂ ⊎ Fin n₃))) → Powerendo ((n₁ + n₂) + n₃)
-flattenP-assocʳ {n₁} {n₂} {n₃} F = record
-  { F₀ = λ As → F.F₀ (As ∙ pack)
-  ; F₁ = λ {As Bs} fs → F.F₁ (fs ∙ pack)
-  ; identity = λ {As} → F.identity
-  ; homomorphism = λ {As Bs Cs fs gs} → F.homomorphism
-  ; F-resp-≡ = λ {As Bs fs gs} fs≡gs → F.F-resp-≡ (fs≡gs ∙ pack)
-  }
-  where
-  module F = Functor F
-  pack = ⟦ inject+ n₃ ∙ inject+ n₂ , ⟦ inject+ n₃ ∙ raise n₁ , raise (n₁ + n₂) ⟧′ ⟧′
+_⑂_ : ∀ {n n′ m′} (F : Hyperendo n n′) (G : Hyperendo n m′) → Hyperendo n (n′ + m′)
+F ⑂ G = flattenHʳ (F lap G)
 
-reduce2ʳ : ∀ (G : Bifunctor C C C) {n₁ n₂ n₃} (F₁ : Powerendo n₁) (F₂ : Powerendo n₂) (F₃ : Powerendo n₃) → Powerendo ((n₁ + n₂) + n₃)
-reduce2ʳ G F₁ F₂ F₃ = flattenP-assocʳ (reduce′ G F₁ (reduce′ G F₂ F₃))
+_∥_ : ∀ {n n′ m m′} (F : Hyperendo n n′) (G : Hyperendo m m′) → Hyperendo (n + m) (n′ + m′)
+F ∥ G = flattenH (F par G)
 
 overlap : ∀ {D E} (H : Bifunctor D D E) {I} (F G : Powerfunctor′ D I) → Powerfunctor′ E I
 overlap {D} {E} H {I} F G = record
@@ -205,6 +157,58 @@ overlap {D} {E} H {I} F G = record
 
 overlap2ʳ : ∀ (G : Bifunctor C C C) {n} (F₁ F₂ F₃ : Powerendo n) → Powerendo n
 overlap2ʳ G F₁ F₂ F₃ = (overlap {C} G F₁ (overlap {C} G F₂ F₃))
+
+reduce′ : ∀ (H : Bifunctor C C C) {I J} (F : Powerendo′ I) (G : Powerendo′ J) → Powerendo′ (I ⊎ J)
+reduce′ H {I} {J} F G = overlap {C} {C} H (rebase inj₁ F) (rebase inj₂ G) {- record
+  { F₀ = my-F₀
+  ; F₁ = my-F₁
+  ; identity = λ {As} → my-identity {As}
+  ; homomorphism = λ {As Bs Cs fs gs} → my-homomorphism {fs = fs} {gs}
+  ; F-resp-≡ = λ fs → H.F-resp-≡ (F.F-resp-≡ (fs ∙ inj₁) , G.F-resp-≡ (fs ∙ inj₂))
+  }
+  where
+  private module L = Category (Exp (I ⊎ J)) 
+  private module F = Functor F
+  private module G = Functor G
+  private module H = Functor H
+  open L using () renaming (_≡_ to _≡≡_; _∘_ to _∘∘_)
+  open C using (_≡_; _∘_)
+  my-F₀ = λ As → H.F₀ ((F.F₀ (As ∙ inj₁)) , (G.F₀ (As ∙ inj₂)))
+  my-F₁ : ∀ {As Bs} → L._⇒_ As Bs → C [ my-F₀ As , my-F₀ Bs ]
+  my-F₁ {As} {Bs} fs = H.F₁ (F.F₁ (fs ∙ inj₁) , G.F₁ (fs ∙ inj₂))
+  .my-identity : ∀ {As} → my-F₁ (L.id {As}) ≡ C.id
+  my-identity {As} = begin
+                        H.F₁ (F.F₁ (λ i → C.id {As (inj₁ i)}) , G.F₁ (λ i → C.id {As (inj₂ i)}))
+                      ↓⟨ H.F-resp-≡ (F.identity , G.identity) ⟩
+                        H.F₁ (C.id , C.id)
+                      ↓⟨ H.identity ⟩
+                        C.id
+                      ∎
+    where
+    open C.HomReasoning
+  .my-homomorphism : ∀ {As Bs Cs} {fs : L._⇒_ As Bs} {gs : L._⇒_ Bs Cs} → my-F₁ (gs ∘∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
+  my-homomorphism {fs = fs} {gs} = 
+    begin
+      my-F₁ (gs ∘∘ fs)
+    ↓⟨ H.F-resp-≡ (F.homomorphism , G.homomorphism) ⟩
+      H.F₁ ((F.F₁ (gs ∙ inj₁) ∘ F.F₁ (fs ∙ inj₁)) , (G.F₁ (gs ∙ inj₂) ∘ G.F₁ (fs ∙ inj₂)))
+    ↓⟨ H.homomorphism ⟩
+      my-F₁ gs ∘ my-F₁ fs
+    ∎
+    where
+    open C.HomReasoning
+-}
+
+reduce : ∀ (H : Bifunctor C C C) {n m} (F : Powerendo n) (G : Powerendo m) → Powerendo (n + m)
+reduce H F G = flattenP (reduce′ H F G)
+
+flattenP-assocʳ : ∀ {n₁ n₂ n₃} (F : Powerendo′ (Fin n₁ ⊎ (Fin n₂ ⊎ Fin n₃))) → Powerendo ((n₁ + n₂) + n₃)
+flattenP-assocʳ {n₁} {n₂} {n₃} =
+  rebase ⟦ inject+ n₃ ∙ inject+ n₂
+         , ⟦ inject+ n₃ ∙ raise n₁ , raise (n₁ + n₂) ⟧′ ⟧′
+
+reduce2ʳ : ∀ (G : Bifunctor C C C) {n₁ n₂ n₃} (F₁ : Powerendo n₁) (F₂ : Powerendo n₂) (F₃ : Powerendo n₃) → Powerendo ((n₁ + n₂) + n₃)
+reduce2ʳ G F₁ F₂ F₃ = flattenP-assocʳ (reduce′ G F₁ (reduce′ G F₂ F₃))
 
 select′ : ∀ {I} (i : I) → Powerendo′ I
 select′ {I} i = record
@@ -309,14 +313,18 @@ hyp F = record
   where
   module F = Functor F
 
+{-
 private
   curryⁿ : ∀ n {a b} {A : Set a} {B : Set b} → ((Fin n → A) → B) → N-ary n A B
-  curryⁿ zero f = f (λ ())
+  curryⁿ zero f = f unpossible
   curryⁿ (suc n) {A = A} f = λ x → curryⁿ n (f ∙ addon x)
     where
     addon : A → (Fin n → A) → Fin (suc n) → A
     addon x _ zero = x
     addon _ g (suc i) = g i
+    unpossible : Fin 0 → B
+    unpossible ()
+-}
 
 plex′ : ∀ {J I} → (J → Powerendo′ I) → Hyperendo′ I J
 plex′ Fs = record
@@ -328,40 +336,10 @@ plex′ Fs = record
   }
 
 plex : ∀ {n} {I} → N-ary n (Powerendo′ I) (Hyperendo′ I (Fin n))
-plex {n} = curryⁿ n plex′
-
-plex₂ : ∀ {I} (F G : Powerendo′ I) → (Hyperendo′ I (Fin 2))
-plex₂ {I} F G = plex′ switch
-  where
-  switch : Fin 2 → Powerendo′ I
-  switch zero = F
-  switch (suc zero) = G
+plex {n} = curryⁿ {n} (plex′ ∙ flip lookup)
 
 widenˡ : ∀ (l : ℕ) {n} (F : Powerendo n) → Powerendo (l + n)
-widenˡ l F = record
-  { F₀ = λ As → F.F₀ (As ∙ pack)
-  ; F₁ = λ {As Bs} fs → F.F₁ (fs ∙ pack)
-  ; identity = λ {As} → F.identity
-  ; homomorphism = λ {As Bs Cs fs gs} → F.homomorphism
-  ; F-resp-≡ = λ {As Bs fs gs} fs≡gs → F.F-resp-≡ (fs≡gs ∙ pack)
-  }
-  where
-  private module F = Functor F
-  pack = raise l
+widenˡ l = rebase (raise l)
 
 widenʳ : ∀ (r : ℕ) {n} (F : Powerendo n) → Powerendo (n + r)
-widenʳ r F = record
-  { F₀ = λ As → F.F₀ (As ∙ pack)
-  ; F₁ = λ {As Bs} fs → F.F₁ (fs ∙ pack)
-  ; identity = λ {As} → F.identity
-  ; homomorphism = λ {As Bs Cs fs gs} → F.homomorphism
-  ; F-resp-≡ = λ {As Bs fs gs} fs≡gs → F.F-resp-≡ (fs≡gs ∙ pack)
-  }
-  where
-  private module F = Functor F
-  pack = inject+ r
-
-open import Categories.Support.PropositionalEquality
-
-.overlap-∘ : ∀ {D E} (H : Bifunctor D D E) {I} (F G : Powerfunctor′ D I) {J} (K : Hyperendo′ J I) → (overlap {D} {E} H F G) ∘F K ≣ overlap {D} {E} H (F ∘F K) (G ∘F K)
-overlap-∘ H F G K = ≣-refl
+widenʳ r = rebase (inject+ r)

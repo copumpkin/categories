@@ -1,7 +1,6 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Monoidal.Braided where
 
-open import Level
 open import Level using (_⊔_)
 
 open import Categories.Category

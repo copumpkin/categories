@@ -63,8 +63,8 @@ record IndexedSetoid {i iℓ} (I : Set i) (_∼_ : B.Rel I iℓ) c ℓ : Set (su
 resp-per : ∀ {c ℓ} {C₁ C₂ : Set c} {_≈₁_ : B.Rel C₁ ℓ} {_≈₂_ : B.Rel C₂ ℓ} {equiv₁ : B.IsEquivalence _≈₁_} {equiv₂ : B.IsEquivalence _≈₂_} → C₁ ≡ C₂ → _≈₁_ ≅ _≈₂_ → _≡_ {A = Setoid c ℓ} record {Carrier = C₁; _≈_ = _≈₁_; isEquivalence = equiv₁} record {Carrier = C₂; _≈_ = _≈₂_; isEquivalence = equiv₂}
 resp-per _≡_.refl _≅_.refl = _≡_.refl
 
-.resp-per′ : ∀ {c ℓ} {S T : Setoid c ℓ} → (Carrier₀ S ≡ Carrier₀ T) → (Setoid._≈_ S ≅ Setoid._≈_ T) → S ≡ T
-resp-per′ {S = S} {T} = resp-per {equiv₁ = Setoid.isEquivalence S} {equiv₂ = Setoid.isEquivalence T}
+.resp-per′ : ∀ {c ℓ} (S T : Setoid c ℓ) → (Carrier₀ S ≡ Carrier₀ T) → (Setoid._≈_ S ≅ Setoid._≈_ T) → S ≡ T
+resp-per′ S T = resp-per {equiv₁ = Setoid.isEquivalence S} {equiv₂ = Setoid.isEquivalence T}
 
 open IndexedSetoid using (_at_)
 
@@ -110,10 +110,13 @@ module SetoidHetero {cf ℓf} (From : Setoid cf ℓf) (ct ℓt : Level) (To : Fr
   localize {x} {y} To$x≡To$y with To$ y
   localize {x} _≡_.refl | ._ = Setoid._≈_ (To$ x)
 
-  data _≈⋆_ {iˣ iʸ : I} (x : To$C iˣ) : (y : To$C iʸ) → Set (ct ⊔ ℓt) where
-    locally : (To$x≡To$y : To$ iˣ ≡ To$ iʸ)
-      {y : To$C iʸ} (x≈y : localize′ To$x≡To$y x y) →
-      x ≈⋆ y
+  data _≈∗_ {S T : Setoid ct ℓt} (x : Carrier₀ S) : (y : Carrier₀ T) → Set (ct ⊔ ℓt) where
+    locally : (S≡T : S ≡ T)
+      {y : Carrier₀ T} (x≈y : localize′ S≡T x y) →
+      _≈∗_ {S} {T} x y
+
+  _≈⋆_ : {iˣ iʸ : I} → B.REL (To$C iˣ) (To$C iʸ) (ct ⊔ ℓt)
+  _≈⋆_ {iˣ} {iʸ} = _≈∗_ {To$ iˣ} {To$ iʸ}
 
 asIndexed : ∀ {cf ℓf ct ℓt} {From : Setoid cf ℓf} → (From ⟶[ ct , ℓt ]) → IndexedSetoid (Carrier₀ From) (Setoid._≈_ From) ct (ct ⊔ ℓt)
 asIndexed {ct = ct} {ℓt} {From} To = record
@@ -124,33 +127,36 @@ asIndexed {ct = ct} {ℓt} {From} To = record
     ; sym = my-sym
     ; trans = my-trans
     }
-  ; resp = λ i∼j → resp-per′ (my-resp-helper i∼j) {!my-resp-helper₂ i∼j!}
+  ; resp = λ {i j} i∼j → resp-per′ (To$ i) (To$ j) (resp-helper i∼j) (resp-helper₂ i∼j)
   }
   where
   open SetoidHetero _ ct ℓt To
 
   .my-refl : I.Reflexive To$C _≈⋆_
-  my-refl {i} {x} = locally _≡_.refl ((Setoid.refl (To$ i)))
+  my-refl {i} {x} = locally {To$ i} _≡_.refl ((Setoid.refl (To$ i)))
 
-  .my-sym-helper : ∀ i j (To$i≡To$j : To$ i ≡ To$ j) (x : To$C i) (y : To$C j) (x≈y : localize′ To$i≡To$j x y) → localize′ (PE.sym To$i≡To$j) y x
-  my-sym-helper i j To$i≡To$j x y with To$ j
-  my-sym-helper i j _≡_.refl x y | ._ = Setoid.sym (To$ i)
+  .sym-helper : ∀ i j (To$i≡To$j : To$ i ≡ To$ j) (x : To$C i) (y : To$C j) (x≈y : localize′ To$i≡To$j x y) → localize′ (PE.sym To$i≡To$j) y x
+  sym-helper i j To$i≡To$j x y with To$ j
+  sym-helper i j _≡_.refl x y | ._ = Setoid.sym (To$ i)
 
   .my-sym : I.Symmetric To$C _≈⋆_
-  my-sym {i} {j} {x} {y} (locally To$i≡To$j x≈y) = locally (PE.sym To$i≡To$j) (my-sym-helper i j To$i≡To$j x y x≈y)
+  my-sym {i} {j} {x} {y} (locally To$i≡To$j x≈y) = locally (PE.sym To$i≡To$j) (sym-helper i j To$i≡To$j x y x≈y)
 
-  .my-trans-helper : ∀ i j k (To$i≡To$j : To$ i ≡ To$ j) (To$j≡To$k : To$ j ≡ To$ k) (x : To$C i) (y : To$C j) (z : To$C k) (x≈y : localize′ To$i≡To$j x y) (y≈z : localize′ To$j≡To$k y z) → localize′ (PE.trans To$i≡To$j To$j≡To$k) x z
-  my-trans-helper i j k To$i≡To$j To$j≡To$k x y z with To$ j | To$ k
-  my-trans-helper i j k _≡_.refl _≡_.refl x y z | ._ | ._ = Setoid.trans (To$ i)
+  .trans-helper : ∀ i j k (To$i≡To$j : To$ i ≡ To$ j) (To$j≡To$k : To$ j ≡ To$ k) (x : To$C i) (y : To$C j) (z : To$C k) (x≈y : localize′ To$i≡To$j x y) (y≈z : localize′ To$j≡To$k y z) → localize′ (PE.trans To$i≡To$j To$j≡To$k) x z
+  trans-helper i j k To$i≡To$j To$j≡To$k x y z with To$ j | To$ k
+  trans-helper i j k _≡_.refl _≡_.refl x y z | ._ | ._ = Setoid.trans (To$ i)
 
   .my-trans : I.Transitive To$C _≈⋆_
-  my-trans (locally To$i≡To$j x≈y) (locally To$j≡To$k y≈z) = locally (PE.trans To$i≡To$j To$j≡To$k) (my-trans-helper _ _ _ To$i≡To$j To$j≡To$k _ _ _ x≈y y≈z)
+  my-trans (locally To$i≡To$j x≈y) (locally To$j≡To$k y≈z) = locally (PE.trans To$i≡To$j To$j≡To$k) (trans-helper _ _ _ To$i≡To$j To$j≡To$k _ _ _ x≈y y≈z)
 
-  .my-resp-helper : ∀ {i j} → From [ i ≈ j ] → To$C i ≡ To$C j
-  my-resp-helper i∼j = PE.cong Carrier₀ (cong₀ To i∼j)
+  .resp-helper : ∀ {i j} → From [ i ≈ j ] → To$C i ≡ To$C j
+  resp-helper i∼j = PE.cong Carrier₀ (cong₀ To i∼j)
 
-  .my-resp-helper₂ : ∀ {i j} → From [ i ≈ j ] → _≈⋆_ {iˣ = i} {i} ≅ _≈⋆_ {iˣ = j} {j}
-  my-resp-helper₂ i∼j = {!!}
+  .resp-helper₃ : (S T : Setoid ct ℓt) → S ≡ T → _≈∗_ {S} {S} ≅ _≈∗_ {T} {T}
+  resp-helper₃ S .S _≡_.refl = _≅_.refl 
+
+  .resp-helper₂ : ∀ {i j} → From [ i ≈ j ] → _≈⋆_ {i} {i} ≅ _≈⋆_ {j} {j}
+  resp-helper₂ {i} {j} i∼j = resp-helper₃ (To$ i) (To$ j) (cong₀ To i∼j)
 
 ------------------------------------------------------------------------
 -- Functions which preserve equality

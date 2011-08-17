@@ -12,11 +12,11 @@ import Categories.Object.Product as Product
 record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     B^A : Obj
-    product : Product.Product C (B^A) B
+    product : Product.Product C (B^A) A
 
-  open Product.Product C product renaming (A×B to B^A×B)
+  open Product.Product C product renaming (A×B to B^A×A)
 
   field
-    eval : B^A×B ⇒ B
-    λg : ∀ X → (P : Product.Product C X A) → (Product.Product.A×B C P ⇒ B)
+    eval : B^A×A ⇒ B
+    λg : (X : Obj) → (P : Product.Product C X A) → (Product.Product.A×B C P ⇒ B) → (X ⇒ B^A)
     -- moar

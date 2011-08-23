@@ -41,10 +41,38 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     eval : B^A ×A ⇒ B
     λg : (X : Obj) → (X ×A ⇒ B) → (X ⇒ B^A)
-    .commutes 
+    .commutes
         : ∀{X}{g : X ×A ⇒ B}
         → (eval ∘ first (λg X g) ≡ g)
     .λ-unique
-        : ∀ {X}{g : X ×A ⇒ B}{h}
+        : ∀ {X}{g : X ×A ⇒ B}{h : X ⇒ B^A}
         → (eval ∘ first h ≡ g)
         → (h ≡ λg X g)
+  
+  .identity
+      : ∀ {X}{f : X ⇒ B^A }
+      → λg X (eval ∘ first f) ≡ f
+  identity {X}{f} = sym (λ-unique refl)
+    where open Equiv
+
+  .λ-resp-≡
+      : ∀ {X f g}
+      → (f ≡ g)
+      → (λg X f ≡ λg X g)
+  λ-resp-≡ {X}{f}{g} f≡g =
+    begin
+        λg X f
+    ↓⟨ λ-unique commutes₂ ⟩
+        λg X g
+    ∎
+    where
+        open HomReasoning
+        commutes₂ : eval ∘ first (λg X f) ≡ g
+        commutes₂ =
+            begin
+                eval ∘ first (λg X f)
+            ↓⟨ commutes ⟩
+                f
+            ↓⟨ f≡g ⟩
+                g
+            ∎

@@ -70,21 +70,19 @@ Comma {o₁}{ℓ₁}{e₁}
         × B [ h₁ ≡ h₂ ]
     
     id′ : {A : Obj′} → Hom′ A A
-    id′ { A } = record 
-        { g = A.id ; h = B.id
-        ; commutes = 
-            begin
-                C [ S₁ B.id ∘ f ]
-            ↓⟨ S.identity ⟩∘⟨ refl ⟩
-                C [ C.id ∘ f ]
-            ↓⟨ C.identityˡ ⟩
-                f
-            ↑⟨ C.identityʳ ⟩
-                C [ f ∘ C.id ]
-            ↑⟨ refl ⟩∘⟨ T.identity ⟩
-                C [ f ∘ T₁ A.id ]
-            ∎
-        } where
+    id′ { A } = A.id , B.id
+        [ begin
+              C [ S₁ B.id ∘ f ]
+          ↓⟨ S.identity ⟩∘⟨ refl ⟩
+              C [ C.id ∘ f ]
+          ↓⟨ C.identityˡ ⟩
+              f
+          ↑⟨ C.identityʳ ⟩
+              C [ f ∘ C.id ]
+          ↑⟨ refl ⟩∘⟨ T.identity ⟩
+              C [ f ∘ T₁ A.id ]
+          ∎ ]
+          where
             open Obj′ A
             open C.HomReasoning
             open C.Equiv

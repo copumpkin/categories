@@ -63,10 +63,8 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   .⟨⟩-cong₂ : ∀ {A B C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
   ⟨⟩-cong₂ = Product.⟨⟩-cong₂ product
   
-  -- If I _really_ wanted to, I could do this for a specific pair of products like the rest above, but I'll write that one
-  -- when I need it.
   _⁂_ : ∀ {A B C D} → (A ⇒ B) → (C ⇒ D) → ((A × C) ⇒ (B × D))
-  f ⁂ g = ⟨ f ∘ π₁ , g ∘ π₂ ⟩
+  f ⁂ g = [ product ⇒ product ] f ⁂ g
 
   -- TODO: this is probably harder to use than necessary because of this definition. Maybe make a version
   -- that doesn't have an explicit id in it, too?

@@ -17,6 +17,8 @@ open Categories.Object.Product.Morphisms C
 
 import Categories.Object.Exponential
 open   Categories.Object.Exponential C
+  hiding (convert)
+  renaming (λ-distrib to λ-distrib′)
 
 open import Categories.Functor
     using (Contravariant)
@@ -35,6 +37,14 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
     eval {A} = Σ↑.eval A ∘ convert product (Σ↑.product A)
     λ-abs : ∀ {Γ} A → (Γ × A) ⇒ Σ → Γ ⇒ Σ↑ A
     λ-abs {Γ} A f = Σ↑.λg A Γ product f
+    
+    {-
+      x : A     |-  f x : B
+      ------------------------------------------   [Σ↑_]
+      k : Σ↑ B  |-  (λ (x : A) → k (f x)) : Σ↑ A
+    -}
+    [Σ↑_] : ∀ {A B} → A ⇒ B → Σ↑ B ⇒ Σ↑ A
+    [Σ↑_] {A}{B} f = λ-abs A (eval ∘ second f)
     
     module Lemmas (A : Obj) where
         -- some lemmas from Exponential specialized to C's chosen products
@@ -111,92 +121,18 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
                         g
                     ∎
     
-    -- TODO: backport this into Exponential module (gonna be painful...)
-    -- or abandon the minimalist approach to products there
-    .λ-∘ : ∀ {A B C}{f : A ⇒ B}{g : (C × B) ⇒ Σ}
-        → λ-abs A (eval ∘ second f) ∘ λ-abs B g ≡ λ-abs A (g ∘ second f)
-    λ-∘ {A}{B}{C}{f}{g} = λ-unique A lem₂
-        where
-            open Equiv
-            open HomReasoning
-            open Lemmas
-            
-            lem₂ : eval ∘ first (λ-abs A (eval ∘ second f) ∘ λ-abs B g) ≡ g ∘ second f
-            lem₂ =
-                begin
-                    eval ∘ first (λ-abs A (eval ∘ second f) ∘ λ-abs B g)
-                ↑⟨ refl ⟩∘⟨ first∘first ⟩
-                    eval ∘ first (λ-abs A (eval ∘ second f)) ∘ first (λ-abs B g)
-                ↑⟨ assoc ⟩
-                    (eval ∘ first (λ-abs A (eval ∘ second f))) ∘ first (λ-abs B g)
-                ↓⟨ commutes A ⟩∘⟨ refl ⟩
-                    (eval ∘ second f) ∘ first (λ-abs B g)   
-                ↓⟨ assoc ⟩
-                    eval ∘ second f ∘ first (λ-abs B g)   
-                ↑⟨ refl ⟩∘⟨ first↔second ⟩
-                    eval ∘ first (λ-abs B g) ∘ second f
-                ↑⟨ assoc ⟩
-                    (eval ∘ first (λ-abs B g)) ∘ second f
-                ↓⟨ commutes B ⟩∘⟨ refl ⟩
-                    g ∘ second f
-                ∎
-    
-    {-
-      x : A     |-  f x : B
-      ------------------------------------------   [Σ↑_]
-      k : Σ↑ B  |-  (λ (x : A) → k (f x)) : Σ↑ A
-    -}
-    [Σ↑_] : ∀ {A B} → A ⇒ B → Σ↑ B ⇒ Σ↑ A
-    [Σ↑_] {A}{B} f = λ-abs A (eval ∘ second f)
-    
-    Σ↑-Functor : Contravariant C C
-    Σ↑-Functor = record
-        { F₀            =  Σ↑_
-        ; F₁            = [Σ↑_]
-        ; identity      = identity
-        ; homomorphism  = homomorphism
-        ; F-resp-≡      = F-resp-≡
-        }
-        where
-            open Equiv
-            open HomReasoning
-            
-            .identity : ∀ {A} → [Σ↑ id {A} ] ≡ id
-            identity {A} = 
-                begin
-                    λ-abs A (eval ∘ second id)
-                ↓⟨ λ-resp-≡ (∘-resp-≡ refl (id⁂id product)) ⟩
-                    λ-abs A (eval ∘ id)
-                ↓⟨ λ-resp-≡ identityʳ ⟩
-                    λ-abs A eval
-                ↓⟨ λ-η ⟩
-                    id
-                ∎ where open Lemmas A
-            
-            .homomorphism : ∀ {X Y Z}
-                {f : X ⇒ Y} {g : Y ⇒ Z}
-                → [Σ↑ (g ∘ f) ] ≡ [Σ↑ f ] ∘ [Σ↑ g ]
-            homomorphism {X}{Y}{Z}{f}{g} =
-                begin
-                    λ-abs X (eval ∘ second (g ∘ f))
-                ↑⟨ λ-resp-≡ (∘-resp-≡ refl second∘second)  ⟩
-                    λ-abs X (eval ∘ second g ∘ second f)
-                ↑⟨ λ-resp-≡ assoc  ⟩
-                    λ-abs X ((eval ∘ second g) ∘ second f)
-                ↑⟨ λ-∘ ⟩
-                    λ-abs X (eval ∘ second f) 
-                        ∘
-                    λ-abs Y (eval ∘ second g)
-                ∎
-                where
-                    open Lemmas X
-            
-            .F-resp-≡ : ∀ {A B}{f g : A ⇒ B }
-                → f ≡ g → [Σ↑ f ] ≡ [Σ↑ g ]
-            F-resp-≡ {A}{B}{f}{g} f≡g =
-                begin
-                    λ-abs A (eval ∘ second f)
-                ↓⟨ λ-resp-≡ (refl ⟩∘⟨ ⟨⟩-cong₂ refl (f≡g ⟩∘⟨ refl)) ⟩
-                    λ-abs A (eval ∘ second g)
-                ∎ where open Lemmas A
-
+        .λ-distrib : ∀ {B C}{f : A ⇒ B}{g : (C × B) ⇒ Σ}
+            → λ-abs A (eval ∘ second f) ∘ λ-abs B g ≡ λ-abs A (g ∘ second f)
+        λ-distrib {B}{C}{f}{g} =
+            begin
+                Σ↑A.λg (Σ↑ B) product ((Σ↑.eval B ∘ convert product (Σ↑.product B)) ∘ second f)
+                  ∘ Σ↑.λg B C product g
+            ↓⟨ λ-resp-≡ assoc ⟩∘⟨ refl ⟩
+                Σ↑A.λg (Σ↑ B) product (Σ↑.eval B ∘ convert product (Σ↑.product B) ∘ second f)
+                  ∘ Σ↑.λg B C product g
+            ↓⟨ λ-resp-≡ (refl ⟩∘⟨ [ product ⇒ product ⇒ Σ↑.product B ]convert∘⁂) ⟩∘⟨ refl ⟩
+                Σ↑A.λg (Σ↑ B) product (Σ↑.eval B ∘ [ product ⇒ Σ↑.product B ]second f)
+                  ∘ Σ↑.λg B C product g
+            ↓⟨ λ-distrib′ exponential exponential product product product ⟩
+                Σ↑A.λg C product (g ∘ second f)
+            ∎

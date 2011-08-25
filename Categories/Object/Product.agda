@@ -54,17 +54,73 @@ record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
         module W×Y = Product W×Y
         module X×Z = Product X×Z
 
+.id⁂id≡id : ∀ {A B}(p : Product A B) → [ p ⇒ p ] id ⁂ id ≡ id
+id⁂id≡id p =
+  begin
+    ⟨ id ∘ π₁ , id ∘ π₂ ⟩
+  ↓⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩
+    ⟨ π₁ , π₂ ⟩
+  ↓⟨ η ⟩
+    id
+  ∎
+  where
+  open Product p
+  open Equiv
+  open HomReasoning
+
+.⁂-cong₂ : ∀ {A B C D}{f g h i}
+    → (p₁ : Product A B)
+    → (p₂ : Product C D)
+    → f ≡ g
+    → h ≡ i
+    → [ p₁ ⇒ p₂ ] f ⁂ h ≡ [ p₁ ⇒ p₂ ] g ⁂ i
+⁂-cong₂ {A}{B}{C}{D}{f}{g}{h}{i} p₁ p₂ f≡g h≡i =
+    Product.⟨⟩-cong₂ p₂ (∘-resp-≡ f≡g refl) (∘-resp-≡ h≡i refl)
+
+.⁂-distrib : ∀ {A B C D E F}{f g h i}
+    → (p₁ : Product A B)
+    → (p₂ : Product C D)
+    → (p₃ : Product E F)
+    → ([ p₂ ⇒ p₃ ] g ⁂ i) ∘ ([ p₁ ⇒ p₂ ] f ⁂ h) ≡ [ p₁ ⇒ p₃ ] (g ∘ f) ⁂ (i ∘ h)
+⁂-distrib {A}{B}{C}{D}{E}{F}{f}{g}{h}{i} p₁ p₂ p₃ =
+    begin
+        p₃.⟨_,_⟩ (g ∘ p₂.π₁) (i ∘ p₂.π₂) ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂)
+    ↓⟨ p₃.⟨⟩-distrib-∘ ⟩
+        p₃.⟨_,_⟩
+            ((g ∘ p₂.π₁) ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
+            ((i ∘ p₂.π₂) ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
+    ↓⟨ p₃.⟨⟩-cong₂ assoc assoc ⟩
+        p₃.⟨_,_⟩
+            (g ∘ p₂.π₁ ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
+            (i ∘ p₂.π₂ ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
+    ↓⟨ p₃.⟨⟩-cong₂ (∘-resp-≡ refl p₂.commute₁) (∘-resp-≡ refl p₂.commute₂) ⟩
+        p₃.⟨_,_⟩ (g ∘ f ∘ p₁.π₁) (i ∘ h ∘ p₁.π₂)
+    ↑⟨ p₃.⟨⟩-cong₂ assoc assoc ⟩
+        p₃.⟨_,_⟩ ((g ∘ f) ∘ p₁.π₁) ((i ∘ h) ∘ p₁.π₂)
+    ∎
+    where
+    module p₁ = Product p₁
+    module p₂ = Product p₂
+    module p₃ = Product p₃
+    open HomReasoning
+
 [_⇒_]first 
     : ∀ {X Y Z}
     → (X×Z : Product X Z) → (Y×Z : Product Y Z)
     → X ⇒ Y → Product.A×B X×Z ⇒ Product.A×B Y×Z
 [_⇒_]first X×Z Y×Z f = [ X×Z ⇒ Y×Z ] f ⁂ id
 
+.first-id≡id : ∀ {A B}(p : Product A B) → [ p ⇒ p ]first id ≡ id
+first-id≡id = id⁂id≡id
+
 [_⇒_]second
     : ∀ {X Y Z}
     → (X×Y : Product X Y) → (X×Z : Product X Z)
     → Y ⇒ Z → Product.A×B X×Y ⇒ Product.A×B X×Z
 [_⇒_]second X×Y X×Z g = [ X×Y ⇒ X×Z ] id ⁂ g
+
+.second-id≡id : ∀ {A B}(p : Product A B) → [ p ⇒ p ]second id ≡ id
+second-id≡id = id⁂id≡id
 
 open import Categories.Morphisms
 
@@ -73,6 +129,10 @@ convert p₁ p₂ = p₂.⟨_,_⟩ p₁.π₁ p₁.π₂
   where
   module p₁ = Product p₁
   module p₂ = Product p₂
+
+.convert≡id⁂id : ∀{X Y}(p₁ p₂ : Product X Y) → convert p₁ p₂ ≡ [ p₁ ⇒ p₂ ] id ⁂ id
+convert≡id⁂id p₁ p₂ = sym (Product.⟨⟩-cong₂ p₂ identityˡ identityˡ)
+    where open Equiv
 
 convert-Iso : ∀ {A B} → (p₁ : Product A B) (p₂ : Product A B) → Iso C (convert p₁ p₂) (convert p₂ p₁)
 convert-Iso p₁ p₂ = record

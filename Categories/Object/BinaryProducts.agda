@@ -154,3 +154,46 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
 
   .⟨⟩∘ : ∀ {A B C D} {f : A ⇒ B} {g : A ⇒ C} {q : D ⇒ A} → ⟨ f , g ⟩ ∘ q ≡ ⟨ f ∘ q , g ∘ q ⟩
   ⟨⟩∘ = sym (universal (trans (sym assoc) (∘-resp-≡ˡ commute₁)) (trans (sym assoc) (∘-resp-≡ˡ commute₂)))
+  
+  .first∘first : ∀ {A B C D}{f : B ⇒ C} {g : A ⇒ B}
+    → first f ∘ first g ≡ first {C = D} (f ∘ g)
+  first∘first {A}{B}{C}{D}{f}{g} =
+    begin
+        first f ∘ first g
+    ↓⟨ first∘⟨⟩ ⟩
+        ⟨ f ∘ g ∘ π₁ , id ∘ π₂ ⟩
+    ↑⟨ ⟨⟩-cong₂ assoc refl ⟩
+        first (f ∘ g)
+    ∎
+    where
+    open HomReasoning
+  
+  .second∘second : ∀ {A B C D}{f : B ⇒ C} {g : A ⇒ B}
+    → second f ∘ second g ≡ second {A = D} (f ∘ g)
+  second∘second {A}{B}{C}{D}{f}{g} =
+    begin
+        second f ∘ second g
+    ↓⟨ second∘⟨⟩ ⟩
+        ⟨ id ∘ π₁ , f ∘ g ∘ π₂ ⟩
+    ↑⟨ ⟨⟩-cong₂ refl assoc ⟩
+        second (f ∘ g)
+    ∎
+    where
+    open HomReasoning
+  
+  .first↔second : ∀ {A B C D}{f : A ⇒ B}{g : C ⇒ D}
+    → first f ∘ second g ≡ second g ∘ first f
+  first↔second {A}{B}{C}{D}{f}{g} =
+    begin
+      first f ∘ second g
+    ↓⟨ ⁂∘⁂ ⟩
+        (f ∘ id) ⁂ (id ∘ g)
+    ↓⟨ ⁂-cong₂ product product identityʳ identityˡ ⟩
+        f ⁂ g
+    ↑⟨ ⁂-cong₂ product product identityˡ identityʳ ⟩
+        (id ∘ f) ⁂ (g ∘ id)
+    ↑⟨ ⁂∘⁂ ⟩
+      second g ∘ first f
+    ∎
+    where
+    open HomReasoning

@@ -11,12 +11,12 @@ open BinaryProducts C binary
 
 import Categories.Object.Product
 open Categories.Object.Product C
-    using ([_⇒_]first; [_⇒_]_⁂_; convert; convert≡id⁂id; ⁂-distrib; ⁂-cong₂; id⁂id≡id)
-module Product = Categories.Object.Product.Product C
+
+import Categories.Object.Product.Morphisms
+open Categories.Object.Product.Morphisms C
 
 import Categories.Object.Exponential
 open   Categories.Object.Exponential C
-  hiding (module Product)
 
 open import Categories.Functor
     using (Contravariant)
@@ -45,16 +45,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
         .convert∘first : ∀ {X}{f : X ⇒ Σ↑ A}
             → convert product Σ↑A.product ∘ first f
             ≡ [ product ⇒ Σ↑A.product ]first f
-        convert∘first {X}{f} =
-            begin
-                convert product Σ↑A.product ∘ first f
-            ↓⟨ convert≡id⁂id product Σ↑A.product ⟩∘⟨ refl ⟩
-                ([ product ⇒ Σ↑A.product ] id ⁂ id) ∘ first f
-            ↓⟨ ⁂-distrib product product Σ↑A.product ⟩
-                ([ product ⇒ Σ↑A.product ] (id ∘ f) ⁂ (id ∘ id))
-            ↓⟨ ⁂-cong₂ product Σ↑A.product identityˡ identityˡ ⟩
-                [ product ⇒ Σ↑A.product ]first f
-            ∎
+        convert∘first = [ product ⇒ product ⇒ Σ↑A.product ]convert∘⁂
         
         .commutes : ∀{X} {g : (X × A) ⇒ Σ}
             → eval ∘ first (λ-abs A g) ≡ g
@@ -174,7 +165,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
             identity {A} = 
                 begin
                     λ-abs A (eval ∘ second id)
-                ↓⟨ λ-resp-≡ (∘-resp-≡ refl (id⁂id≡id product)) ⟩
+                ↓⟨ λ-resp-≡ (∘-resp-≡ refl (id⁂id product)) ⟩
                     λ-abs A (eval ∘ id)
                 ↓⟨ λ-resp-≡ identityʳ ⟩
                     λ-abs A eval

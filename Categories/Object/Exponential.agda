@@ -9,8 +9,10 @@ open import Data.Product using (∃)
 open import Level
 
 import Categories.Object.Product
-open Categories.Object.Product C using (Product; [_⇒_]first; [_⇒_]second; first-id≡id; [_⇒_]_⁂_)
-module Product = Categories.Object.Product.Product C
+open Categories.Object.Product C
+
+import Categories.Object.Product.Morphisms
+open Categories.Object.Product.Morphisms C
 
 record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
@@ -71,7 +73,7 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
       λg B^A product eval
     ↑⟨ λ-resp-≡ B^A product identityʳ ⟩
       λg B^A product (eval ∘ id)
-    ↑⟨ λ-resp-≡ B^A product (∘-resp-≡ refl (first-id≡id product)) ⟩
+    ↑⟨ λ-resp-≡ B^A product (∘-resp-≡ refl (first-id product)) ⟩
       λg B^A product (eval ∘ [ product ⇒ product ]first id)
     ↑⟨ λ-unique B^A product refl ⟩
       id

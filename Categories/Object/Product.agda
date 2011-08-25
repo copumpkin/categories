@@ -40,87 +40,10 @@ record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     lem {W}{X}{Y}{Z}{f}{g}{h}{i} commute =
       trans (sym assoc) (∘-resp-≡ commute refl)
   
-  .⟨⟩-distrib-∘ : ∀ {C D}{f : C ⇒ D}{g : D ⇒ A}{h : D ⇒ B}
+  .⟨⟩-distrib : ∀ {C D}{f : C ⇒ D}{g : D ⇒ A}{h : D ⇒ B}
     → ⟨ g , h ⟩ ∘ f ≡ ⟨ g ∘ f , h ∘ f ⟩
-  ⟨⟩-distrib-∘ {C}{D}{f}{g}{h} 
+  ⟨⟩-distrib {C}{D}{f}{g}{h} 
     = sym (universal (lem commute₁) (lem commute₂))
-
-[_⇒_]_⁂_ : ∀ {W X Y Z}
-    → (W×Y : Product W Y)
-    → (X×Z : Product X Z)
-    → (W ⇒ X) → (Y ⇒ Z) → (Product.A×B W×Y ⇒ Product.A×B X×Z)
-[_⇒_]_⁂_ W×Y X×Z f g = X×Z.⟨_,_⟩ (f ∘ W×Y.π₁) (g ∘ W×Y.π₂)
-    where
-        module W×Y = Product W×Y
-        module X×Z = Product X×Z
-
-.id⁂id≡id : ∀ {A B}(p : Product A B) → [ p ⇒ p ] id ⁂ id ≡ id
-id⁂id≡id p =
-  begin
-    ⟨ id ∘ π₁ , id ∘ π₂ ⟩
-  ↓⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩
-    ⟨ π₁ , π₂ ⟩
-  ↓⟨ η ⟩
-    id
-  ∎
-  where
-  open Product p
-  open Equiv
-  open HomReasoning
-
-.⁂-cong₂ : ∀ {A B C D}{f g h i}
-    → (p₁ : Product A B)
-    → (p₂ : Product C D)
-    → f ≡ g
-    → h ≡ i
-    → [ p₁ ⇒ p₂ ] f ⁂ h ≡ [ p₁ ⇒ p₂ ] g ⁂ i
-⁂-cong₂ {A}{B}{C}{D}{f}{g}{h}{i} p₁ p₂ f≡g h≡i =
-    Product.⟨⟩-cong₂ p₂ (∘-resp-≡ f≡g refl) (∘-resp-≡ h≡i refl)
-
-.⁂-distrib : ∀ {A B C D E F}{f g h i}
-    → (p₁ : Product A B)
-    → (p₂ : Product C D)
-    → (p₃ : Product E F)
-    → ([ p₂ ⇒ p₃ ] g ⁂ i) ∘ ([ p₁ ⇒ p₂ ] f ⁂ h) ≡ [ p₁ ⇒ p₃ ] (g ∘ f) ⁂ (i ∘ h)
-⁂-distrib {A}{B}{C}{D}{E}{F}{f}{g}{h}{i} p₁ p₂ p₃ =
-    begin
-        p₃.⟨_,_⟩ (g ∘ p₂.π₁) (i ∘ p₂.π₂) ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂)
-    ↓⟨ p₃.⟨⟩-distrib-∘ ⟩
-        p₃.⟨_,_⟩
-            ((g ∘ p₂.π₁) ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
-            ((i ∘ p₂.π₂) ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
-    ↓⟨ p₃.⟨⟩-cong₂ assoc assoc ⟩
-        p₃.⟨_,_⟩
-            (g ∘ p₂.π₁ ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
-            (i ∘ p₂.π₂ ∘ p₂.⟨_,_⟩ (f ∘ p₁.π₁) (h ∘ p₁.π₂))
-    ↓⟨ p₃.⟨⟩-cong₂ (∘-resp-≡ refl p₂.commute₁) (∘-resp-≡ refl p₂.commute₂) ⟩
-        p₃.⟨_,_⟩ (g ∘ f ∘ p₁.π₁) (i ∘ h ∘ p₁.π₂)
-    ↑⟨ p₃.⟨⟩-cong₂ assoc assoc ⟩
-        p₃.⟨_,_⟩ ((g ∘ f) ∘ p₁.π₁) ((i ∘ h) ∘ p₁.π₂)
-    ∎
-    where
-    module p₁ = Product p₁
-    module p₂ = Product p₂
-    module p₃ = Product p₃
-    open HomReasoning
-
-[_⇒_]first 
-    : ∀ {X Y Z}
-    → (X×Z : Product X Z) → (Y×Z : Product Y Z)
-    → X ⇒ Y → Product.A×B X×Z ⇒ Product.A×B Y×Z
-[_⇒_]first X×Z Y×Z f = [ X×Z ⇒ Y×Z ] f ⁂ id
-
-.first-id≡id : ∀ {A B}(p : Product A B) → [ p ⇒ p ]first id ≡ id
-first-id≡id = id⁂id≡id
-
-[_⇒_]second
-    : ∀ {X Y Z}
-    → (X×Y : Product X Y) → (X×Z : Product X Z)
-    → Y ⇒ Z → Product.A×B X×Y ⇒ Product.A×B X×Z
-[_⇒_]second X×Y X×Z g = [ X×Y ⇒ X×Z ] id ⁂ g
-
-.second-id≡id : ∀ {A B}(p : Product A B) → [ p ⇒ p ]second id ≡ id
-second-id≡id = id⁂id≡id
 
 open import Categories.Morphisms
 
@@ -130,43 +53,28 @@ convert p₁ p₂ = p₂.⟨_,_⟩ p₁.π₁ p₁.π₂
   module p₁ = Product p₁
   module p₂ = Product p₂
 
-.convert≡id⁂id : ∀{X Y}(p₁ p₂ : Product X Y) → convert p₁ p₂ ≡ [ p₁ ⇒ p₂ ] id ⁂ id
-convert≡id⁂id p₁ p₂ = sym (Product.⟨⟩-cong₂ p₂ identityˡ identityˡ)
-    where open Equiv
-
 convert-Iso : ∀ {A B} → (p₁ : Product A B) (p₂ : Product A B) → Iso C (convert p₁ p₂) (convert p₂ p₁)
-convert-Iso p₁ p₂ = record
-  { isoˡ = isoˡ
-  ; isoʳ = isoʳ
+convert-Iso {A}{B} p₁ p₂ = record
+  { isoˡ = iso p₁ p₂
+  ; isoʳ = iso p₂ p₁
   }
   where
-  module p₁ = Product p₁
-  module p₂ = Product p₂
-  open Product p₁
-  open Product p₂ renaming (π₁ to π′₁; π₂ to π′₂; ⟨_,_⟩ to ⟨_,_⟩′)
-  open HomReasoning
-
-  .isoˡ : ⟨ π′₁ , π′₂ ⟩ ∘ ⟨ π₁ , π₂ ⟩′ ≡ id
-  isoˡ = begin
+  .iso : (p₁ p₂ : Product A B) → _
+  iso p₁ p₂ = begin
            ⟨ π′₁ , π′₂ ⟩ ∘ ⟨ π₁ , π₂ ⟩′
-         ↓⟨ p₁.⟨⟩-distrib-∘ ⟩
+         ↓⟨ p₁.⟨⟩-distrib ⟩
            ⟨ π′₁ ∘ ⟨ π₁ , π₂ ⟩′ , π′₂ ∘ ⟨ π₁ , π₂ ⟩′ ⟩
          ↓⟨ p₁.⟨⟩-cong₂ p₂.commute₁ p₂.commute₂ ⟩
            ⟨ π₁ , π₂ ⟩
          ↓⟨ p₁.η ⟩
            id
          ∎
-
-  .isoʳ : ⟨ π₁ , π₂ ⟩′ ∘ ⟨ π′₁ , π′₂ ⟩ ≡ id
-  isoʳ = begin
-           ⟨ π₁ , π₂ ⟩′ ∘ ⟨ π′₁ , π′₂ ⟩
-         ↓⟨ p₂.⟨⟩-distrib-∘ ⟩
-           ⟨ π₁ ∘ ⟨ π′₁ , π′₂ ⟩ , π₂ ∘ ⟨ π′₁ , π′₂ ⟩ ⟩′
-         ↓⟨ p₂.⟨⟩-cong₂ p₁.commute₁ p₁.commute₂ ⟩
-           ⟨ π′₁ , π′₂ ⟩′
-         ↓⟨ p₂.η ⟩
-           id
-         ∎
+         where
+         module p₁ = Product p₁
+         module p₂ = Product p₂
+         open Product p₁
+         open Product p₂ renaming (π₁ to π′₁; π₂ to π′₂; ⟨_,_⟩ to ⟨_,_⟩′)
+         open HomReasoning
 
 Unique : ∀ {A B} → (p₁ : Product A B) (p₂ : Product A B) → _≅_ C (Product.A×B p₁) (Product.A×B p₂)
 Unique p₁ p₂ = record
@@ -230,7 +138,7 @@ Twist {X}{Y}{Z} p₁ p₂ p₃ = record
   commute₁ {C}{f}{g} = 
     begin
       p₁.⟨_,_⟩ p₃.π₁ (p₂.π₁ ∘ p₃.π₂) ∘ ⟨ f , g ⟩
-    ↓⟨ p₁.⟨⟩-distrib-∘ ⟩
+    ↓⟨ p₁.⟨⟩-distrib ⟩
       p₁.⟨_,_⟩ (p₃.π₁ ∘ ⟨ f , g ⟩) ((p₂.π₁ ∘ p₃.π₂) ∘ ⟨ f , g ⟩)
     ↓⟨ p₁.⟨⟩-cong₂ p₃.commute₁ interchange ⟩
       p₁.⟨_,_⟩ (p₁.π₁ ∘ f) (p₁.π₂ ∘ f)

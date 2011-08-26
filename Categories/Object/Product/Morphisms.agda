@@ -205,20 +205,20 @@ second-id = id⁂id
   ∎
 
 .[_⇒_,_⇒_]first↔second : ∀ {A B C D}{f : A ⇒ B}{g : C ⇒ D}
-  → (p₁ : Product A C)
-  → (p₂ : Product B C)
-  → (p₃ : Product A D)
-  → (p₄ : Product B D)
-  → [ p₃ ⇒ p₄ ]first f ∘ [ p₁ ⇒ p₃ ]second g ≡ [ p₂ ⇒ p₄ ]second g ∘ [ p₁ ⇒ p₂ ]first f
+  → (p₁ : Product A D)
+  → (p₂ : Product B D)
+  → (p₃ : Product A C)
+  → (p₄ : Product B C)
+  → [ p₁ ⇒ p₂ ]first f ∘ [ p₃ ⇒ p₁ ]second g ≡ [ p₄ ⇒ p₂ ]second g ∘ [ p₃ ⇒ p₄ ]first f
 [_⇒_,_⇒_]first↔second {A}{B}{C}{D}{f}{g} p₁ p₂ p₃ p₄ =
   begin
-    [ p₃ ⇒ p₄ ]first f ∘ [ p₁ ⇒ p₃ ]second g
-  ↓⟨ [ p₁ ⇒ p₃ ⇒ p₄ ]⁂∘⁂ ⟩
-    [ p₁ ⇒ p₄ ] (f ∘ id) ⁂ (id ∘ g)
-  ↓⟨ [ p₁ ⇒ p₄ ]⁂-cong₂ identityʳ identityˡ ⟩
-    [ p₁ ⇒ p₄ ] f ⁂ g
-  ↑⟨ [ p₁ ⇒ p₄ ]⁂-cong₂ identityˡ identityʳ ⟩
-    [ p₁ ⇒ p₄ ] (id ∘ f) ⁂ (g ∘ id)
-  ↑⟨ [ p₁ ⇒ p₂ ⇒ p₄ ]⁂∘⁂ ⟩
-    [ p₂ ⇒ p₄ ]second g ∘ [ p₁ ⇒ p₂ ]first f
+    [ p₁ ⇒ p₂ ]first f ∘ [ p₃ ⇒ p₁ ]second g
+  ↓⟨ [ p₃ ⇒ p₁ ⇒ p₂ ]⁂∘⁂ ⟩
+    [ p₃ ⇒ p₂ ] (f ∘ id) ⁂ (id ∘ g)
+  ↓⟨ [ p₃ ⇒ p₂ ]⁂-cong₂ identityʳ identityˡ ⟩
+    [ p₃ ⇒ p₂ ] f ⁂ g
+  ↑⟨ [ p₃ ⇒ p₂ ]⁂-cong₂ identityˡ identityʳ ⟩
+    [ p₃ ⇒ p₂ ] (id ∘ f) ⁂ (g ∘ id)
+  ↑⟨ [ p₃ ⇒ p₄ ⇒ p₂ ]⁂∘⁂ ⟩
+    [ p₄ ⇒ p₂ ]second g ∘ [ p₃ ⇒ p₄ ]first f
   ∎

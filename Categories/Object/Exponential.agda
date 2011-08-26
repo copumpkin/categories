@@ -26,58 +26,83 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   
   field
     eval : B^A×A ⇒ B
-    λg : (X : Obj) → (X×A : Product X A) → (Product.A×B X×A ⇒ B) → (X ⇒ B^A)
+    λg : {X : Obj} → (X×A : Product X A) → (Product.A×B X×A ⇒ B) → (X ⇒ B^A)
     
     .commutes
         : (X : Obj) → (X×A : Product X A)
         → {g : Product.A×B X×A ⇒ B}
-        → (eval ∘ [ X×A ⇒ product ]first (λg X X×A g) ≡ g)
+        → (eval ∘ [ X×A ⇒ product ]first (λg X×A g) ≡ g)
     .λ-unique
         : (X : Obj) → (X×A : Product X A)
         → {g : Product.A×B X×A ⇒ B}
         → {h : X ⇒ B^A}
         → (eval ∘ [ X×A ⇒ product ]first h ≡ g)
-        → (h ≡ λg X X×A g)
+        → (h ≡ λg X×A g)
   
-  .g-η
+  .η
       : ∀ (X : Obj) (X×A : Product X A)
       {f : X ⇒ B^A }
-      → λg X X×A (eval ∘ [ X×A ⇒ product ]first f) ≡ f
-  g-η X X×A {f} = sym (λ-unique X X×A refl)
+      → λg X×A (eval ∘ [ X×A ⇒ product ]first f) ≡ f
+  η X X×A {f} = sym (λ-unique X X×A refl)
     where open Equiv
-
+  
   .λ-resp-≡
       : (X : Obj)(X×A : Product X A)
       → ∀{f g}
       → (f ≡ g)
-      → (λg X X×A f ≡ λg X X×A g)
+      → (λg X×A f ≡ λg X×A g)
   λ-resp-≡ X X×A {f}{g} f≡g =
     begin
-        λg X X×A f
+        λg X×A f
     ↓⟨ λ-unique X X×A commutes₂ ⟩
-        λg X X×A g
+        λg X×A g
     ∎
     where
         open HomReasoning
-        commutes₂ : eval ∘ [ X×A ⇒ product ]first (λg X X×A f) ≡ g
+        commutes₂ : eval ∘ [ X×A ⇒ product ]first (λg X×A f) ≡ g
         commutes₂ =
             begin
-                eval ∘ [ X×A ⇒ product ]first (λg X X×A f)
+                eval ∘ [ X×A ⇒ product ]first (λg X×A f)
             ↓⟨ commutes X X×A ⟩
                 f
             ↓⟨ f≡g ⟩
                 g
             ∎
   
-  .η : λg B^A product eval ≡ id
-  η =
+  .cut : ∀ {C D}
+    → {p₂ : Product C A}
+    → {p₃ : Product D A}
+    → {f : Product.A×B p₃ ⇒ B}{g : C ⇒ D}
+    → λg p₃ f ∘ g
+    ≡ λg p₂ (f ∘ [ p₂ ⇒ p₃ ]first g)
+  cut {C}{D}{p₂}{p₃}{f}{g} = λ-unique C p₂ cut-commutes
+    where
+    open HomReasoning
+    open Equiv
+    p₁ = product
+    cut-commutes =
+      begin
+          eval ∘ [ p₂ ⇒ p₁ ]first (λg p₃ f ∘ g)
+        ↑⟨ refl ⟩∘⟨ [ p₂ ⇒ p₃ ⇒ p₁ ]first∘first ⟩
+          eval 
+            ∘ [ p₃ ⇒ p₁ ]first (λg p₃ f)
+            ∘ [ p₂ ⇒ p₃ ]first g
+        ↑⟨ assoc ⟩
+          (eval ∘ [ p₃ ⇒ p₁ ]first (λg p₃ f))
+                   ∘ [ p₂ ⇒ p₃ ]first g
+        ↓⟨ commutes D p₃ ⟩∘⟨ refl ⟩
+          f ∘ [ p₂ ⇒ p₃ ]first g
+      ∎
+  
+  .η-id : λg product eval ≡ id
+  η-id =
     begin
-      λg B^A product eval
-    ↑⟨ λ-resp-≡ B^A product identityʳ ⟩
-      λg B^A product (eval ∘ id)
-    ↑⟨ λ-resp-≡ B^A product (∘-resp-≡ refl (first-id product)) ⟩
-      λg B^A product (eval ∘ [ product ⇒ product ]first id)
-    ↑⟨ λ-unique B^A product refl ⟩
+      λg product eval
+    ↑⟨ identityʳ ⟩
+      λg product eval ∘ id
+    ↓⟨ cut ⟩
+      λg product (eval ∘ [ product ⇒ product ]first id)
+    ↓⟨ η B^A product ⟩
       id
     ∎
     where
@@ -86,11 +111,12 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 
 open Morphisms C
 
+-- some aliases to make proof signatures less ugly
 [_]eval : ∀{A B}(e₁ : Exponential A B) → Exponential.B^A×A e₁ ⇒ B
 [ e₁ ]eval = Exponential.eval e₁
 
 [_]λ : ∀{A B}(e₁ : Exponential A B)
-  → (X : Obj) → (X×A : Product X A) → (Product.A×B X×A ⇒ B) → (X ⇒ Exponential.B^A e₁)
+  → {X : Obj} → (X×A : Product X A) → (Product.A×B X×A ⇒ B) → (X ⇒ Exponential.B^A e₁)
 [ e₁ ]λ = Exponential.λg e₁
 
 .λ-distrib : ∀ {A B C D}
@@ -100,11 +126,19 @@ open Morphisms C
   → (p₄ : Product D A)
   → (p₅ : Product (Exponential.B^A e₂) C)
   → {f : C ⇒ A}{g : Product.A×B p₄ ⇒ B}
-  →   [ e₁ ]λ (Exponential.B^A e₂) p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
-    ∘ [ e₂ ]λ D p₄ g
-    ≡ [ e₁ ]λ D p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
+  →   [ e₁ ]λ p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
+    ∘ [ e₂ ]λ p₄ g
+    ≡ [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
 λ-distrib {A}{B}{C}{D} e₁ e₂ p₃ p₄ p₅ {f}{g} =
-  e₁.λ-unique D p₃ lem₁
+  begin
+      [ e₁ ]λ p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
+    ∘ [ e₂ ]λ p₄ g
+  ↓⟨ e₁.cut ⟩
+    [ e₁ ]λ p₃ (([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f) ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g))
+  ↓⟨ e₁.λ-resp-≡ D p₃ eval∘second∘first ⟩
+    [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
+  ∎
+
   where
   open HomReasoning
   open Equiv
@@ -113,38 +147,26 @@ open Morphisms C
   p₁ = e₁.product
   p₂ = e₂.product
   
-  lem₁ =
+  eval∘second∘first =
     begin
-      e₁.eval ∘ [ p₃ ⇒ p₁ ]first
-           ([ e₁ ]λ e₂.B^A p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ p₂ ]second f)
-          ∘ [ e₂ ]λ D p₄ g)
-    ↑⟨ refl ⟩∘⟨ [ p₃ ⇒ p₅ ⇒ p₁ ]first∘first ⟩
-      e₁.eval 
-        ∘ [ p₅ ⇒ p₁ ]first ([ e₁ ]λ e₂.B^A p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ p₂ ]second f))
-        ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ D p₄ g)
-    ↑⟨ assoc ⟩
-      (e₁.eval ∘ [ p₅ ⇒ p₁ ]first ([ e₁ ]λ e₂.B^A p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ p₂ ]second f)))
-               ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ D p₄ g)
-    ↓⟨ e₁.commutes e₂.B^A p₅ ⟩∘⟨ refl ⟩
-      ([ e₂ ]eval ∘ [ p₅ ⇒ p₂ ]second f)
-                  ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ D p₄ g)
+      ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f) ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g)
     ↓⟨ assoc ⟩
       [ e₂ ]eval
           ∘ [ p₅ ⇒ p₂ ]second f
-          ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ D p₄ g)
-    ↑⟨ refl ⟩∘⟨ [ p₃ ⇒ p₅ , p₄ ⇒ p₂ ]first↔second ⟩
+          ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g)
+    ↑⟨ refl ⟩∘⟨ [ p₄ ⇒ p₂ , p₃ ⇒ p₅ ]first↔second ⟩
       [ e₂ ]eval
-          ∘ [ p₄ ⇒ p₂ ]first ([ e₂ ]λ D p₄ g)
+          ∘ [ p₄ ⇒ p₂ ]first ([ e₂ ]λ p₄ g)
           ∘ [ p₃ ⇒ p₄ ]second f
     ↑⟨ assoc ⟩
-      ([ e₂ ]eval ∘ [ p₄ ⇒ p₂ ]first ([ e₂ ]λ D p₄ g))
+      ([ e₂ ]eval ∘ [ p₄ ⇒ p₂ ]first ([ e₂ ]λ p₄ g))
                   ∘ [ p₃ ⇒ p₄ ]second f
     ↓⟨ e₂.commutes D p₄ ⟩∘⟨ refl ⟩
       g ∘ [ p₃ ⇒ p₄ ]second f
     ∎
 
 convert : ∀{A B} (e₁ e₂ : Exponential A B) → Exponential.B^A e₁ ⇒ Exponential.B^A e₂
-convert e₁ e₂ = e₂.λg e₁.B^A e₁.product e₁.eval
+convert e₁ e₂ = e₂.λg e₁.product e₁.eval
   where
     module e₁ = Exponential e₁
     module e₂ = Exponential e₂
@@ -161,16 +183,16 @@ convert-Iso e₁ e₂ = record
     .iso : ∀{A B} (e₁ e₂ : Exponential A B) → convert e₂ e₁ ∘ convert e₁ e₂ ≡ id
     iso e₁ e₂ =
       begin
-          [ e₁ ]λ e₂.B^A p₂ [ e₂ ]eval
-        ∘ [ e₂ ]λ e₁.B^A p₁ [ e₁ ]eval
+          [ e₁ ]λ p₂ [ e₂ ]eval
+        ∘ [ e₂ ]λ p₁ [ e₁ ]eval
       ↓⟨ e₁.λ-resp-≡ e₂.B^A p₂ (intro-second e₂) ⟩∘⟨ refl ⟩
-          [ e₁ ]λ e₂.B^A p₂ ([ e₂ ]eval ∘ [ p₂ ⇒ p₂ ]second id)
-        ∘ [ e₂ ]λ e₁.B^A p₁ [ e₁ ]eval
+          [ e₁ ]λ p₂ ([ e₂ ]eval ∘ [ p₂ ⇒ p₂ ]second id)
+        ∘ [ e₂ ]λ p₁ [ e₁ ]eval
       ↓⟨ λ-distrib e₁ e₂ p₁ p₁ p₂ ⟩
-          [ e₁ ]λ e₁.B^A p₁ ([ e₁ ]eval ∘ [ p₁ ⇒ p₁ ]second id)
+          [ e₁ ]λ p₁ ([ e₁ ]eval ∘ [ p₁ ⇒ p₁ ]second id)
       ↑⟨ e₁.λ-resp-≡ e₁.B^A p₁ (intro-second e₁) ⟩
-          [ e₁ ]λ e₁.B^A p₁ [ e₁ ]eval
-      ↓⟨ e₁.η ⟩
+          [ e₁ ]λ p₁ [ e₁ ]eval
+      ↓⟨ e₁.η-id ⟩
         id
       ∎
       where

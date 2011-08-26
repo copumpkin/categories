@@ -40,7 +40,7 @@ open import Categories.Functor
                 λ-abs A (eval ∘ id)
             ↓⟨ λ-resp-≡ identityʳ ⟩
                 λ-abs A eval
-            ↓⟨ λ-η ⟩
+            ↓⟨ λ-η-id ⟩
                 id
             ∎ where open Lemmas A
         

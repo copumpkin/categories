@@ -38,8 +38,14 @@ open import Categories.Monad
 
 Σ↑-Self-Adjunction : Adjunction (Functor.op Σ↑-Functor) Σ↑-Functor
 Σ↑-Self-Adjunction = record
-  { unit    = unit
-  ; counit  = counit
+  { unit    = record
+      { η       = λ _ → flip id
+      ; commute = unit-commute
+      }
+  ; counit  = record
+      { η       = λ _ → flip id
+      ; commute = counit-commute
+      }
   ; zig     = zig-zag
   ; zag     = zig-zag
   } where
@@ -49,72 +55,56 @@ open import Categories.Monad
     [Σ²_] : ∀ {X Y} → X ⇒ Y → Σ² X ⇒ Σ² Y
     [Σ² f ] = [Σ↑ [Σ↑ f ] ]
     
-    unit-η : ∀ X → X ⇒ Σ² X
-    unit-η _ = flip id
-    
-    -- TODO: shoot self, then clean up this mess.
-    -- Or some permutation thereof.
-    -- Don't forget to annotate evals with their types.
-    .lem₁ : ∀ {X Y}{f : X ⇒ Y}
-      → eval ∘ first (flip id ∘ f)
-      ≡ eval ∘ swap ∘ second [Σ↑ f ]
-    lem₁ {X}{Y}{f} =
+    .lem₁ : ∀{A B C D}{f : (B × C) ⇒ D}{g : A ⇒ (C × B)}
+      → (f ∘ swap ∘ second id) ∘ g
+      ≡ f ∘ swap ∘ g
+    lem₁ {A}{B}{C}{D}{f}{g} =
       begin
-        eval ∘ first (λ-abs (Σ↑ Y) (eval ∘ swap ∘ second id) ∘ f)
-      ↑⟨ refl ⟩∘⟨ first∘first ⟩
-        eval 
-          ∘ first (λ-abs (Σ↑ Y) (eval ∘ swap ∘ second id))
-          ∘ first f
-      ↑⟨ assoc ⟩
-        (eval ∘ first (λ-abs (Σ↑ Y) (eval ∘ swap ∘ second id)))
-          ∘ first f
-      ↓⟨ commutes _ ⟩∘⟨ refl ⟩
-        (eval ∘ swap ∘ second id) ∘ first f
+        (f ∘ swap ∘ second id) ∘ g
       ↓⟨ (refl ⟩∘⟨ refl ⟩∘⟨ second-id product) ⟩∘⟨ refl ⟩
-        (eval ∘ swap ∘ id) ∘ first f
+        (f ∘ swap ∘ id) ∘ g
       ↓⟨ (refl ⟩∘⟨ identityʳ) ⟩∘⟨ refl ⟩
-        (eval ∘ swap) ∘ first f
+        (f ∘ swap) ∘ g
       ↓⟨ assoc ⟩
-        eval ∘ swap ∘ first f
-      ↓⟨ refl ⟩∘⟨ swap∘⁂ ⟩
-        eval ∘ second f ∘ swap
-      ↑⟨ assoc ⟩
-        (eval ∘ second f) ∘ swap
-      ↑⟨ commutes X ⟩∘⟨ refl ⟩
-        (eval ∘ first (λ-abs X (eval ∘ second f))) ∘ swap
-      ↓⟨ assoc ⟩
-        eval ∘ first (λ-abs X (eval ∘ second f)) ∘ swap
-      ↑⟨ refl ⟩∘⟨ swap∘⁂ ⟩
-        eval ∘ swap ∘ second (λ-abs X (eval ∘ second f))
+        f ∘ swap ∘ g
       ∎
     
-    .lem₂ : ∀{X Y} {f : X ⇒ Σ↑ Y}
-      → (eval ∘ swap ∘ second id) ∘ second f
-      ≡ eval ∘ swap ∘ second f
+    .lem₂ : ∀ {X Y}{f : X ⇒ Y}
+      → eval {Σ↑ Y} ∘ first (flip id ∘ f)
+      ≡ eval {X}    ∘ swap ∘ second [Σ↑ f ]
     lem₂ {X}{Y}{f} =
       begin
-        (eval ∘ swap ∘ second id) ∘ second f
+        eval {Σ↑ Y} ∘ first (flip id ∘ f)
+      ↑⟨ refl ⟩∘⟨ first∘first ⟩
+        eval {Σ↑ Y} ∘ first (flip id) ∘ first f
+      ↑⟨ assoc ⟩
+        (eval {Σ↑ Y} ∘ first (flip id)) ∘ first f
+      ↓⟨ commutes (Σ↑ Y) ⟩∘⟨ refl ⟩
+        (eval {Y} ∘ swap ∘ second id) ∘ first f
+      ↓⟨ lem₁ ⟩
+        eval {Y} ∘ swap ∘ first f
+      ↓⟨ refl ⟩∘⟨ swap∘⁂ ⟩
+        eval {Y} ∘ second f ∘ swap
+      ↑⟨ assoc ⟩
+        (eval {Y} ∘ second f) ∘ swap
+      ↑⟨ commutes X ⟩∘⟨ refl ⟩
+        (eval {X} ∘ first (λ-abs X (eval {Y} ∘ second f))) ∘ swap
       ↓⟨ assoc ⟩
-        eval ∘ (swap ∘ second id) ∘ second f
-      ↓⟨ refl ⟩∘⟨ assoc ⟩
-        eval ∘ swap ∘ second id ∘ second f
-      ↓⟨ refl ⟩∘⟨ refl ⟩∘⟨ second∘second ⟩
-        eval ∘ swap ∘ second (id ∘ f)
-      ↓⟨ refl ⟩∘⟨ refl ⟩∘⟨ ⁂-cong₂ refl identityˡ ⟩
-        eval ∘ swap ∘ second f
+        eval {X} ∘ first (λ-abs X (eval {Y} ∘ second f)) ∘ swap
+      ↑⟨ refl ⟩∘⟨ swap∘⁂ ⟩
+        eval {X} ∘ swap ∘ second (λ-abs X (eval ∘ second f))
       ∎
     
-    -- [Σ↑ f ] = λ-abs _ (eval ∘ second f)
     .unit-commute : ∀ {X Y} (f : X ⇒ Y)
       → flip id ∘ f ≡ [Σ² f ] ∘ flip id
     unit-commute {X}{Y} f =
       begin
         flip id ∘ f
-      ↓⟨ λ-unique (Σ↑ Y) lem₁ ⟩
+      ↓⟨ λ-unique (Σ↑ Y) lem₂ ⟩
         flip [Σ↑ f ]
-      ↑⟨ λ-resp-≡ (Σ↑ Y) lem₂ ⟩
-        λ-abs (Σ↑ Y) ((eval ∘ swap ∘ second id) ∘ second [Σ↑ f ])
-      ↑⟨ λ-distrib (Σ↑ Y) ⟩
+      ↑⟨ λ-resp-≡ (Σ↑ Y) lem₁ ⟩
+        λ-abs (Σ↑ Y) ((eval {X} ∘ swap ∘ second id) ∘ second [Σ↑ f ])
+      ↓⟨ λ-distrib (Σ↑ Y) ⟩
         [Σ↑ [Σ↑ f ] ] ∘ flip id
       ∎
     
@@ -122,34 +112,16 @@ open import Categories.Monad
       → [Σ² f ] ∘ flip id ≡ flip id ∘ f
     counit-commute f = sym (unit-commute f)
     
-    unit : NaturalTransformation idF Σ²-Functor
-    unit = record
-      { η       = unit-η
-      ; commute = unit-commute
-      }
-    
-    counit : NaturalTransformation (Functor.op Σ²-Functor) idF
-    counit = record
-      { η       = unit-η
-      ; commute = counit-commute
-      }
-    
-    module unit   = NaturalTransformation unit
-    module counit = NaturalTransformation counit
-    
-    F = Functor.op Σ↑-Functor
-    G = Σ↑-Functor
-    
     .zig-zag : ∀{X}
-      → id ≡ [Σ↑ unit.η X ] ∘ unit.η (Σ↑ X)
+      → id ≡ [Σ↑ flip id ] ∘ flip id
     zig-zag {X} =
       begin
         id
       ↑⟨ flip² ⟩
         flip (flip id)
-      ↑⟨ λ-resp-≡ X lem₂ ⟩
+      ↑⟨ λ-resp-≡ X lem₁ ⟩
         λ-abs X ((eval ∘ swap ∘ second id) ∘ second (flip id))
-      ↑⟨ λ-distrib X ⟩
+      ↓⟨ λ-distrib X ⟩
         [Σ↑ flip id ] ∘ flip id
       ∎
 

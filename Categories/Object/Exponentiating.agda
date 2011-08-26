@@ -20,9 +20,6 @@ open   Categories.Object.Exponential C
   hiding (convert)
   renaming (λ-distrib to λ-distrib′)
 
-open import Categories.Functor
-    using (Contravariant)
-
 open import Level
 
 record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
@@ -56,7 +53,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
       k : Σ↑ B  |-  (λ (x : A) → k (f x)) : Σ↑ A
     -}
     [Σ↑_] : ∀ {A B} → A ⇒ B → Σ↑ B ⇒ Σ↑ A
-    [Σ↑_] {A}{B} f = λ-abs A (eval ∘ second f)
+    [Σ↑_] {A}{B} f = λ-abs A (eval {B} ∘ second f)
     
     flip : ∀ {A B} → A ⇒ Σ↑ B → B ⇒ Σ↑ A
     flip {A}{B} f = λ-abs {B} A (eval {B} ∘ swap ∘ second f)
@@ -81,7 +78,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
                 Σ↑A.eval ∘ convert product Σ↑A.product ∘ first (Σ↑A.λg product g)
             ↓⟨ refl ⟩∘⟨ convert∘first ⟩
                 Σ↑A.eval ∘ [ product ⇒ Σ↑A.product ]first (Σ↑A.λg product g)
-            ↓⟨ Σ↑A.commutes X product ⟩
+            ↓⟨ Σ↑A.commutes product ⟩
                 g
             ∎
         
@@ -90,7 +87,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
             → (eval ∘ first h ≡ g)
             → (h ≡ λ-abs A g)
         λ-unique {X}{g}{h} commutes 
-            = Σ↑A.λ-unique X product commutes′
+            = Σ↑A.λ-unique product commutes′
             where
                 commutes′ : Σ↑A.eval ∘ [ product ⇒ Σ↑A.product ]first h ≡ g
                 commutes′ =
@@ -112,37 +109,38 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
             → (f ≡ g)
             → (λ-abs A f ≡ λ-abs A g)
         λ-resp-≡ {B}{f}{g} f≡g
-            = Σ↑A.λ-resp-≡ B product f≡g
+            = Σ↑A.λ-resp-≡ product f≡g
 
         .cut : ∀ {C D} {f : (D × A) ⇒ Σ} {g : C ⇒ D}
           → λ-abs {D} A f ∘ g
           ≡ λ-abs {C} A (f ∘ first g)
-        cut = Σ↑A.cut
+        cut = Σ↑A.cut product product
 
         .λ-η-id : λ-abs A eval ≡ id
         λ-η-id =
           begin
               Σ↑.λg A product (Σ↑.eval A ∘ convert product (Σ↑.product A))
-          ↓⟨ Σ↑A.λ-resp-≡ (Σ↑ A) product (∘-resp-≡ refl (convert≡id⁂id product Σ↑A.product)) ⟩
+          ↓⟨ Σ↑A.λ-resp-≡ product (∘-resp-≡ refl (convert≡id⁂id product Σ↑A.product)) ⟩
               Σ↑.λg A product (Σ↑.eval A ∘ [ product ⇒ Σ↑A.product ]first id)
-          ↓⟨ Σ↑A.η (Σ↑ A) product ⟩
+          ↓⟨ Σ↑A.η product ⟩
               id
           ∎
-    
+        
         .λ-distrib : ∀ {B C}{f : A ⇒ B}{g : (C × B) ⇒ Σ}
-            → λ-abs A (eval ∘ second f) ∘ λ-abs B g ≡ λ-abs A (g ∘ second f)
+            → λ-abs A (g ∘ second f)
+            ≡ [Σ↑ f ] ∘ λ-abs B g
         λ-distrib {B}{C}{f}{g} =
             begin
-                Σ↑A.λg product ((Σ↑.eval B ∘ convert product (Σ↑.product B)) ∘ second f)
-                  ∘ Σ↑.λg B product g
-            ↓⟨ λ-resp-≡ assoc ⟩∘⟨ refl ⟩
-                Σ↑A.λg product (Σ↑.eval B ∘ convert product (Σ↑.product B) ∘ second f)
-                  ∘ Σ↑.λg B product g
-            ↓⟨ λ-resp-≡ (refl ⟩∘⟨ [ product ⇒ product ⇒ Σ↑.product B ]convert∘⁂) ⟩∘⟨ refl ⟩
+                Σ↑A.λg product (g ∘ second f)
+            ↓⟨ λ-distrib′ exponential exponential product product product ⟩
                 Σ↑A.λg product (Σ↑.eval B ∘ [ product ⇒ Σ↑.product B ]second f)
                   ∘ Σ↑.λg B product g
-            ↓⟨ λ-distrib′ exponential exponential product product product ⟩
-                Σ↑A.λg product (g ∘ second f)
+            ↑⟨ λ-resp-≡ (refl ⟩∘⟨ [ product ⇒ product ⇒ Σ↑.product B ]convert∘⁂) ⟩∘⟨ refl ⟩
+                Σ↑A.λg product (Σ↑.eval B ∘ convert product (Σ↑.product B) ∘ second f)
+                  ∘ Σ↑.λg B product g
+            ↑⟨ λ-resp-≡ assoc ⟩∘⟨ refl ⟩
+                Σ↑A.λg product ((Σ↑.eval B ∘ convert product (Σ↑.product B)) ∘ second f)
+                  ∘ Σ↑.λg B product g
             ∎
 
     .flip² : ∀{A B}{f : A ⇒ Σ↑ B} → flip (flip f) ≡ f

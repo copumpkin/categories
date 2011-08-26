@@ -29,32 +29,32 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     λg : {X : Obj} → (X×A : Product X A) → (Product.A×B X×A ⇒ B) → (X ⇒ B^A)
     
     .commutes
-        : (X : Obj) → (X×A : Product X A)
+        : {X : Obj} → (X×A : Product X A)
         → {g : Product.A×B X×A ⇒ B}
         → (eval ∘ [ X×A ⇒ product ]first (λg X×A g) ≡ g)
     .λ-unique
-        : (X : Obj) → (X×A : Product X A)
+        : {X : Obj} → (X×A : Product X A)
         → {g : Product.A×B X×A ⇒ B}
         → {h : X ⇒ B^A}
         → (eval ∘ [ X×A ⇒ product ]first h ≡ g)
         → (h ≡ λg X×A g)
   
   .η
-      : ∀ (X : Obj) (X×A : Product X A)
+      : ∀ {X : Obj} (X×A : Product X A)
       {f : X ⇒ B^A }
       → λg X×A (eval ∘ [ X×A ⇒ product ]first f) ≡ f
-  η X X×A {f} = sym (λ-unique X X×A refl)
+  η X×A {f} = sym (λ-unique X×A refl)
     where open Equiv
   
   .λ-resp-≡
-      : (X : Obj)(X×A : Product X A)
+      : {X : Obj}(X×A : Product X A)
       → ∀{f g}
       → (f ≡ g)
       → (λg X×A f ≡ λg X×A g)
-  λ-resp-≡ X X×A {f}{g} f≡g =
+  λ-resp-≡ X×A {f}{g} f≡g =
     begin
         λg X×A f
-    ↓⟨ λ-unique X X×A commutes₂ ⟩
+    ↓⟨ λ-unique X×A commutes₂ ⟩
         λg X×A g
     ∎
     where
@@ -63,19 +63,19 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
         commutes₂ =
             begin
                 eval ∘ [ X×A ⇒ product ]first (λg X×A f)
-            ↓⟨ commutes X X×A ⟩
+            ↓⟨ commutes X×A ⟩
                 f
             ↓⟨ f≡g ⟩
                 g
             ∎
   
   .cut : ∀ {C D}
-    → {p₂ : Product C A}
-    → {p₃ : Product D A}
+    → (p₂ : Product C A)
+    → (p₃ : Product D A)
     → {f : Product.A×B p₃ ⇒ B}{g : C ⇒ D}
     → λg p₃ f ∘ g
     ≡ λg p₂ (f ∘ [ p₂ ⇒ p₃ ]first g)
-  cut {C}{D}{p₂}{p₃}{f}{g} = λ-unique C p₂ cut-commutes
+  cut {C}{D} p₂ p₃ {f}{g} = λ-unique p₂ cut-commutes
     where
     open HomReasoning
     open Equiv
@@ -90,7 +90,7 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
         ↑⟨ assoc ⟩
           (eval ∘ [ p₃ ⇒ p₁ ]first (λg p₃ f))
                    ∘ [ p₂ ⇒ p₃ ]first g
-        ↓⟨ commutes D p₃ ⟩∘⟨ refl ⟩
+        ↓⟨ commutes p₃ ⟩∘⟨ refl ⟩
           f ∘ [ p₂ ⇒ p₃ ]first g
       ∎
   
@@ -100,9 +100,9 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
       λg product eval
     ↑⟨ identityʳ ⟩
       λg product eval ∘ id
-    ↓⟨ cut ⟩
+    ↓⟨ cut _ _ ⟩
       λg product (eval ∘ [ product ⇒ product ]first id)
-    ↓⟨ η B^A product ⟩
+    ↓⟨ η product ⟩
       id
     ∎
     where
@@ -126,17 +126,17 @@ open Morphisms C
   → (p₄ : Product D A)
   → (p₅ : Product (Exponential.B^A e₂) C)
   → {f : C ⇒ A}{g : Product.A×B p₄ ⇒ B}
-  →   [ e₁ ]λ p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
+  → [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
+    ≡ [ e₁ ]λ p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
     ∘ [ e₂ ]λ p₄ g
-    ≡ [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
 λ-distrib {A}{B}{C}{D} e₁ e₂ p₃ p₄ p₅ {f}{g} =
   begin
+    [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
+  ↑⟨ e₁.λ-resp-≡ p₃ eval∘second∘first ⟩
+    [ e₁ ]λ p₃ (([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f) ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g))
+  ↑⟨ e₁.cut p₃ p₅ ⟩
       [ e₁ ]λ p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
     ∘ [ e₂ ]λ p₄ g
-  ↓⟨ e₁.cut ⟩
-    [ e₁ ]λ p₃ (([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f) ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g))
-  ↓⟨ e₁.λ-resp-≡ D p₃ eval∘second∘first ⟩
-    [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
   ∎
 
   where
@@ -161,7 +161,7 @@ open Morphisms C
     ↑⟨ assoc ⟩
       ([ e₂ ]eval ∘ [ p₄ ⇒ p₂ ]first ([ e₂ ]λ p₄ g))
                   ∘ [ p₃ ⇒ p₄ ]second f
-    ↓⟨ e₂.commutes D p₄ ⟩∘⟨ refl ⟩
+    ↓⟨ e₂.commutes p₄ ⟩∘⟨ refl ⟩
       g ∘ [ p₃ ⇒ p₄ ]second f
     ∎
 
@@ -185,12 +185,12 @@ convert-Iso e₁ e₂ = record
       begin
           [ e₁ ]λ p₂ [ e₂ ]eval
         ∘ [ e₂ ]λ p₁ [ e₁ ]eval
-      ↓⟨ e₁.λ-resp-≡ e₂.B^A p₂ (intro-second e₂) ⟩∘⟨ refl ⟩
+      ↓⟨ e₁.λ-resp-≡ p₂ (intro-second e₂) ⟩∘⟨ refl ⟩
           [ e₁ ]λ p₂ ([ e₂ ]eval ∘ [ p₂ ⇒ p₂ ]second id)
         ∘ [ e₂ ]λ p₁ [ e₁ ]eval
-      ↓⟨ λ-distrib e₁ e₂ p₁ p₁ p₂ ⟩
+      ↑⟨ λ-distrib e₁ e₂ p₁ p₁ p₂ ⟩
           [ e₁ ]λ p₁ ([ e₁ ]eval ∘ [ p₁ ⇒ p₁ ]second id)
-      ↑⟨ e₁.λ-resp-≡ e₁.B^A p₁ (intro-second e₁) ⟩
+      ↑⟨ e₁.λ-resp-≡ p₁ (intro-second e₁) ⟩
           [ e₁ ]λ p₁ [ e₁ ]eval
       ↓⟨ e₁.η-id ⟩
         id

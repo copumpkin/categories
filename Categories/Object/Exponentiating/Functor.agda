@@ -50,11 +50,11 @@ open import Categories.Functor
         homomorphism {X}{Y}{Z}{f}{g} =
             begin
                 λ-abs X (eval ∘ second (g ∘ f))
-            ↑⟨ λ-resp-≡ (∘-resp-≡ refl second∘second)  ⟩
+            ↑⟨ λ-resp-≡ (refl ⟩∘⟨ second∘second) ⟩
                 λ-abs X (eval ∘ second g ∘ second f)
             ↑⟨ λ-resp-≡ assoc  ⟩
                 λ-abs X ((eval ∘ second g) ∘ second f)
-            ↑⟨ λ-distrib ⟩
+            ↓⟨ λ-distrib ⟩
                 λ-abs X (eval ∘ second f) 
                     ∘
                 λ-abs Y (eval ∘ second g)

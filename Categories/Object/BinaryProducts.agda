@@ -68,7 +68,10 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   
   _⁂_ : ∀ {A B C D} → (A ⇒ B) → (C ⇒ D) → ((A × C) ⇒ (B × D))
   f ⁂ g = [ product ⇒ product ] f ⁂ g
-
+  
+  swap : ∀ {A B} → ((A × B) ⇒ (B × A))
+  swap = ⟨ π₂ , π₁ ⟩
+  
   -- TODO: this is probably harder to use than necessary because of this definition. Maybe make a version
   -- that doesn't have an explicit id in it, too?
   first : ∀ {A B C} → (A ⇒ B) → ((A × C) ⇒ (B × C))
@@ -83,6 +86,10 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
 
   .π₂∘⁂ : ∀ {A B C D} → {f : A ⇒ B} → {g : C ⇒ D} → π₂ ∘ (f ⁂ g) ≡ g ∘ π₂
   π₂∘⁂ {f = f} {g} = commute₂
+
+  .⁂-cong₂ : ∀ {A B C D}{f g : A ⇒ B}{h i : C ⇒ D}
+    → f ≡ g → h ≡ i → f ⁂ h ≡ g ⁂ i
+  ⁂-cong₂ = [ product ⇒ product ]⁂-cong₂
 
   .⁂∘⟨⟩ : ∀ {A B C D E} → {f : B ⇒ C} {f′ : A ⇒ B} {g : D ⇒ E} {g′ : A ⇒ D} → (f ⁂ g) ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f ∘ f′ , g ∘ g′ ⟩
   ⁂∘⟨⟩ = [ product ⇒ product ]⁂∘⟨⟩
@@ -110,3 +117,28 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   .first↔second : ∀ {A B C D}{f : A ⇒ B}{g : C ⇒ D}
     → first f ∘ second g ≡ second g ∘ first f
   first↔second = [ product ⇒ product , product ⇒ product ]first↔second
+  
+  .swap∘⟨⟩ : ∀ {A B C} {f : A ⇒ B} {g : A ⇒ C}
+    → swap ∘ ⟨ f , g ⟩ ≡ ⟨ g , f ⟩
+  swap∘⟨⟩ {A}{B}{C}{f}{g} =
+    begin
+      ⟨ π₂ , π₁ ⟩ ∘ ⟨ f , g ⟩
+    ↓⟨ ⟨⟩∘ ⟩
+      ⟨ π₂ ∘ ⟨ f , g ⟩ , π₁ ∘ ⟨ f , g ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ commute₂ commute₁ ⟩
+      ⟨ g , f ⟩
+    ∎ where open HomReasoning
+
+  .swap∘⁂ : ∀ {A B C D} {f : A ⇒ B} {g : C ⇒ D}
+    → swap ∘ (f ⁂ g) ≡ (g ⁂ f) ∘ swap
+  swap∘⁂ {f = f}{g} =
+    begin
+      swap ∘ (f ⁂ g)
+    ↓⟨ swap∘⟨⟩ ⟩
+      ⟨ g ∘ π₂ , f ∘ π₁ ⟩
+    ↑⟨ ⁂∘⟨⟩ ⟩
+      (g ⁂ f) ∘ swap
+    ∎ where open HomReasoning
+  
+  .swap∘swap : ∀ {A B} → (swap {A}{B}) ∘ (swap {B}{A}) ≡ id
+  swap∘swap = trans swap∘⟨⟩ η

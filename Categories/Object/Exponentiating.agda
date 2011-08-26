@@ -46,6 +46,9 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
     [Σ↑_] : ∀ {A B} → A ⇒ B → Σ↑ B ⇒ Σ↑ A
     [Σ↑_] {A}{B} f = λ-abs A (eval ∘ second f)
     
+    flip : ∀ {A B} → A ⇒ Σ↑ B → B ⇒ Σ↑ A
+    flip {A}{B} f = λ-abs {B} A (eval {B} ∘ swap ∘ second f)
+    
     module Lemmas (A : Obj) where
         -- some lemmas from Exponential specialized to C's chosen products
         module Σ↑A = Σ↑ A
@@ -58,7 +61,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
         convert∘first = [ product ⇒ product ⇒ Σ↑A.product ]convert∘⁂
         
         .commutes : ∀{X} {g : (X × A) ⇒ Σ}
-            → eval ∘ first (λ-abs A g) ≡ g
+            → eval {A} ∘ first (λ-abs A g) ≡ g
         commutes {X}{g} =
             begin
                 (Σ↑A.eval ∘ convert product Σ↑A.product) ∘ first (Σ↑A.λg X product g)
@@ -136,3 +139,39 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
             ↓⟨ λ-distrib′ exponential exponential product product product ⟩
                 Σ↑A.λg C product (g ∘ second f)
             ∎
+
+    .flip² : ∀{A B}{f : A ⇒ Σ↑ B} → flip (flip f) ≡ f
+    flip² {A}{B}{f} =
+      begin
+        λ-abs {A} B (eval {A} ∘ swap ∘ second (flip f))
+      ↓⟨ λ-resp-≡ B lem₁ ⟩
+        λ-abs {A} B (eval {B} ∘ first f)
+      ↓⟨ λ-g-η B ⟩
+        f
+      ∎
+      where
+      open Equiv
+      open HomReasoning
+      open Lemmas
+      
+      lem₁ : eval {A} ∘ swap ∘ second (flip f) ≡ eval {B} ∘ first f
+      lem₁ = 
+        begin
+          eval {A} ∘ swap ∘ second (flip f)
+        ↓⟨ refl ⟩∘⟨ swap∘⁂ ⟩
+          eval {A} ∘ first (flip f) ∘ swap
+        ↑⟨ assoc ⟩
+          (eval {A} ∘ first (flip f)) ∘ swap
+        ↓⟨ commutes A ⟩∘⟨ refl ⟩
+          (eval {B} ∘ swap ∘ second f) ∘ swap
+        ↓⟨ assoc ⟩
+          eval {B} ∘ (swap ∘ second f) ∘ swap
+        ↓⟨ refl ⟩∘⟨ swap∘⁂ ⟩∘⟨ refl ⟩
+          eval {B} ∘ (first f ∘ swap) ∘ swap
+        ↓⟨ refl ⟩∘⟨ assoc ⟩
+          eval {B} ∘ first f ∘ swap ∘ swap
+        ↓⟨ refl ⟩∘⟨ refl ⟩∘⟨ swap∘swap ⟩
+          eval {B} ∘ first f ∘ id
+        ↓⟨ refl ⟩∘⟨ identityʳ ⟩
+          eval {B} ∘ first f
+        ∎

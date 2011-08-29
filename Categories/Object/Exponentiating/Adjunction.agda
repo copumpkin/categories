@@ -21,7 +21,6 @@ open Categories.Object.Product.Morphisms C
 
 open Equiv
 open HomReasoning
-open Lemmas
 
 import Categories.Object.Exponentiating.Functor
 open Categories.Object.Exponentiating.Functor C binary Σ exponentiating
@@ -49,12 +48,6 @@ open import Categories.Monad
   ; zig     = zig-zag
   ; zag     = zig-zag
   } where
-    Σ² : Obj → Obj
-    Σ² X = Σ↑ (Σ↑ X)
-    
-    [Σ²_] : ∀ {X Y} → X ⇒ Y → Σ² X ⇒ Σ² Y
-    [Σ² f ] = [Σ↑ [Σ↑ f ] ]
-    
     .lem₁ : ∀{A B C D}{f : (B × C) ⇒ D}{g : A ⇒ (C × B)}
       → (f ∘ swap ∘ second id) ∘ g
       ≡ f ∘ swap ∘ g
@@ -79,7 +72,7 @@ open import Categories.Monad
         eval {Σ↑ Y} ∘ first (flip id) ∘ first f
       ↑⟨ assoc ⟩
         (eval {Σ↑ Y} ∘ first (flip id)) ∘ first f
-      ↓⟨ commutes (Σ↑ Y) ⟩∘⟨ refl ⟩
+      ↓⟨ β ⟩∘⟨ refl ⟩
         (eval {Y} ∘ swap ∘ second id) ∘ first f
       ↓⟨ lem₁ ⟩
         eval {Y} ∘ swap ∘ first f
@@ -87,7 +80,7 @@ open import Categories.Monad
         eval {Y} ∘ second f ∘ swap
       ↑⟨ assoc ⟩
         (eval {Y} ∘ second f) ∘ swap
-      ↑⟨ commutes X ⟩∘⟨ refl ⟩
+      ↑⟨ β ⟩∘⟨ refl ⟩
         (eval {X} ∘ first (λ-abs X (eval {Y} ∘ second f))) ∘ swap
       ↓⟨ assoc ⟩
         eval {X} ∘ first (λ-abs X (eval {Y} ∘ second f)) ∘ swap
@@ -100,11 +93,11 @@ open import Categories.Monad
     unit-commute {X}{Y} f =
       begin
         flip id ∘ f
-      ↓⟨ λ-unique (Σ↑ Y) lem₂ ⟩
+      ↓⟨ λ-unique lem₂ ⟩
         flip [Σ↑ f ]
-      ↑⟨ λ-resp-≡ (Σ↑ Y) lem₁ ⟩
+      ↑⟨ λ-resp-≡ lem₁ ⟩
         λ-abs (Σ↑ Y) ((eval {X} ∘ swap ∘ second id) ∘ second [Σ↑ f ])
-      ↓⟨ λ-distrib (Σ↑ Y) ⟩
+      ↓⟨ λ-distrib ⟩
         [Σ↑ [Σ↑ f ] ] ∘ flip id
       ∎
     
@@ -119,9 +112,9 @@ open import Categories.Monad
         id
       ↑⟨ flip² ⟩
         flip (flip id)
-      ↑⟨ λ-resp-≡ X lem₁ ⟩
+      ↑⟨ λ-resp-≡ lem₁ ⟩
         λ-abs X ((eval ∘ swap ∘ second id) ∘ second (flip id))
-      ↓⟨ λ-distrib X ⟩
+      ↓⟨ λ-distrib ⟩
         [Σ↑ flip id ] ∘ flip id
       ∎
 

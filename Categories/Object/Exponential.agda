@@ -28,7 +28,7 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     eval : B^A×A ⇒ B
     λg : {X : Obj} → (X×A : Product X A) → (Product.A×B X×A ⇒ B) → (X ⇒ B^A)
     
-    .commutes
+    .β
         : {X : Obj} → (X×A : Product X A)
         → {g : Product.A×B X×A ⇒ B}
         → (eval ∘ [ X×A ⇒ product ]first (λg X×A g) ≡ g)
@@ -51,23 +51,9 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
       → ∀{f g}
       → (f ≡ g)
       → (λg X×A f ≡ λg X×A g)
-  λ-resp-≡ X×A {f}{g} f≡g =
-    begin
-        λg X×A f
-    ↓⟨ λ-unique X×A commutes₂ ⟩
-        λg X×A g
-    ∎
+  λ-resp-≡ X×A {f}{g} f≡g = λ-unique X×A (trans (β X×A) f≡g)
     where
-        open HomReasoning
-        commutes₂ : eval ∘ [ X×A ⇒ product ]first (λg X×A f) ≡ g
-        commutes₂ =
-            begin
-                eval ∘ [ X×A ⇒ product ]first (λg X×A f)
-            ↓⟨ commutes X×A ⟩
-                f
-            ↓⟨ f≡g ⟩
-                g
-            ∎
+      open Equiv
   
   .cut : ∀ {C D}
     → (p₂ : Product C A)
@@ -90,7 +76,7 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
         ↑⟨ assoc ⟩
           (eval ∘ [ p₃ ⇒ p₁ ]first (λg p₃ f))
                    ∘ [ p₂ ⇒ p₃ ]first g
-        ↓⟨ commutes p₃ ⟩∘⟨ refl ⟩
+        ↓⟨ β p₃ ⟩∘⟨ refl ⟩
           f ∘ [ p₂ ⇒ p₃ ]first g
       ∎
   
@@ -161,7 +147,7 @@ open Morphisms C
     ↑⟨ assoc ⟩
       ([ e₂ ]eval ∘ [ p₄ ⇒ p₂ ]first ([ e₂ ]λ p₄ g))
                   ∘ [ p₃ ⇒ p₄ ]second f
-    ↓⟨ e₂.commutes p₄ ⟩∘⟨ refl ⟩
+    ↓⟨ e₂.β p₄ ⟩∘⟨ refl ⟩
       g ∘ [ p₃ ⇒ p₄ ]second f
     ∎
 

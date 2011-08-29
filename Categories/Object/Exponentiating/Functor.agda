@@ -42,7 +42,7 @@ open import Categories.Functor
                 λ-abs A eval
             ↓⟨ λ-η-id ⟩
                 id
-            ∎ where open Lemmas A
+            ∎
         
         .homomorphism : ∀ {X Y Z}
             {f : X ⇒ Y} {g : Y ⇒ Z}
@@ -59,8 +59,6 @@ open import Categories.Functor
                     ∘
                 λ-abs Y (eval ∘ second g)
             ∎
-            where
-                open Lemmas X
         
         .F-resp-≡ : ∀ {A B}{f g : A ⇒ B }
             → f ≡ g → [Σ↑ f ] ≡ [Σ↑ g ]
@@ -69,7 +67,7 @@ open import Categories.Functor
                 λ-abs A (eval ∘ second f)
             ↓⟨ λ-resp-≡ (refl ⟩∘⟨ ⟨⟩-cong₂ refl (f≡g ⟩∘⟨ refl)) ⟩
                 λ-abs A (eval ∘ second g)
-            ∎ where open Lemmas A
+            ∎
 
 Σ²-Functor : Functor C C
 Σ²-Functor = Σ↑-Functor ∘F Functor.op Σ↑-Functor

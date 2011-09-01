@@ -21,6 +21,14 @@ open import Level
   → (p : Product B C) → A ⇒ B → A ⇒ C → A ⇒ [[ p ]]
 [ p ]⟨ f , g ⟩ = Product.⟨_,_⟩ p f g
 
+[_]π₁ : ∀ {A B}
+  → (p : Product A B) → [[ p ]] ⇒ A
+[_]π₁ = Product.π₁
+
+[_]π₂ : ∀ {A B}
+  → (p : Product A B) → [[ p ]] ⇒ B
+[_]π₂ = Product.π₂
+
 [_⇒_]_⁂_ : ∀ {A B C D}
     → (p₁ : Product A C)
     → (p₂ : Product B D)
@@ -126,6 +134,22 @@ convert≡id p = trans (convert≡id⁂id p p) (id⁂id p)
     [ p₁ ⇒ p₃ ] (id ∘ f) ⁂ (id ∘ g)
   ↓⟨ [ p₁ ⇒ p₃ ]⁂-cong₂ identityˡ identityˡ ⟩
     [ p₁ ⇒ p₃ ] f ⁂ g
+  ∎
+
+.[_⇒_⇒_]convert∘convert : ∀{A B} 
+  → (p₁ p₂ p₃ : Product A B)
+  → convert p₂ p₃ ∘ convert p₁ p₂ ≡ convert p₁ p₃
+[_⇒_⇒_]convert∘convert p₁ p₂ p₃ =
+  begin
+    convert p₂ p₃ ∘ convert p₁ p₂
+  ↓⟨ convert≡id⁂id p₂ p₃ ⟩∘⟨ convert≡id⁂id p₁ p₂ ⟩
+    ([ p₂ ⇒ p₃ ] id ⁂ id) ∘ ([ p₁ ⇒ p₂ ] id ⁂ id)
+  ↓⟨ [ p₁ ⇒ p₂ ⇒ p₃ ]⁂∘⁂ ⟩
+    [ p₁ ⇒ p₃ ] (id ∘ id) ⁂ (id ∘ id)
+  ↓⟨ [ p₁ ⇒ p₃ ]⁂-cong₂ identityˡ identityˡ ⟩
+    [ p₁ ⇒ p₃ ] id ⁂ id
+  ↑⟨ convert≡id⁂id p₁ p₃ ⟩
+    convert p₁ p₃
   ∎
 
 [_⇒_]first 

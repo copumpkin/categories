@@ -110,16 +110,16 @@ module SetoidHetero {cf ℓf} (From : Setoid cf ℓf) (ct ℓt : Level) (To : Fr
   localize {x} {y} To$x≡To$y with To$ y
   localize {x} _≡_.refl | ._ = Setoid._≈_ (To$ x)
 
-  data _≈∗_ {S T : Setoid ct ℓt} (x : Carrier₀ S) : (y : Carrier₀ T) → Set (ct ⊔ ℓt) where
+  data _≈∗_ {S T : Setoid ct ℓt} (x : Carrier₀ S) : (y : Carrier₀ T) → Set (suc (ct ⊔ ℓt)) where
     locally : (S≡T : S ≡ T)
       {y : Carrier₀ T} (x≈y : localize′ S≡T x y) →
       _≈∗_ {S} {T} x y
 
-  _≈⋆_ : {iˣ iʸ : I} → B.REL (To$C iˣ) (To$C iʸ) (ct ⊔ ℓt)
+  _≈⋆_ : {iˣ iʸ : I} → B.REL (To$C iˣ) (To$C iʸ) (suc (ct ⊔ ℓt))
   _≈⋆_ {iˣ} {iʸ} = _≈∗_ {To$ iˣ} {To$ iʸ}
 
-asIndexed : ∀ {cf ℓf ct ℓt} {From : Setoid cf ℓf} → (From ⟶[ ct , ℓt ]) → IndexedSetoid (Carrier₀ From) (Setoid._≈_ From) ct (ct ⊔ ℓt)
-asIndexed {ct = ct} {ℓt} {From} To = record
+asIndexed : ∀ {cf ℓf} ct ℓt {From : Setoid cf ℓf} → (From ⟶[ ct , ℓt ]) → IndexedSetoid (Carrier₀ From) (Setoid._≈_ From) ct (suc (ct ⊔ ℓt))
+asIndexed ct ℓt {From} To = record
   { Carrier = To$C
   ; _≈_ = _≈⋆_
   ; isEquivalence = record
@@ -127,7 +127,7 @@ asIndexed {ct = ct} {ℓt} {From} To = record
     ; sym = my-sym
     ; trans = my-trans
     }
-  ; resp = λ {i j} i∼j → resp-per′ (To$ i) (To$ j) (resp-helper i∼j) (resp-helper₂ i∼j)
+  ; resp = λ {i j} i∼j → resp-per′ (fake-at i) (fake-at j) (resp-helper i∼j) (resp-helper₂ i∼j)
   }
   where
   open SetoidHetero _ ct ℓt To
@@ -158,6 +158,17 @@ asIndexed {ct = ct} {ℓt} {From} To = record
   .resp-helper₂ : ∀ {i j} → From [ i ≈ j ] → _≈⋆_ {i} {i} ≅ _≈⋆_ {j} {j}
   resp-helper₂ {i} {j} i∼j = resp-helper₃ (To$ i) (To$ j) (cong₀ To i∼j)
 
+  .fake-at : ∀ i → Setoid ct (suc (ct ⊔ ℓt))
+  fake-at i = record
+    { Carrier = To$C i
+    ; _≈_ = _≈⋆_ {i} {i}
+    ; isEquivalence = record
+      { refl = my-refl
+      ; sym = my-sym
+      ; trans = my-trans
+      }
+    }
+
 ------------------------------------------------------------------------
 -- Functions which preserve equality
 
@@ -172,6 +183,9 @@ record Π {f₁ f₂ t₁ t₂}
     .cong : Setoid._≈_ From =[ _⟨$⟩_ ]⇒ IndexedSetoid._≈_ To
 
 open Π public
+
+Π′ : ∀ {cf ℓf} (ct ℓt : Level) (From : Setoid cf ℓf) (To : From ⟶[ ct , ℓt ]) → Set (cf ⊔ ℓf ⊔ suc (ct ⊔ ℓt))
+Π′ ct ℓt From To = Π From (asIndexed ct ℓt To)
 
 -- Pis that 'just happen' to be independent, instead of being necessarily so.
 
@@ -255,7 +269,3 @@ setoid From To = record
   open module From = Setoid      From using () renaming (_≈_ to _≈₁_)
   open module To = IndexedSetoid To   using () renaming (_≈_ to _≈₂_)
 
--- because we don't have indexed setoids, this is a little stricter than the
--- standard library version
-Π′ : ∀ {cf ℓf} (ct ℓt : Level) (From : Setoid cf ℓf) (To : From ⟶[ ct , ℓt ]) → Set (cf ⊔ ℓf ⊔ ct ⊔ ℓt)
-Π′ ct ℓt From To = {!!}

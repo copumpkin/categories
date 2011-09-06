@@ -2,7 +2,9 @@
 module Categories.Support.Equivalence where
 
 open import Level
-open import Relation.Binary using (Rel; IsEquivalence; module IsEquivalence; IsPreorder; Preorder; Reflexive; Transitive; Symmetric; _⇒_)
+open import Relation.Binary using (Rel; IsEquivalence; module IsEquivalence; IsPreorder; Preorder; Reflexive; Transitive; Symmetric; _⇒_) renaming (Setoid to RSetoid; module Setoid to RSetoid)
+open import Data.Product using (_×_; _,_)
+open import Relation.Binary.Product.Pointwise using (_×-isEquivalence_)
 open import Relation.Binary.PropositionalEquality as PropEq using (_≡_)
 
 ------------------------------------------------------------------------
@@ -50,3 +52,42 @@ record Setoid c ℓ : Set (suc (c ⊔ ℓ)) where
       }
     }
   -}
+
+setoid-r→i : ∀ {c ℓ} → RSetoid c ℓ → Setoid c ℓ
+setoid-r→i Base = record
+  { Carrier = Base.Carrier
+  ; _≈_ = Base._≈_
+  ; isEquivalence = Base.isEquivalence
+  }
+  where module Base = RSetoid Base
+
+record I→R-Wrapper {c ℓ} {Carrier : Set c} (Base : Rel Carrier ℓ) (x y : Carrier) : Set ℓ where
+  constructor squash
+  field
+    .anonymous-witness : Base x y
+
+setoid-i→r : ∀ {c ℓ} → Setoid c ℓ → RSetoid c ℓ
+setoid-i→r Base = record
+  { Carrier = Base.Carrier
+  ; _≈_ = I→R-Wrapper Base._≈_
+  ; isEquivalence = record
+    { refl = squash Base.refl
+    ; sym = λ pf → squash (Base.sym (anonymous-witness pf))
+    ; trans = λ i≈j j≈k → squash (Base.trans (anonymous-witness i≈j) (anonymous-witness j≈k))
+    }
+  }
+  where
+  module Base = Setoid Base
+  open I→R-Wrapper
+
+set→setoid : ∀ {ℓ} → Set ℓ → Setoid ℓ ℓ
+set→setoid Base = record
+  { Carrier = Base
+  ; _≈_ = _≡_
+  ; isEquivalence = PropEq.isEquivalence
+  }
+
+_×-setoid_ : ∀ {s₁ s₂ s₃ s₄} → Setoid s₁ s₂ → Setoid s₃ s₄ → Setoid _ _
+S₁ ×-setoid S₂ = record
+  { isEquivalence = isEquivalence S₁ ×-isEquivalence isEquivalence S₂
+  } where open Setoid

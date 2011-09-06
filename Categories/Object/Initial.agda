@@ -12,7 +12,7 @@ record Initial : Set (o ⊔ ℓ ⊔ e) where
   field
     ⊥ : Obj
     ! : ∀ {A} → (⊥ ⇒ A)
-    !-unique : ∀ {A} → (f : ⊥ ⇒ A) → ! ≡ f
+    .!-unique : ∀ {A} → (f : ⊥ ⇒ A) → ! ≡ f
  
   .!-unique₂ : ∀ {A} → (f g : ⊥ ⇒ A) → f ≡ g
   !-unique₂ f g =

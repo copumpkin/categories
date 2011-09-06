@@ -71,3 +71,6 @@ Cones {C = C} F = record
       where
       open HomReasoning
 
+-- The category of cones comes with an equivalence of objects, which can be
+-- used to float morphisms from one to another.  Really it should have a
+-- setoid of objects, but we're not equipped for that.

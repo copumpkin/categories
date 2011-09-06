@@ -71,9 +71,9 @@ module Law {o ℓ e} (C : Category o ℓ e) (P : BinaryProducts C) where
   π₂∘shave4ˡ = commute₂
   
   private
-    infixr 4 _⟩,⟨_
-    ._⟩,⟨_ : ∀ {A B C} → {f f′ : A ⇒ B} {g g′ : A ⇒ C} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
-    _⟩,⟨_ x y = ⟨⟩-cong₂ x y
+    infix 3 ⟨_⟩,⟨_⟩
+    .⟨_⟩,⟨_⟩ : ∀ {A B C} → {f f′ : A ⇒ B} {g g′ : A ⇒ C} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
+    ⟨_⟩,⟨_⟩ x y = ⟨⟩-cong₂ x y
     
   .shave3ˡ∘assocˡ : ∀ {X Y Z W} → shave3ˡ ∘ assocˡ ≡ assocˡ ∘ shave4ˡ {X} {Y} {Z} {W}
   shave3ˡ∘assocˡ =
@@ -81,13 +81,13 @@ module Law {o ℓ e} (C : Category o ℓ e) (P : BinaryProducts C) where
       shave3ˡ ∘ assocˡ
     ↓⟨ ⟨⟩∘ ⟩
       ⟨ (π₂ ∘ π₁) ∘ assocˡ , π₂ ∘ assocˡ ⟩
-    ↓⟨ π₂₁-assocˡ ⟩,⟨ π₂∘assocˡ ⟩
+    ↓⟨ ⟨ π₂₁-assocˡ ⟩,⟨ π₂∘assocˡ ⟩ ⟩
       ⟨ (π₂ ∘ π₁) ∘ π₁ , shave3ˡ ⟩
-    ↑⟨ π₁∘shave4ˡʳ ⟩,⟨ ⟨⟩-congˡ π₂∘shave4ˡʳ ⟩
+    ↑⟨ ⟨ π₁∘shave4ˡʳ ⟩,⟨ ⟨⟩-congˡ π₂∘shave4ˡʳ ⟩ ⟩
       ⟨ π₁ ∘ shave4ˡʳ , ⟨ π₂ ∘ shave4ˡʳ , π₂ ⟩ ⟩
-    ↑⟨ ∘-resp-≡ʳ π₁∘shave4ˡ ⟩,⟨ (∘-resp-≡ʳ π₁∘shave4ˡ ⟩,⟨ π₂∘shave4ˡ) ⟩
+    ↑⟨ ⟨ ∘-resp-≡ʳ π₁∘shave4ˡ ⟩,⟨ ⟨ ∘-resp-≡ʳ π₁∘shave4ˡ ⟩,⟨ π₂∘shave4ˡ ⟩ ⟩ ⟩
       ⟨ π₁ ∘ (π₁ ∘ shave4ˡ) , ⟨ π₂ ∘ (π₁ ∘ shave4ˡ) , π₂ ∘ shave4ˡ ⟩ ⟩
-    ↑⟨ assoc ⟩,⟨ ⟨⟩-congˡ assoc ⟩
+    ↑⟨ ⟨ assoc ⟩,⟨ ⟨⟩-congˡ assoc ⟩ ⟩
       ⟨ (π₁ ∘ π₁) ∘ shave4ˡ , ⟨ (π₂ ∘ π₁) ∘ shave4ˡ , π₂ ∘ shave4ˡ ⟩ ⟩
     ↑⟨ ⟨⟩-congʳ ⟨⟩∘ ⟩
       ⟨ (π₁ ∘ π₁) ∘ shave4ˡ , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ shave4ˡ ⟩
@@ -104,9 +104,9 @@ module Law {o ℓ e} (C : Category o ℓ e) (P : BinaryProducts C) where
       shave3ˡ ∘ first assocˡ
     ↓⟨ ⟨⟩∘ ⟩
       ⟨ (π₂ ∘ π₁) ∘ first assocˡ , π₂ ∘ first assocˡ ⟩
-    ↓⟨ glue◃◽ π₂∘assocˡ π₁∘⁂ ⟩,⟨ π₂∘⁂ ⟩
+    ↓⟨ ⟨ glue◃◽ π₂∘assocˡ π₁∘⁂ ⟩,⟨ π₂∘⁂ ⟩ ⟩
       ⟨ shave3ˡ ∘ π₁ , id ∘ π₂ ⟩
-    ↓⟨ shave3ˡ∘π₁ ⟩,⟨ identityˡ ⟩
+    ↓⟨ ⟨ shave3ˡ∘π₁ ⟩,⟨ identityˡ ⟩ ⟩
       shave4ˡ
     ∎
     where
@@ -122,9 +122,9 @@ module Law {o ℓ e} (C : Category o ℓ e) (P : BinaryProducts C) where
       ⟨ (π₁ ∘ π₁) ∘ assocˡ , shave3ˡ ∘ assocˡ ⟩
     ↓⟨ ⟨⟩-congʳ shave3ˡ∘assocˡ ⟩
       ⟨ (π₁ ∘ π₁) ∘ assocˡ , assocˡ ∘ shave4ˡ ⟩
-    ↑⟨ sym π₁₁-assocˡ ⟩,⟨ ∘-resp-≡ʳ shave3ˡ∘first-assocˡ ⟩
+    ↑⟨ ⟨ sym π₁₁-assocˡ ⟩,⟨ ∘-resp-≡ʳ shave3ˡ∘first-assocˡ ⟩ ⟩
       ⟨ (π₁ ∘ π₁) ∘ first assocˡ , assocˡ ∘ (shave3ˡ ∘ first assocˡ) ⟩
-    ↑⟨ ∘-resp-≡ˡ identityˡ ⟩,⟨ assoc ⟩
+    ↑⟨ ⟨ ∘-resp-≡ˡ identityˡ ⟩,⟨ assoc ⟩ ⟩
       ⟨ (id ∘ (π₁ ∘ π₁)) ∘ first assocˡ , (assocˡ ∘ shave3ˡ) ∘ first assocˡ ⟩
     ↑⟨ ⟨⟩∘ ⟩
       ⟨ id ∘ (π₁ ∘ π₁) , assocˡ ∘ shave3ˡ ⟩ ∘ first assocˡ

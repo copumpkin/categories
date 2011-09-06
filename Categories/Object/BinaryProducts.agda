@@ -66,6 +66,12 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   .⟨⟩-cong₂ : ∀ {A B C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
   ⟨⟩-cong₂ = Product.⟨⟩-cong₂ product
   
+  .⟨⟩-congˡ : ∀ {A B C} → {f f′ : C ⇒ A} {g : C ⇒ B} → f ≡ f′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g ⟩
+  ⟨⟩-congˡ pf = ⟨⟩-cong₂ pf refl
+  
+  .⟨⟩-congʳ : ∀ {A B C} → {f : C ⇒ A} {g g′ : C ⇒ B} → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f , g′ ⟩
+  ⟨⟩-congʳ pf = ⟨⟩-cong₂ refl pf
+  
   _⁂_ : ∀ {A B C D} → (A ⇒ B) → (C ⇒ D) → ((A × C) ⇒ (B × D))
   f ⁂ g = [ product ⇒ product ] f ⁂ g
   

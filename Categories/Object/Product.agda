@@ -7,6 +7,11 @@ open Category C
 open Equiv
 
 open import Level
+open import Function using (flip)
+open import Categories.Support.PropositionalEquality
+
+open import Categories.Square
+open GlueSquares C
 
 -- Borrowed from Dan Doel's definition of products
 record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
@@ -30,11 +35,84 @@ record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   .⟨⟩-cong₂ : ∀ {C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
   ⟨⟩-cong₂ f≡f′ g≡g′ = 
     universal (trans commute₁ (sym f≡f′)) (trans commute₂ (sym g≡g′))
+
+  .⟨⟩∘ : ∀ {C D} {f : C ⇒ A} {g : C ⇒ B} {q : D ⇒ C} → ⟨ f , g ⟩ ∘ q ≡ ⟨ f ∘ q , g ∘ q ⟩
+  ⟨⟩∘ = sym (universal (pullˡ commute₁) (pullˡ commute₂))
     
 
-open import Categories.Morphisms
+import Categories.Morphisms
+open Categories.Morphisms C
 
-Commutative : ∀ {A B} → (p₁ : Product A B) (p₂ : Product B A) → _≅_ C (Product.A×B p₁) (Product.A×B p₂)
+Reversible : ∀ {A B} → (p : Product A B) → Product B A
+Reversible p = record
+  { A×B = p.A×B
+  ; π₁ = p.π₂
+  ; π₂ = p.π₁
+  ; ⟨_,_⟩ = flip p.⟨_,_⟩
+  ; commute₁ = p.commute₂
+  ; commute₂ = p.commute₁
+  ; universal = flip p.universal
+  }
+  where module p = Product p
+
+private 
+  module Lemmas {A B : Obj} where
+    open Product {A} {B} renaming (⟨_,_⟩ to _⟨_,_⟩)
+
+    repack : (p₁ p₂ : Product A B) → A×B p₁ ⇒ A×B p₂
+    repack p₁ p₂ = p₂ ⟨ π₁ p₁ , π₂ p₁ ⟩
+
+    .repack∘ : (p₁ p₂ p₃ : Product A B) → repack p₂ p₃ ∘ repack p₁ p₂ ≡ repack p₁ p₃
+    repack∘ p₁ p₂ p₃ = sym (universal p₃ 
+      (glueTrianglesʳ (commute₁ p₃) (commute₁ p₂))
+      (glueTrianglesʳ (commute₂ p₃) (commute₂ p₂)))
+
+    .repack-id : (p : Product A B) → repack p p ≡ id
+    repack-id p = η p
+
+    .repack-cancel : (p₁ p₂ : Product A B) → repack p₁ p₂ ∘ repack p₂ p₁ ≡ id
+    repack-cancel p₁ p₂ = trans (repack∘ p₂ p₁ p₂) (repack-id p₂)
+
+up-to-iso : ∀ {A B} → (p₁ p₂ : Product A B) → Product.A×B p₁ ≅ Product.A×B p₂
+up-to-iso p₁ p₂ = record
+  { f = repack p₁ p₂
+  ; g = repack p₂ p₁
+  ; iso = record
+    { isoˡ = repack-cancel p₂ p₁
+    ; isoʳ = repack-cancel p₁ p₂
+    }
+  }
+  where
+  open Lemmas
+
+transport-by-iso : ∀ {A B} → (p : Product A B) → ∀ {X} → Product.A×B p ≅ X → Product A B
+transport-by-iso p {X} p≅X = record
+  { A×B = X
+  ; π₁ = p.π₁ ∘ g
+  ; π₂ = p.π₂ ∘ g
+  ; ⟨_,_⟩ = λ h₁ h₂ → f ∘ p ⟨ h₁ , h₂ ⟩
+  ; commute₁ = trans (cancelInner isoˡ) p.commute₁
+  ; commute₂ = trans (cancelInner isoˡ) p.commute₂
+  ; universal = λ {_ l r i} pfˡ pfʳ → let open HomReasoning in
+      begin
+        f ∘ p ⟨ l , r ⟩
+      ↑⟨ ∘-resp-≡ʳ (p.⟨⟩-cong₂ pfˡ pfʳ) ⟩
+        f ∘ p ⟨ (p.π₁ ∘ g) ∘ i , (p.π₂ ∘ g) ∘ i ⟩
+      ↓⟨ ∘-resp-≡ʳ (p.universal (sym assoc) (sym assoc)) ⟩
+        f ∘ (g ∘ i)
+      ↓⟨ cancelLeft isoʳ ⟩
+        i
+      ∎
+  }
+  where
+  module p = Product p
+  open Product using () renaming (⟨_,_⟩ to _⟨_,_⟩) 
+  open _≅_ p≅X
+
+Commutative′ : ∀ {A B} (p₁ : Product A B) (p₂ : Product B A) → Product.A×B p₁ ≅ Product.A×B p₂
+Commutative′ p₁ p₂ = up-to-iso p₁ (Reversible p₂)
+
+Commutative : ∀ {A B} → (p₁ : Product A B) (p₂ : Product B A) → (Product.A×B p₁) ≅ (Product.A×B p₂)
 Commutative p₁ p₂ = record 
   { f = ⟨ π₂ , π₁ ⟩′
   ; g = ⟨ π′₂ , π′₁ ⟩
@@ -58,9 +136,7 @@ Commutative p₁ p₂ = record
   .idˡ-commutes₁ : π₁ ∘ idˡ ≡ π₁
   idˡ-commutes₁ = begin
                     π₁ ∘ idˡ
-                  ↑⟨ assoc ⟩ 
-                    (π₁ ∘ ⟨ π′₂ , π′₁ ⟩) ∘ ⟨ π₂ , π₁ ⟩′
-                  ↓⟨ ∘-resp-≡ˡ p₁.commute₁ ⟩
+                  ↓⟨ pullˡ p₁.commute₁ ⟩
                     π′₂ ∘ ⟨ π₂ , π₁ ⟩′
                   ↓⟨ p₂.commute₂ ⟩
                     π₁
@@ -71,9 +147,7 @@ Commutative p₁ p₂ = record
   .idˡ-commutes₂ : π₂ ∘ idˡ ≡ π₂
   idˡ-commutes₂ = begin
                     π₂ ∘ idˡ
-                  ↑⟨ assoc ⟩ 
-                    (π₂ ∘ ⟨ π′₂ , π′₁ ⟩) ∘ ⟨ π₂ , π₁ ⟩′
-                  ↓⟨ ∘-resp-≡ˡ p₁.commute₂ ⟩
+                  ↓⟨ pullˡ p₁.commute₂ ⟩
                     π′₁ ∘ ⟨ π₂ , π₁ ⟩′
                   ↓⟨ p₂.commute₁ ⟩
                     π₂
@@ -96,9 +170,7 @@ Commutative p₁ p₂ = record
   .idʳ-commutes₁ : π′₁ ∘ idʳ ≡ π′₁
   idʳ-commutes₁ = begin
                     π′₁ ∘ idʳ
-                  ↑⟨ assoc ⟩ 
-                    (π′₁ ∘ ⟨ π₂ , π₁ ⟩′) ∘ ⟨ π′₂ , π′₁ ⟩
-                  ↓⟨ ∘-resp-≡ˡ p₂.commute₁ ⟩
+                  ↓⟨ pullˡ p₂.commute₁ ⟩
                     π₂ ∘ ⟨ π′₂ , π′₁ ⟩
                   ↓⟨ p₁.commute₂ ⟩
                     π′₁
@@ -109,9 +181,7 @@ Commutative p₁ p₂ = record
   .idʳ-commutes₂ : π′₂ ∘ idʳ ≡ π′₂
   idʳ-commutes₂ = begin
                     π′₂ ∘ idʳ
-                  ↑⟨ assoc ⟩ 
-                    (π′₂ ∘ ⟨ π₂ , π₁ ⟩′) ∘ ⟨ π′₂ , π′₁ ⟩
-                  ↓⟨ ∘-resp-≡ˡ p₂.commute₂ ⟩
+                  ↓⟨ pullˡ p₂.commute₂ ⟩
                     π₁ ∘ ⟨ π′₂ , π′₁ ⟩
                   ↓⟨ p₁.commute₁ ⟩
                     π′₂
@@ -131,7 +201,41 @@ Commutative p₁ p₂ = record
     open HomReasoning
 
 
-Associative : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → _≅_ C (Product.A×B p₃) (Product.A×B p₄)
+Associable : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) → Product (Product.A×B p₁) Z
+Associable p₁ p₂ p₃ = record
+  { A×B = A×B p₃
+  ; π₁ = p₁ ⟨ π₁ p₃ , π₁ p₂ ∘ π₂ p₃ ⟩
+  ; π₂ = π₂ p₂ ∘ π₂ p₃
+  ; ⟨_,_⟩ = λ f g → p₃ ⟨ π₁ p₁ ∘ f , p₂ ⟨ π₂ p₁ ∘ f , g ⟩ ⟩
+  ; commute₁ = λ {_ f g} → let open HomReasoning in begin
+      p₁ ⟨ π₁ p₃ , π₁ p₂ ∘ π₂ p₃ ⟩ ∘ p₃ ⟨ π₁ p₁ ∘ f , p₂ ⟨ π₂ p₁ ∘ f , g ⟩ ⟩
+    ↓⟨ ⟨⟩∘ p₁ ⟩
+      p₁ ⟨ π₁ p₃ ∘ p₃ ⟨ π₁ p₁ ∘ f , _ ⟩ , (π₁ p₂ ∘ π₂ p₃) ∘ p₃ ⟨ _ , p₂ ⟨ π₂ p₁ ∘ f , g ⟩ ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ p₁ (commute₁ p₃) (glueTrianglesˡ (commute₁ p₂) (commute₂ p₃)) ⟩
+      p₁ ⟨ π₁ p₁ ∘ f , π₂ p₁ ∘ f ⟩
+    ↓⟨ g-η p₁ ⟩
+      f
+    ∎
+  ; commute₂ = λ {_ f g} → glueTrianglesˡ (commute₂ p₂) (commute₂ p₃)
+  ; universal = λ {D l r i} pfˡ pfʳ → let open HomReasoning in begin
+      p₃ ⟨ π₁ p₁ ∘ l , p₂ ⟨ π₂ p₁ ∘ l , r ⟩ ⟩
+    ↑⟨ ⟨⟩-cong₂ p₃ (∘-resp-≡ʳ pfˡ) (⟨⟩-cong₂ p₂ (∘-resp-≡ʳ pfˡ) pfʳ) ⟩
+      p₃ ⟨ π₁ p₁ ∘ (p₁ ⟨ π₁ p₃ , _ ⟩ ∘ i) , p₂ ⟨ π₂ p₁ ∘ (p₁ ⟨ _ , π₁ p₂ ∘ π₂ p₃ ⟩ ∘ i) , (π₂ p₂ ∘ π₂ p₃) ∘ i ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ p₃ (pullˡ (commute₁ p₁)) (⟨⟩-cong₂ p₂ (pullˡ (commute₂ p₁)) refl) ⟩
+      p₃ ⟨ π₁ p₃ ∘ i , p₂ ⟨ (π₁ p₂ ∘ π₂ p₃) ∘ i , (π₂ p₂ ∘ π₂ p₃) ∘ i ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ p₃ refl (universal p₂ (sym assoc) (sym assoc)) ⟩
+      p₃ ⟨ π₁ p₃ ∘ i , π₂ p₃ ∘ i ⟩
+    ↓⟨ g-η p₃ ⟩
+      i
+    ∎
+  }
+  where
+  open Product renaming (⟨_,_⟩ to _⟨_,_⟩)
+
+Associative′ : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → (Product.A×B p₃) ≅ (Product.A×B p₄)
+Associative′ p₁ p₂ p₃ p₄ = up-to-iso (Associable p₁ p₂ p₃) p₄
+
+Associative : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → (Product.A×B p₃) ≅ (Product.A×B p₄)
 Associative p₁ p₂ p₃ p₄ = record 
   { f = f
   ; g = g
@@ -165,13 +269,9 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmˡ₁ : π₁ ∘ idˡ ≡ π₁
   cmˡ₁ = begin 
            π₁ ∘ idˡ
-         ↑⟨ assoc ⟩
-           (π₁ ∘ g) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₃.commute₁ ⟩
+         ↓⟨ pullˡ p₃.commute₁ ⟩
            (p₁.π₁ ∘ π′₁) ∘ f
-         ↓⟨ assoc ⟩
-           p₁.π₁ ∘ (π′₁ ∘ f)
-         ↓⟨ ∘-resp-≡ʳ p₄.commute₁ ⟩
+         ↓⟨ pullʳ p₄.commute₁ ⟩
            p₁.π₁ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁
          ↓⟨ p₁.commute₁ ⟩
            p₃.π₁
@@ -182,13 +282,9 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmˡ₂₁ : p₂.π₁ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f) ≡ p₂.π₁ ∘ p₃.π₂
   cmˡ₂₁ = begin
            p₂.π₁ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f)
-         ↑⟨ assoc ⟩
-           (p₂.π₁ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₂.commute₁ ⟩
+         ↓⟨ pullˡ p₂.commute₁ ⟩
            (p₁.π₂ ∘ p₄.π₁) ∘ f
-         ↓⟨ assoc ⟩
-           p₁.π₂ ∘ (p₄.π₁ ∘ f)
-         ↓⟨ ∘-resp-≡ʳ p₄.commute₁ ⟩
+         ↓⟨ pullʳ p₄.commute₁ ⟩
            p₁.π₂ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁
          ↓⟨ p₁.commute₂ ⟩
            p₂.π₁ ∘ p₃.π₂
@@ -199,9 +295,7 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmˡ₂₂ : p₂.π₂ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f) ≡ p₂.π₂ ∘ p₃.π₂
   cmˡ₂₂ = begin
            p₂.π₂ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f)
-         ↑⟨ assoc ⟩
-           (p₂.π₂ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₂.commute₂ ⟩
+         ↓⟨ pullˡ p₂.commute₂ ⟩
            p₄.π₂ ∘ f
          ↓⟨ p₄.commute₂ ⟩
            p₂.π₂ ∘ p₃.π₂
@@ -212,9 +306,7 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmˡ₂ : π₂ ∘ idˡ ≡ π₂
   cmˡ₂ = begin
            π₂ ∘ idˡ
-         ↑⟨ assoc ⟩
-           (π₂ ∘ g) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₃.commute₂ ⟩
+         ↓⟨ pullˡ p₃.commute₂ ⟩
            ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f
          ↑⟨ p₂.universal cmˡ₂₁ cmˡ₂₂ ⟩
            ⟨ p₂.π₁ ∘ p₃.π₂ , p₂.π₂ ∘ p₃.π₂ ⟩p₂
@@ -238,9 +330,7 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmʳ₁₁ : p₁.π₁ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g) ≡ p₁.π₁ ∘ p₄.π₁
   cmʳ₁₁ = begin
             p₁.π₁ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g)
-          ↑⟨ assoc ⟩
-            (p₁.π₁ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁) ∘ g
-          ↓⟨ ∘-resp-≡ˡ p₁.commute₁ ⟩
+          ↓⟨ pullˡ p₁.commute₁ ⟩
             p₃.π₁ ∘ g
           ↓⟨ p₃.commute₁ ⟩
             p₁.π₁ ∘ p₄.π₁
@@ -251,13 +341,9 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmʳ₁₂ : p₁.π₂ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g) ≡ p₁.π₂ ∘ p₄.π₁
   cmʳ₁₂ = begin
             p₁.π₂ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g)
-          ↑⟨ assoc ⟩
-            (p₁.π₂ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁) ∘ g
-          ↓⟨ ∘-resp-≡ˡ p₁.commute₂ ⟩
+          ↓⟨ pullˡ p₁.commute₂ ⟩
             (p₂.π₁ ∘ p₃.π₂) ∘ g
-          ↓⟨ assoc ⟩
-            p₂.π₁ ∘ (p₃.π₂ ∘ g)
-          ↓⟨ ∘-resp-≡ʳ p₃.commute₂ ⟩
+          ↓⟨ pullʳ p₃.commute₂ ⟩
             p₂.π₁ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂
           ↓⟨ p₂.commute₁ ⟩
             p₁.π₂ ∘ p₄.π₁
@@ -269,9 +355,7 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmʳ₁ : π′₁ ∘ idʳ ≡ π′₁
   cmʳ₁ = begin
            π′₁ ∘ idʳ
-         ↑⟨ assoc ⟩
-           (π′₁ ∘ f) ∘ g
-         ↓⟨ ∘-resp-≡ˡ p₄.commute₁ ⟩
+         ↓⟨ pullˡ p₄.commute₁ ⟩
            ⟨ π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g
          ↑⟨ p₁.universal cmʳ₁₁ cmʳ₁₂ ⟩
            ⟨ p₁.π₁ ∘ p₄.π₁ , p₁.π₂ ∘ p₄.π₁ ⟩p₁
@@ -284,13 +368,9 @@ Associative p₁ p₂ p₃ p₄ = record
   .cmʳ₂ : π′₂ ∘ idʳ ≡ π′₂
   cmʳ₂ = begin
            π′₂ ∘ idʳ
-         ↑⟨ assoc ⟩
-           (π′₂ ∘ f) ∘ g
-         ↓⟨ ∘-resp-≡ˡ p₄.commute₂ ⟩
+         ↓⟨ pullˡ p₄.commute₂ ⟩
            (p₂.π₂ ∘ p₃.π₂) ∘ g
-         ↓⟨ assoc ⟩
-           p₂.π₂ ∘ (p₃.π₂ ∘ g)
-         ↓⟨ ∘-resp-≡ʳ p₃.commute₂ ⟩
+         ↓⟨ pullʳ p₃.commute₂ ⟩
            p₂.π₂ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂
          ↓⟨ p₂.commute₂ ⟩
            p₄.π₂
@@ -308,3 +388,6 @@ Associative p₁ p₂ p₃ p₄ = record
          ∎
     where
     open HomReasoning
+
+Associative-test : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → Associative′ p₁ p₂ p₃ p₄ ≣ Associative p₁ p₂ p₃ p₄
+Associative-test p₁ p₂ p₃ p₄ = ≣-refl

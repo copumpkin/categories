@@ -14,6 +14,7 @@ import Categories.Object.BinaryProducts as BinaryProducts
 open Terminal C
 open BinaryProducts C
 
+-- this should really be 'FiniteProducts', no?
 record Products : Set (o ⊔ ℓ ⊔ e) where
   field
     terminal : Terminal

@@ -3,7 +3,7 @@ module Categories.Category where
 
 open import Level
 open import Relation.Binary using (Rel; IsEquivalence; module IsEquivalence; Reflexive; Symmetric; Transitive) renaming (_⇒_ to _⊆_)
-open import Relation.Binary.PropositionalEquality using () renaming (_≡_ to _≣_)
+open import Relation.Binary.PropositionalEquality using () renaming (_≡_ to _≣_; refl to ≣-refl)
 open import Function using (flip)
 open import Categories.Support.Equivalence
 open import Categories.Support.EqReasoning
@@ -125,6 +125,27 @@ module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
              {F G} {h : F ⇒ G}
           → f ∼ g → g ∼ h → f ∼ h
   trans (≡⇒∼ f≡g) (≡⇒∼ g≡h) = ≡⇒∼ (trans′ f≡g g≡h)
+
+  ∘-resp-∼ : ∀ {A B C A′ B′ C′} {f : B ⇒ C} {h : B′ ⇒ C′} {g : A ⇒ B} {i : A′ ⇒ B′} → f ∼ h → g ∼ i → (f ∘ g) ∼ (h ∘ i)
+  ∘-resp-∼ (≡⇒∼ f≡h) (≡⇒∼ g≡i) = ≡⇒∼ (∘-resp-≡ f≡h g≡i)
+
+  ∘-resp-∼ˡ : ∀ {A B C C′} {f : B ⇒ C} {h : B ⇒ C′} {g : A ⇒ B} → f ∼ h → (f ∘ g) ∼ (h ∘ g)
+  ∘-resp-∼ˡ (≡⇒∼ f≡h) = ≡⇒∼ (∘-resp-≡ˡ f≡h)
+
+  ∘-resp-∼ʳ : ∀ {A A′ B C} {f : A ⇒ B} {h : A′ ⇒ B} {g : B ⇒ C} → f ∼ h → (g ∘ f) ∼ (g ∘ h)
+  ∘-resp-∼ʳ (≡⇒∼ f≡h) = ≡⇒∼ (∘-resp-≡ʳ f≡h)
+
+  .∼⇒≡ : ∀ {A B} {f g : A ⇒ B} → f ∼ g → f ≡ g
+  ∼⇒≡ (≡⇒∼ f≡g) = f≡g
+
+  domain-≣ : ∀ {A A′ B B′} {f : A ⇒ B} {f′ : A′ ⇒ B′} → f ∼ f′ → A ≣ A′
+  domain-≣ (≡⇒∼ _) = ≣-refl
+
+  codomain-≣ : ∀ {A A′ B B′} {f : A ⇒ B} {f′ : A′ ⇒ B′} → f ∼ f′ → B ≣ B′
+  codomain-≣ (≡⇒∼ _) = ≣-refl
+
+  ∼-cong : ∀ {t : Level} {T : Set t} {dom cod : T → Obj} (f : (x : T) → dom x ⇒ cod x) → ∀ {i j} (eq : i ≣ j) → f i ∼ f j
+  ∼-cong f ≣-refl = refl
 
 _[_∼_] : ∀ {o ℓ e} (C : Category o ℓ e) {A B} (f : C [ A , B ]) {X Y} (g : C [ X , Y ]) → Set (ℓ ⊔ e)
 C [ f ∼ g ] = Heterogeneous._∼_ C f g

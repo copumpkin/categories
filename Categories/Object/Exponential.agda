@@ -55,18 +55,18 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     where
       open Equiv
   
-  .cut : ∀ {C D}
+  .subst : ∀ {C D}
     → (p₂ : Product C A)
     → (p₃ : Product D A)
     → {f : Product.A×B p₃ ⇒ B}{g : C ⇒ D}
     → λg p₃ f ∘ g
     ≡ λg p₂ (f ∘ [ p₂ ⇒ p₃ ]first g)
-  cut {C}{D} p₂ p₃ {f}{g} = λ-unique p₂ cut-commutes
+  subst {C}{D} p₂ p₃ {f}{g} = λ-unique p₂ subst-commutes
     where
     open HomReasoning
     open Equiv
     p₁ = product
-    cut-commutes =
+    subst-commutes =
       begin
           eval ∘ [ p₂ ⇒ p₁ ]first (λg p₃ f ∘ g)
         ↑⟨ refl ⟩∘⟨ [ p₂ ⇒ p₃ ⇒ p₁ ]first∘first ⟩
@@ -86,7 +86,7 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
       λg product eval
     ↑⟨ identityʳ ⟩
       λg product eval ∘ id
-    ↓⟨ cut _ _ ⟩
+    ↓⟨ subst _ _ ⟩
       λg product (eval ∘ [ product ⇒ product ]first id)
     ↓⟨ η product ⟩
       id
@@ -120,7 +120,7 @@ open Morphisms C
     [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
   ↑⟨ e₁.λ-resp-≡ p₃ eval∘second∘first ⟩
     [ e₁ ]λ p₃ (([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f) ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g))
-  ↑⟨ e₁.cut p₃ p₅ ⟩
+  ↑⟨ e₁.subst p₃ p₅ ⟩
       [ e₁ ]λ p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
     ∘ [ e₂ ]λ p₄ g
   ∎

@@ -114,10 +114,10 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
     λ-resp-≡ {A}{B}{f}{g} f≡g
         = Σ↑.λ-resp-≡ A product f≡g
 
-    .cut : ∀ {A C D} {f : (D × A) ⇒ Σ} {g : C ⇒ D}
+    .subst : ∀ {A C D} {f : (D × A) ⇒ Σ} {g : C ⇒ D}
       → λ-abs {D} A f ∘ g
       ≡ λ-abs {C} A (f ∘ first g)
-    cut {A} = Σ↑.cut A product product
+    subst {A} = Σ↑.subst A product product
 
     .λ-η-id : ∀ {A} → λ-abs A eval ≡ id
     λ-η-id {A} =

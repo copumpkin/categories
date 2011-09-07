@@ -57,6 +57,12 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   assocʳ : ∀ {A B C} → ((A × (B × C)) ⇒ ((A × B) × C))
   assocʳ = _≅_.f C ×-assoc
 
+  .assocʳ∘assocˡ : ∀ {A B C} → assocʳ {A}{B}{C} ∘ assocˡ {A}{B}{C} ≡ id
+  assocʳ∘assocˡ = Iso.isoʳ C (_≅_.iso C ×-assoc)
+  
+  .assocˡ∘assocʳ : ∀ {A B C} → assocˡ {A}{B}{C} ∘ assocʳ {A}{B}{C} ≡ id
+  assocˡ∘assocʳ = Iso.isoˡ C (_≅_.iso C ×-assoc)
+  
   .g-η : ∀ {A B C} {f : C ⇒ (A × B)} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
   g-η = Product.g-η product
 
@@ -148,3 +154,77 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   
   .swap∘swap : ∀ {A B} → (swap {A}{B}) ∘ (swap {B}{A}) ≡ id
   swap∘swap = trans swap∘⟨⟩ η
+  
+  .assocʳ∘⟨⟩ : ∀ {A B C D} {f : A ⇒ B} {g : A ⇒ C} {h : A ⇒ D}
+    → assocʳ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ ≡ ⟨ ⟨ f , g ⟩ , h ⟩
+  assocʳ∘⟨⟩ {f = f}{g}{h} =
+    begin
+      assocʳ ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↓⟨ ⟨⟩∘ ⟩
+      ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+      , (π₂ ∘ π₂) ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+      ⟩
+    ↓⟨ ⟨⟩-cong₂ ⟨⟩∘ assoc ⟩
+      ⟨ ⟨ π₁        ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+        , (π₁ ∘ π₂) ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+        ⟩
+      , π₂ ∘ π₂ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+      ⟩
+    ↓⟨ ⟨⟩-cong₂ (⟨⟩-cong₂ commute₁ assoc ) (∘-resp-≡ʳ commute₂) ⟩
+      ⟨ ⟨ f , π₁ ∘ π₂ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ ⟩
+      , π₂ ∘ ⟨ g , h ⟩ 
+      ⟩
+    ↓⟨ ⟨⟩-cong₂ (⟨⟩-congʳ (∘-resp-≡ʳ commute₂)) commute₂ ⟩
+      ⟨ ⟨ f , π₁ ∘ ⟨ g , h ⟩ ⟩ , h ⟩
+    ↓⟨ ⟨⟩-congˡ (⟨⟩-congʳ commute₁) ⟩
+      ⟨ ⟨ f , g ⟩ , h ⟩
+    ∎ where open HomReasoning
+  
+  .assocˡ∘⟨⟩ : ∀ {A B C D} {f : A ⇒ B} {g : A ⇒ C} {h : A ⇒ D}
+    → assocˡ ∘ ⟨ ⟨ f , g ⟩ , h ⟩ ≡ ⟨ f , ⟨ g , h ⟩ ⟩
+  assocˡ∘⟨⟩ {f = f}{g}{h} =
+    begin
+      assocˡ ∘ ⟨ ⟨ f , g ⟩ , h ⟩
+    ↑⟨ refl ⟩∘⟨ assocʳ∘⟨⟩ ⟩
+      assocˡ ∘ assocʳ ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↑⟨ assoc ⟩
+      (assocˡ ∘ assocʳ) ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↓⟨ assocˡ∘assocʳ ⟩∘⟨ refl ⟩
+      id ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↓⟨ identityˡ ⟩
+      ⟨ f , ⟨ g , h ⟩ ⟩
+    ∎ where open HomReasoning
+  
+  .assocʳ-commute : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
+    → assocʳ ∘ (f ⁂ (g ⁂ h)) ≡ ((f ⁂ g) ⁂ h) ∘ assocʳ
+  assocʳ-commute {f = f}{g}{h} = 
+    begin
+      assocʳ ∘ (f ⁂ (g ⁂ h))
+    ↓⟨ refl ⟩∘⟨ ⟨⟩-congʳ ⟨⟩∘ ⟩
+      assocʳ ∘ ⟨ f ∘ π₁ , ⟨ (g ∘ π₁) ∘ π₂ , (h ∘ π₂) ∘ π₂ ⟩ ⟩
+    ↓⟨ assocʳ∘⟨⟩ ⟩
+      ⟨ ⟨ f ∘ π₁ , (g ∘ π₁) ∘ π₂ ⟩ , (h ∘ π₂) ∘ π₂ ⟩
+    ↓⟨ ⟨⟩-cong₂ (⟨⟩-congʳ assoc) assoc ⟩
+      ⟨ ⟨ f ∘ π₁ , g ∘ π₁ ∘ π₂ ⟩ , h ∘ π₂ ∘ π₂ ⟩
+    ↑⟨ ⟨⟩-congˡ ⁂∘⟨⟩ ⟩
+      ⟨ (f ⁂ g) ∘ ⟨ π₁ , π₁ ∘ π₂ ⟩ , h ∘ π₂ ∘ π₂ ⟩
+    ↑⟨ ⁂∘⟨⟩ ⟩
+      ((f ⁂ g) ⁂ h) ∘ assocʳ
+    ∎ where open HomReasoning
+  
+  .assocˡ-commute : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
+    → assocˡ ∘ ((f ⁂ g) ⁂ h) ≡ (f ⁂ (g ⁂ h)) ∘ assocˡ
+  assocˡ-commute {f = f}{g}{h} = 
+    begin
+      assocˡ ∘ ((f ⁂ g) ⁂ h)
+    ↓⟨ refl ⟩∘⟨ ⟨⟩-congˡ ⟨⟩∘ ⟩
+      assocˡ ∘ ⟨ ⟨ (f ∘ π₁) ∘ π₁ , (g ∘ π₂) ∘ π₁ ⟩ , h ∘ π₂ ⟩
+    ↓⟨ assocˡ∘⟨⟩ ⟩
+      ⟨ (f ∘ π₁) ∘ π₁ , ⟨ (g ∘ π₂) ∘ π₁ , h ∘ π₂ ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ assoc (⟨⟩-congˡ assoc) ⟩
+      ⟨ f ∘ π₁ ∘ π₁ , ⟨ g ∘ π₂ ∘ π₁ , h ∘ π₂ ⟩ ⟩
+    ↑⟨ ⟨⟩-congʳ ⁂∘⟨⟩ ⟩
+      ⟨ f ∘ π₁ ∘ π₁ , (g ⁂ h) ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
+    ↑⟨ ⁂∘⟨⟩ ⟩
+      (f ⁂ (g ⁂ h)) ∘ assocˡ
+    ∎ where open HomReasoning

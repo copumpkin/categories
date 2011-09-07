@@ -93,35 +93,3 @@ module Properties (P : Products) where
     ↑⟨ first∘⟨⟩ ⟩
       first f ∘ ⟨ id , ! ⟩
     ∎
-  
-  .assocˡ-commute : ∀ {X₀ Y₀ X₁ Y₁ X₂ Y₂} {f : X₀ ⇒ Y₀} {g : X₁ ⇒ Y₁} {h : X₂ ⇒ Y₂} → assocˡ ∘ ((f ⁂ g) ⁂ h) ≡ (f ⁂ (g ⁂ h)) ∘ assocˡ
-  assocˡ-commute {f = f} {g} {h} =
-    begin
-      assocˡ ∘ ((f ⁂ g) ⁂ h)
-    ↓⟨ ⟨⟩∘ ⟩
-      ⟨ (π₁ ∘ π₁) ∘ ((f ⁂ g) ⁂ h) , ⟨ π₂ ∘ π₁ , π₂ ⟩ ∘ ((f ⁂ g) ⁂ h) ⟩
-    ↓⟨ ⟨⟩-cong₂ (glue π₁∘⁂ π₁∘⁂) ⟨⟩∘ ⟩
-      ⟨ f ∘ (π₁ ∘ π₁) , ⟨ (π₂ ∘ π₁) ∘ ((f ⁂ g) ⁂ h) , π₂ ∘ ((f ⁂ g) ⁂ h) ⟩ ⟩
-    ↓⟨ ⟨⟩-congʳ (⟨⟩-cong₂ (glue π₂∘⁂ π₁∘⁂) π₂∘⁂) ⟩
-      ⟨ f ∘ (π₁ ∘ π₁) , ⟨ g ∘ (π₂ ∘ π₁) , h ∘ π₂ ⟩ ⟩
-    ↑⟨ ⟨⟩-congʳ ⁂∘⟨⟩ ⟩
-      ⟨ f ∘ (π₁ ∘ π₁) , (g ⁂ h) ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
-    ↑⟨ ⁂∘⟨⟩ ⟩
-      (f ⁂ (g ⁂ h)) ∘ assocˡ
-    ∎
-
-  .assocʳ-commute : ∀ {X₀ Y₀ X₁ Y₁ X₂ Y₂} {f : X₀ ⇒ Y₀} {g : X₁ ⇒ Y₁} {h : X₂ ⇒ Y₂} → assocʳ ∘ (f ⁂ (g ⁂ h)) ≡ ((f ⁂ g) ⁂ h) ∘ assocʳ
-  assocʳ-commute {f = f} {g} {h} =
-    begin
-      assocʳ ∘ (f ⁂ (g ⁂ h))
-    ↓⟨ ⟨⟩∘ ⟩
-      ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ ∘ (f ⁂ (g ⁂ h)) , (π₂ ∘ π₂) ∘ (f ⁂ (g ⁂ h)) ⟩
-    ↓⟨ ⟨⟩-cong₂ ⟨⟩∘ (glue π₂∘⁂ π₂∘⁂) ⟩
-      ⟨ ⟨ π₁ ∘ (f ⁂ (g ⁂ h)) , (π₁ ∘ π₂) ∘ (f ⁂ (g ⁂ h)) ⟩ , h ∘ (π₂ ∘ π₂) ⟩
-    ↓⟨ ⟨⟩-congˡ (⟨⟩-cong₂ π₁∘⁂ (glue π₁∘⁂ π₂∘⁂)) ⟩
-      ⟨ ⟨ f ∘ π₁ , g ∘ (π₁ ∘ π₂) ⟩ , h ∘ (π₂ ∘ π₂) ⟩
-    ↑⟨ ⟨⟩-congˡ ⁂∘⟨⟩ ⟩
-      ⟨ (f ⁂ g) ∘ ⟨ π₁ , π₁ ∘ π₂ ⟩ , h ∘ (π₂ ∘ π₂) ⟩
-    ↑⟨ ⁂∘⟨⟩ ⟩
-      ((f ⁂ g) ⁂ h) ∘ assocʳ
-    ∎

@@ -95,7 +95,7 @@ open import Categories.Monad
         flip id ∘ f
       ↓⟨ λ-unique lem₂ ⟩
         flip [Σ↑ f ]
-      ↑⟨ λ-resp-≡ lem₁ ⟩
+      ↑⟨ λ-cong lem₁ ⟩
         λ-abs (Σ↑ Y) ((eval {X} ∘ swap ∘ second id) ∘ second [Σ↑ f ])
       ↓⟨ λ-distrib ⟩
         [Σ↑ [Σ↑ f ] ] ∘ flip id
@@ -112,11 +112,8 @@ open import Categories.Monad
         id
       ↑⟨ flip² ⟩
         flip (flip id)
-      ↑⟨ λ-resp-≡ lem₁ ⟩
+      ↑⟨ λ-cong lem₁ ⟩
         λ-abs X ((eval ∘ swap ∘ second id) ∘ second (flip id))
       ↓⟨ λ-distrib ⟩
         [Σ↑ flip id ] ∘ flip id
       ∎
-
-Σ²-Monad : Monad C
-Σ²-Monad = Adjunction.monad Σ↑-Self-Adjunction

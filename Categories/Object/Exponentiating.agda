@@ -64,6 +64,10 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
     flip : ∀ {A B} → A ⇒ Σ↑ B → B ⇒ Σ↑ A
     flip {A}{B} f = λ-abs {B} A (eval {B} ∘ swap ∘ second f)
     
+    -- not sure this is the best name... "partial-apply" might be better
+    curry : ∀ {X Y} → (Σ↑ (X × Y) × X) ⇒ Σ↑ Y
+    curry {X}{Y} = λ-abs Y (eval {X × Y} ∘ assocˡ)
+    
     -- some lemmas from Exponential specialized to C's chosen products
     open Equiv
     open HomReasoning
@@ -108,11 +112,11 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
         → λ-abs A (eval ∘ first f) ≡ f
     λ-η {A}{X}{f} = sym (λ-unique refl)
         
-    .λ-resp-≡ : ∀{A B : Obj}{f g : (B × A) ⇒ Σ}
+    .λ-cong : ∀{A B : Obj}{f g : (B × A) ⇒ Σ}
         → (f ≡ g)
         → (λ-abs A f ≡ λ-abs A g)
-    λ-resp-≡ {A}{B}{f}{g} f≡g
-        = Σ↑.λ-resp-≡ A product f≡g
+    λ-cong {A}{B}{f}{g} f≡g
+        = Σ↑.λ-cong A product f≡g
 
     .subst : ∀ {A C D} {f : (D × A) ⇒ Σ} {g : C ⇒ D}
       → λ-abs {D} A f ∘ g
@@ -123,7 +127,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
     λ-η-id {A} =
       begin
           Σ↑.λg A product (Σ↑.eval A ∘ convert product (Σ↑.product A))
-      ↓⟨ Σ↑.λ-resp-≡ A product (∘-resp-≡ refl (convert≡id⁂id product (Σ↑.product A))) ⟩
+      ↓⟨ Σ↑.λ-cong A product (∘-resp-≡ refl (convert≡id⁂id product (Σ↑.product A))) ⟩
           Σ↑.λg A product (Σ↑.eval A ∘ [ product ⇒ Σ↑.product A ]first id)
       ↓⟨ Σ↑.η A product ⟩
           id
@@ -138,10 +142,10 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
         ↓⟨ λ-distrib′ exponential exponential product product product ⟩
             Σ↑.λg A product (Σ↑.eval B ∘ [ product ⇒ Σ↑.product B ]second f)
               ∘ Σ↑.λg B product g
-        ↑⟨ λ-resp-≡ (refl ⟩∘⟨ [ product ⇒ product ⇒ Σ↑.product B ]convert∘⁂) ⟩∘⟨ refl ⟩
+        ↑⟨ λ-cong (refl ⟩∘⟨ [ product ⇒ product ⇒ Σ↑.product B ]convert∘⁂) ⟩∘⟨ refl ⟩
             Σ↑.λg A product (Σ↑.eval B ∘ convert product (Σ↑.product B) ∘ second f)
               ∘ Σ↑.λg B product g
-        ↑⟨ λ-resp-≡ assoc ⟩∘⟨ refl ⟩
+        ↑⟨ λ-cong assoc ⟩∘⟨ refl ⟩
             Σ↑.λg A product ((Σ↑.eval B ∘ convert product (Σ↑.product B)) ∘ second f)
               ∘ Σ↑.λg B product g
         ∎
@@ -150,7 +154,7 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
     flip² {A}{B}{f} =
       begin
         λ-abs {A} B (eval {A} ∘ swap ∘ second (flip f))
-      ↓⟨ λ-resp-≡ lem₁ ⟩
+      ↓⟨ λ-cong lem₁ ⟩
         λ-abs {A} B (eval {B} ∘ first f)
       ↓⟨ λ-η ⟩
         f

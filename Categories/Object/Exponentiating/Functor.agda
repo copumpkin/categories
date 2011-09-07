@@ -36,9 +36,9 @@ open import Categories.Functor
         identity {A} = 
             begin
                 λ-abs A (eval ∘ second id)
-            ↓⟨ λ-resp-≡ (∘-resp-≡ refl (id⁂id product)) ⟩
+            ↓⟨ λ-cong (∘-resp-≡ refl (id⁂id product)) ⟩
                 λ-abs A (eval ∘ id)
-            ↓⟨ λ-resp-≡ identityʳ ⟩
+            ↓⟨ λ-cong identityʳ ⟩
                 λ-abs A eval
             ↓⟨ λ-η-id ⟩
                 id
@@ -50,9 +50,9 @@ open import Categories.Functor
         homomorphism {X}{Y}{Z}{f}{g} =
             begin
                 λ-abs X (eval ∘ second (g ∘ f))
-            ↑⟨ λ-resp-≡ (refl ⟩∘⟨ second∘second) ⟩
+            ↑⟨ λ-cong (refl ⟩∘⟨ second∘second) ⟩
                 λ-abs X (eval ∘ second g ∘ second f)
-            ↑⟨ λ-resp-≡ assoc  ⟩
+            ↑⟨ λ-cong assoc  ⟩
                 λ-abs X ((eval ∘ second g) ∘ second f)
             ↓⟨ λ-distrib ⟩
                 λ-abs X (eval ∘ second f) 
@@ -65,7 +65,7 @@ open import Categories.Functor
         F-resp-≡ {A}{B}{f}{g} f≡g =
             begin
                 λ-abs A (eval ∘ second f)
-            ↓⟨ λ-resp-≡ (refl ⟩∘⟨ ⟨⟩-cong₂ refl (f≡g ⟩∘⟨ refl)) ⟩
+            ↓⟨ λ-cong (refl ⟩∘⟨ ⟨⟩-cong₂ refl (f≡g ⟩∘⟨ refl)) ⟩
                 λ-abs A (eval ∘ second g)
             ∎
 

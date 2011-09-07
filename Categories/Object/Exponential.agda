@@ -46,12 +46,12 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   η X×A {f} = sym (λ-unique X×A refl)
     where open Equiv
   
-  .λ-resp-≡
+  .λ-cong
       : {X : Obj}(X×A : Product X A)
       → ∀{f g}
       → (f ≡ g)
       → (λg X×A f ≡ λg X×A g)
-  λ-resp-≡ X×A {f}{g} f≡g = λ-unique X×A (trans (β X×A) f≡g)
+  λ-cong X×A {f}{g} f≡g = λ-unique X×A (trans (β X×A) f≡g)
     where
       open Equiv
   
@@ -118,7 +118,7 @@ open Morphisms C
 λ-distrib {A}{B}{C}{D} e₁ e₂ p₃ p₄ p₅ {f}{g} =
   begin
     [ e₁ ]λ p₃ (g ∘ [ p₃ ⇒ p₄ ]second f)
-  ↑⟨ e₁.λ-resp-≡ p₃ eval∘second∘first ⟩
+  ↑⟨ e₁.λ-cong p₃ eval∘second∘first ⟩
     [ e₁ ]λ p₃ (([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f) ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g))
   ↑⟨ e₁.subst p₃ p₅ ⟩
       [ e₁ ]λ p₅ ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f)
@@ -171,12 +171,12 @@ convert-Iso e₁ e₂ = record
       begin
           [ e₁ ]λ p₂ [ e₂ ]eval
         ∘ [ e₂ ]λ p₁ [ e₁ ]eval
-      ↓⟨ e₁.λ-resp-≡ p₂ (intro-second e₂) ⟩∘⟨ refl ⟩
+      ↓⟨ e₁.λ-cong p₂ (intro-second e₂) ⟩∘⟨ refl ⟩
           [ e₁ ]λ p₂ ([ e₂ ]eval ∘ [ p₂ ⇒ p₂ ]second id)
         ∘ [ e₂ ]λ p₁ [ e₁ ]eval
       ↑⟨ λ-distrib e₁ e₂ p₁ p₁ p₂ ⟩
           [ e₁ ]λ p₁ ([ e₁ ]eval ∘ [ p₁ ⇒ p₁ ]second id)
-      ↑⟨ e₁.λ-resp-≡ p₁ (intro-second e₁) ⟩
+      ↑⟨ e₁.λ-cong p₁ (intro-second e₁) ⟩
           [ e₁ ]λ p₁ [ e₁ ]eval
       ↓⟨ e₁.η-id ⟩
         id

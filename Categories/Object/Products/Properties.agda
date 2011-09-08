@@ -21,8 +21,6 @@ open Categories.Object.Products C
 import Categories.Morphisms
 open Categories.Morphisms C
 
-open import Categories.Square
-
 module Properties (P : Products) where
   open Products P
   
@@ -30,7 +28,6 @@ module Properties (P : Products) where
   open BinaryProducts binary
   open HomReasoning
   open Equiv
-  open GlueSquares C
   
   unitˡ : ∀ {X} → (⊤ × X) ≅ X
   unitˡ {X} = record

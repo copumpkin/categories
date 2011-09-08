@@ -45,11 +45,11 @@ Cartesian C Ps = record
   ; assoc = record
     { F⇒G = record
       { η = λ X → assocˡ
-      ; commute = λ f → assocˡ-commute
+      ; commute = λ f → assocˡ∘⁂
       }
     ; F⇐G = record
       { η = λ X → assocʳ
-      ; commute = λ f → assocʳ-commute
+      ; commute = λ f → assocʳ∘⁂
       }
     ; iso = λ X → record
       { isoˡ = Iso.isoʳ C (_≅_.iso C ×-assoc)

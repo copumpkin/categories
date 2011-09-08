@@ -195,9 +195,9 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
       ⟨ f , ⟨ g , h ⟩ ⟩
     ∎ where open HomReasoning
   
-  .assocʳ-commute : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
+  .assocʳ∘⁂ : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
     → assocʳ ∘ (f ⁂ (g ⁂ h)) ≡ ((f ⁂ g) ⁂ h) ∘ assocʳ
-  assocʳ-commute {f = f}{g}{h} = 
+  assocʳ∘⁂ {f = f}{g}{h} = 
     begin
       assocʳ ∘ (f ⁂ (g ⁂ h))
     ↓⟨ refl ⟩∘⟨ ⟨⟩-congʳ ⟨⟩∘ ⟩
@@ -212,9 +212,9 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
       ((f ⁂ g) ⁂ h) ∘ assocʳ
     ∎ where open HomReasoning
   
-  .assocˡ-commute : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
+  .assocˡ∘⁂ : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
     → assocˡ ∘ ((f ⁂ g) ⁂ h) ≡ (f ⁂ (g ⁂ h)) ∘ assocˡ
-  assocˡ-commute {f = f}{g}{h} = 
+  assocˡ∘⁂ {f = f}{g}{h} = 
     begin
       assocˡ ∘ ((f ⁂ g) ⁂ h)
     ↓⟨ refl ⟩∘⟨ ⟨⟩-congˡ ⟨⟩∘ ⟩

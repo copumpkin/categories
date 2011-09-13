@@ -3,12 +3,13 @@ module Categories.Graphs where
 
 open import Categories.Category
   hiding (module Heterogeneous)
+open import Data.Product
 open import Level
 open import Relation.Binary
   renaming (_⇒_ to _⊆_)
 open import Relation.Binary.PropositionalEquality
   using ()
-  renaming (_≡_ to _≣_)
+  renaming (_≡_ to _≣_; refl to ≣-refl)
 
 open import Graphs.Graph
 open import Graphs.GraphMorphism
@@ -34,5 +35,5 @@ Graphs o ℓ e = record
     _⇒_ = GraphMorphism
     
     .assoc : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → ((h ∘ g) ∘ f) ≈ (h ∘ (g ∘ f))
-    assoc {f = f}{g}{h} x = refl
+    assoc {f = f}{g}{h} = (λ x → ≣-refl) , (λ f → refl)
       where open Heterogeneous _

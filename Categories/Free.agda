@@ -61,13 +61,11 @@ Free = record
 --            fs ▻▻ gs      ↦ fs ∘ gs
 -- 
 -- This functor is (I believe) an initial morphism from ArrSetoid 
--- (considered as an object in in some category "Graphs" of directed
--- graphs and graph homomorphisms) to the underlying graph functor
--- (from "Categories" to "Graphs").
+-- (considered as an object in "Graphs") to the underlying graph
+-- functor (from "Categories" to "Graphs").
 -- 
--- TODO: Define a category Graphs and prove:
+-- TODO: Prove:
 --  Free : Functor Graphs Categories
---  Underlying : Functor Categories Graphs
 --  Free⊣Underlying : Adjunction Free Underlying
 -- Then let Cata = Adjunction.unit Free⊣Underlying
 -- and prove Cata to be initial in the appropriate comma category

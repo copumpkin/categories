@@ -47,26 +47,57 @@ G ∘ F = record
     open GraphMorphism F
     open GraphMorphism G renaming (F₀ to G₀; F₁ to G₁; F-resp-≈ to G-resp-≈)
 
+_≈₀_ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} {A : Graph o₁ ℓ₁ e₁} {B : Graph o₂ ℓ₂ e₂}
+  → (F G : GraphMorphism A B)
+  → Set (o₁ ⊔ o₂)
+_≈₀_ {A = A}{B} F G
+  = ∀ X → F₀ X ≣ G₀ X
+  where
+    open GraphMorphism F using (F₀)
+    open GraphMorphism G renaming (F₀ to G₀)
+
+isEquivalence₀ : ∀{o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} {A : Graph o₁ ℓ₁ e₁} {B : Graph o₂ ℓ₂ e₂}
+  → IsEquivalence (_≈₀_ {A = A}{B}) 
+isEquivalence₀ {A = A}{B} = record
+  { refl  = λ     x → ≣-refl
+  ; sym   = λ p   x → ≣-sym   (p x)
+  ; trans = λ p q x → ≣-trans (p x) (q x)
+  }
+
+_≈₁_ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} {A : Graph o₁ ℓ₁ e₁} {B : Graph o₂ ℓ₂ e₂}
+  → (F G : GraphMorphism A B)
+  → Set (o₁ ⊔ ℓ₁ ⊔ ℓ₂ ⊔ e₂)
+_≈₁_ {A = A}{B} F G
+  = ∀ {X Y} (f : A [ X ↝ Y ]) → B [ F₁ f ~ G₁ f ]
+  where
+    open GraphMorphism F using (F₁)
+    open GraphMorphism G renaming (F₁ to G₁)
+
+isEquivalence₁ : ∀{o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} {A : Graph o₁ ℓ₁ e₁} {B : Graph o₂ ℓ₂ e₂}
+  → IsEquivalence (_≈₁_ {A = A}{B}) 
+isEquivalence₁ {A = A}{B} = record
+  { refl  = λ     f → refl
+  ; sym   = λ p   f → sym   (p f)
+  ; trans = λ p q f → trans (p f) (q f)
+  } where open Heterogeneous B
+
 _≈_ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} {A : Graph o₁ ℓ₁ e₁} {B : Graph o₂ ℓ₂ e₂}
   → (F G : GraphMorphism A B)
-  → Set _
-_≈_ {A = A}{B} F G
-  = (∀ X → F₀ X ≣ G₀ X)
-  × (∀ {X Y} (f : A [ X ↝ Y ]) → B [ F₁ f ~ G₁ f ])
-  where
-    open GraphMorphism F using (F₀; F₁)
-    open GraphMorphism G renaming (F₀ to G₀; F₁ to G₁)
+  → Set (o₁ ⊔ o₂ ⊔ ℓ₁ ⊔ ℓ₂ ⊔ e₂)
+_≈_ = _≈₀_ -×- _≈₁_
 
 isEquivalence : ∀{o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} {A : Graph o₁ ℓ₁ e₁} {B : Graph o₂ ℓ₂ e₂}
-  → IsEquivalence (_≈_ {o₁}{ℓ₁}{e₁}{o₂}{ℓ₂}{e₂}{A}{B})
+  → IsEquivalence (_≈_ {A = A}{B})
 isEquivalence {A = A}{B} = record
-  { refl  = (λ x → ≣-refl)
-          , (λ f → refl)
-  ; sym   = λ p   → (λ x → ≣-sym (proj₁ p x))
-                  , (λ f → sym   (proj₂ p f))
-  ; trans = λ p q → (λ x → ≣-trans (proj₁ p x) (proj₁ q x))
-                  , (λ f → trans   (proj₂ p f) (proj₂ q f))
-  } where open Heterogeneous B
+  { refl  = λ {x}       → refl₀  {x} , λ f → refl₁  {x} f
+  ; sym   = λ {x}{y}    → map (sym₀   {x}{y})    (sym₁   {x}{y})
+  ; trans = λ {x}{y}{z} → zip (trans₀ {x}{y}{z}) (trans₁ {x}{y}{z})
+  } 
+  where
+    open IsEquivalence isEquivalence₀
+      renaming (refl to refl₀; sym to sym₀; trans to trans₀)
+    open IsEquivalence isEquivalence₁
+      renaming (refl to refl₁; sym to sym₁; trans to trans₁)
 
 .∘-resp-≈  : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
                {A : Graph o₀ ℓ₀ e₀} {B : Graph o₁ ℓ₁ e₁} {C : Graph o₂ ℓ₂ e₂}

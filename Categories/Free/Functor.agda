@@ -22,17 +22,26 @@ open import Data.Star.Properties
 open import Data.Star.Equality
 open import Level using (_⊔_)
 
-◅-resp-~ : 
+ε∼ε : ∀{o₁ ℓ₁ e₁}{X : Graph o₁ ℓ₁ e₁}
+       {o₂ ℓ₂ e₂}{Y : Graph o₂ ℓ₂ e₂}
+  → (F G : GraphMorphism X Y)
+  → F ≈ G
+  → {x : Graph.Obj X}
+  → Free₀ Y [ ε {x = GraphMorphism.F₀ F x} ~C ε {x = GraphMorphism.F₀ G x} ]
+ε∼ε {Y = Y} F G F≈G {x} rewrite proj₁ F≈G x = refl
+  where open Heterogeneous (Free₀ Y)
+
+_◅~◅_ : 
   ∀ {o ℓ e}{G : Graph o ℓ e}
     {a₀ a₁ b₀ b₁ c₀ c₁ : Graph.Obj G}
     {f  :       G [ a₀ ↝ b₀ ]}
     {g  :       G [ a₁ ↝ b₁ ]}
     {fs : Free₀ G [ b₀ , c₀ ]}
     {gs : Free₀ G [ b₁ , c₁ ]}
-  →      G [ f  ~G g  ]
+  →       G [ f  ~G g  ]
   → Free₀ G [ fs ~C gs ]
   → Free₀ G [ (f ◅ fs) ~C (g ◅ gs) ]
-◅-resp-~ {G = G} (HeterogeneousG.≈⇒~ hd) (Heterogeneous.≡⇒∼ tl)
+_◅~◅_ {G = G} (HeterogeneousG.≈⇒~ hd) (Heterogeneous.≡⇒∼ tl)
   = ≡⇒∼ (hd ◅-cong tl)
   where
     open Heterogeneous (Free₀ G)
@@ -53,24 +62,12 @@ Free {o}{ℓ}{e} = record
     .homomorphism : ∀ {X Y Z} {f : GraphMorphism X Y} {g : GraphMorphism Y Z}
                   → Free₁ (g ∘G f) ≡F (Free₁ g ∘F Free₁ f)
     homomorphism ε = Heterogeneous.refl _
-    homomorphism {X}{Y}{Z}{f}{g}{S}{U} (_◅_ {.S}{T}{.U} h hs) = help!!
-      where
-        open Heterogeneous (Free₀ Z)
-        open PathEquality Z using (_◅-cong_)
-        
-        help!! : (GraphMorphism.F₁ g (GraphMorphism.F₁ f h) ◅ Functor.F₁ (Free₁ (g ∘G f)) hs)
-            ∼ (GraphMorphism.F₁ g (GraphMorphism.F₁ f h) ◅ Functor.F₁ (Free₁ g) (Functor.F₁ (Free₁ f) hs))
-        help!! with homomorphism {X}{Y}{Z}{f}{g}{T}{U} hs
-        ... | (≡⇒∼ tl) = ≡⇒∼ (Graph.Equiv.refl Z ◅-cong tl)
+    homomorphism {X}{Y}{Z}{f}{g}{S}{U} (_◅_ {.S}{T}{.U} h hs) = 
+      HeterogeneousG.refl Z ◅~◅ homomorphism {X}{Y}{Z}{f}{g}{T}{U} hs
     
     .Free₁-resp-≡ : ∀ {X Y} {F G : GraphMorphism X Y} 
       → F ≈ G
       → Free₁ F ≡F Free₁ G
-    Free₁-resp-≡ {X}{Y}{F}{G} F≈G {S}{.S} ε = ε∼ε
-      where
-        open Heterogeneous (Free₀ Y)
-        open PathEquality Y using (ε-cong)
-        ε∼ε : ∀ {x} → (ε {x = GraphMorphism.F₀ F x}) ∼ (ε {x = GraphMorphism.F₀ G x})
-        ε∼ε {x} rewrite proj₁ F≈G x = refl
+    Free₁-resp-≡ {X}{Y}{F}{G} F≈G {S}{.S} ε = ε∼ε F G F≈G
     Free₁-resp-≡ {X}{Y}{F}{G} F≈G {S}{U} (_◅_ {.S}{T}{.U} h hs) 
-      = ◅-resp-~ (proj₂ F≈G h) (Free₁-resp-≡ {X}{Y}{F}{G} F≈G {T}{U} hs)
+      = proj₂ F≈G h ◅~◅ Free₁-resp-≡ {X}{Y}{F}{G} F≈G {T}{U} hs

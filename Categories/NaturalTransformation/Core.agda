@@ -17,12 +17,18 @@ record NaturalTransformation {o ℓ e o′ ℓ′ e′}
   private module D = Category D
   private module F = Functor F
   private module G = Functor G
-  open F
-  open G renaming (F₀ to G₀; F₁ to G₁)
+  open F using (F₀; F₁)
+  open G using () renaming (F₀ to G₀; F₁ to G₁)
 
   field
     η : ∀ X → D [ F₀ X , G₀ X ]
     .commute : ∀ {X Y} (f : C [ X , Y ]) → D.CommutativeSquare (F₁ f) (η X) (η Y) (G₁ f)
+
+  op : NaturalTransformation G.op F.op
+  op = record
+    { η = η
+    ; commute = λ f → D.Equiv.sym (commute f)
+    }
 
 id : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F : Functor C D} → NaturalTransformation F F
 id {C = C} {D} {F} = record 

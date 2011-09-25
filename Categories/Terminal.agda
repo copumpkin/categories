@@ -11,9 +11,8 @@ import Categories.Object.Terminal as Terminal
 
 open Terminal (Categories o ℓ e)
 
-private
-  record Unit {x : _} : Set x where
-    constructor unit
+record Unit {x : _} : Set x where
+  constructor unit
 
 -- I can probably use Discrete here once we get universe cumulativity in Agda
 One : Terminal

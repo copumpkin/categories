@@ -2,6 +2,7 @@
 module Categories.Product where
 
 open import Level
+open import Function using () renaming (_∘_ to _∙_)
 open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>; swap)
 
 open import Categories.Category
@@ -81,6 +82,42 @@ _※ⁿ_ : ∀ {o ℓ e o′₁ ℓ′₁ e′₁} {C : Category o ℓ e} {D₁ 
          where
          module α = NaturalTransformation α
          module β = NaturalTransformation β
+
+assocˡ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} → (C₁ : Category o₁ ℓ₁ e₁) (C₂ : Category o₂ ℓ₂ e₂) (C₃ : Category o₃ ℓ₃ e₃) → Functor (Product (Product C₁ C₂) C₃) (Product C₁ (Product C₂ C₃))
+assocˡ C₁ C₂ C₃ = record
+  { F₀ = < proj₁ ∙ proj₁ , < proj₂ ∙ proj₁ , proj₂ > >
+  ; F₁ = < proj₁ ∙ proj₁ , < proj₂ ∙ proj₁ , proj₂ > >
+  ; identity = C₁.Equiv.refl , C₂.Equiv.refl , C₃.Equiv.refl
+  ; homomorphism = C₁.Equiv.refl , C₂.Equiv.refl , C₃.Equiv.refl
+  ; F-resp-≡ = < proj₁ ∙ proj₁ , < proj₂ ∙ proj₁ , proj₂ > >
+  }
+  where
+  module C₁ = Category C₁
+  module C₂ = Category C₂
+  module C₃ = Category C₃
+
+assocʳ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} → (C₁ : Category o₁ ℓ₁ e₁) (C₂ : Category o₂ ℓ₂ e₂) (C₃ : Category o₃ ℓ₃ e₃) → Functor (Product C₁ (Product C₂ C₃)) (Product (Product C₁ C₂) C₃)
+assocʳ C₁ C₂ C₃ = record
+  { F₀ = < < proj₁ , proj₁ ∙ proj₂ > , proj₂ ∙ proj₂ >
+  ; F₁ = < < proj₁ , proj₁ ∙ proj₂ > , proj₂ ∙ proj₂ >
+  ; identity = (C₁.Equiv.refl , C₂.Equiv.refl) , C₃.Equiv.refl
+  ; homomorphism = (C₁.Equiv.refl , C₂.Equiv.refl) , C₃.Equiv.refl
+  ; F-resp-≡ = < < proj₁ , proj₁ ∙ proj₂ > , proj₂ ∙ proj₂ >
+  }
+  where
+  module C₁ = Category C₁
+  module C₂ = Category C₂
+  module C₃ = Category C₃
+
+πˡ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product C D) C
+πˡ {C = C} = record { F₀ = proj₁; F₁ = proj₁; identity = refl
+                    ; homomorphism = refl; F-resp-≡ = proj₁ }
+  where open Category.Equiv C using (refl)
+
+πʳ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product C D) D
+πʳ {D = D} = record { F₀ = proj₂; F₁ = proj₂; identity = refl
+                    ; homomorphism = refl; F-resp-≡ = proj₂ }
+  where open Category.Equiv D using (refl)
 
 Swap : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product D C) (Product C D)
 Swap {C = C} {D = D} = (record

@@ -3,8 +3,9 @@ module Categories.Category where
 
 open import Level
 open import Relation.Binary using (Rel; IsEquivalence; module IsEquivalence; Reflexive; Symmetric; Transitive) renaming (_⇒_ to _⊆_)
-open import Relation.Binary.PropositionalEquality using () renaming (_≡_ to _≣_; refl to ≣-refl)
 open import Function using (flip)
+
+open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
 open import Categories.Support.EqReasoning
 
@@ -48,6 +49,12 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
     reflexive = e.reflexive q
 
   private open Equiv
+
+  domain : ∀ {A B} → (A ⇒ B) → Obj
+  domain {A} _ = A
+
+  codomain : ∀ {A B} → (A ⇒ B) → Obj
+  codomain {B = B} _ = B
 
   .∘-resp-≡ˡ : ∀ {A B C} {f h : B ⇒ C} {g : A ⇒ B} → f ≡ h → f ∘ g ≡ h ∘ g
   ∘-resp-≡ˡ pf = ∘-resp-≡ pf refl
@@ -136,7 +143,7 @@ module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
   ∘-resp-∼ʳ (≡⇒∼ f≡h) = ≡⇒∼ (∘-resp-≡ʳ f≡h)
 
   .∼⇒≡ : ∀ {A B} {f g : A ⇒ B} → f ∼ g → f ≡ g
-  ∼⇒≡ (≡⇒∼ f≡g) = f≡g
+  ∼⇒≡ (≡⇒∼ f≡g) = irr f≡g
 
   domain-≣ : ∀ {A A′ B B′} {f : A ⇒ B} {f′ : A′ ⇒ B′} → f ∼ f′ → A ≣ A′
   domain-≣ (≡⇒∼ _) = ≣-refl
@@ -146,6 +153,44 @@ module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
 
   ∼-cong : ∀ {t : Level} {T : Set t} {dom cod : T → Obj} (f : (x : T) → dom x ⇒ cod x) → ∀ {i j} (eq : i ≣ j) → f i ∼ f j
   ∼-cong f ≣-refl = refl
+
+  -- floating morphisms on ≣
+  float₂ : ∀ {A A′ B B′} → A ≣ A′ → B ≣ B′ → A ⇒ B → A′ ⇒ B′
+  float₂ = ≣-subst₂ _⇒_
+
+  floatˡ : ∀ {A B B′} → B ≣ B′ → A ⇒ B → A ⇒ B′
+  floatˡ {A} = ≣-subst (_⇒_ A)
+
+  floatˡ-resp-trans : ∀ {A B B′ B″} (B≣B′ : B ≣ B′) (B′≣B″ : B′ ≣ B″) (f : A ⇒ B) → floatˡ (≣-trans B≣B′ B′≣B″) f ≣ floatˡ B′≣B″ (floatˡ B≣B′ f)
+  floatˡ-resp-trans {A} = ≣-subst-trans (_⇒_ A)
+
+  floatʳ : ∀ {A A′ B} → A ≣ A′ → A ⇒ B → A′ ⇒ B
+  floatʳ {B = B} = ≣-subst (λ X → X ⇒ B)
+
+  float₂-breakdown-lr : ∀ {A A′} (A≣A′ : A ≣ A′) {B B′} (B≣B′ : B ≣ B′) (f : A ⇒ B) → float₂ A≣A′ B≣B′ f ≣ floatˡ B≣B′ (floatʳ A≣A′ f)
+  float₂-breakdown-lr = ≣-subst₂-breakdown-lr _⇒_
+
+  float₂-breakdown-rl : ∀ {A A′} (A≣A′ : A ≣ A′) {B B′} (B≣B′ : B ≣ B′) (f : A ⇒ B) → float₂ A≣A′ B≣B′ f ≣ floatʳ A≣A′ (floatˡ B≣B′ f)
+  float₂-breakdown-rl = ≣-subst₂-breakdown-rl _⇒_
+  
+  -- henry ford versions
+  .∼⇒≡₂ : ∀ {A A′ B B′} {f : A ⇒ B} {f′ : A′ ⇒ B′} → f ∼ f′ → (A≣A′ : A ≣ A′) (B≣B′ : B ≣ B′) → float₂ A≣A′ B≣B′ f ≡ f′
+  ∼⇒≡₂ pf ≣-refl ≣-refl = ∼⇒≡ pf
+
+  .∼⇒≡ˡ : ∀ {A B B′} {f : A ⇒ B} {f′ : A ⇒ B′} → f ∼ f′ → (B≣B′ : B ≣ B′) → floatˡ B≣B′ f ≡ f′
+  ∼⇒≡ˡ pf ≣-refl = ∼⇒≡ pf
+
+  .∼⇒≡ʳ : ∀ {A A′ B} {f : A ⇒ B} {f′ : A′ ⇒ B} → f ∼ f′ → (A≣A′ : A ≣ A′) → floatʳ A≣A′ f ≡ f′
+  ∼⇒≡ʳ pf ≣-refl = ∼⇒≡ pf
+
+  float₂-resp-∼ : ∀ {A A′ B B′} (A≣A′ : A ≣ A′) (B≣B′ : B ≣ B′) {f : C [ A , B ]} → f ∼ float₂ A≣A′ B≣B′ f
+  float₂-resp-∼ ≣-refl ≣-refl = refl
+
+  floatˡ-resp-∼ : ∀ {A B B′} (B≣B′ : B ≣ B′) {f : C [ A , B ]} → f ∼ floatˡ B≣B′ f
+  floatˡ-resp-∼ ≣-refl = refl
+
+  floatʳ-resp-∼ : ∀ {A A′ B} (A≣A′ : A ≣ A′) {f : C [ A , B ]} → f ∼ floatʳ A≣A′ f
+  floatʳ-resp-∼ ≣-refl = refl
 
 _[_∼_] : ∀ {o ℓ e} (C : Category o ℓ e) {A B} (f : C [ A , B ]) {X Y} (g : C [ X , Y ]) → Set (ℓ ⊔ e)
 C [ f ∼ g ] = Heterogeneous._∼_ C f g

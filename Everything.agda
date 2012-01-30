@@ -12,6 +12,9 @@ import Categories.Adjunction
 -- The Agda Set category
 import Categories.Agda
 
+-- The fact that one version of it is cocomplete
+import Categories.Agda.ISetoids.Cocomplete
+
 -- The arrow category construction on any category
 import Categories.Arrow
 
@@ -29,6 +32,9 @@ import Categories.Closed
 
 -- Cocones
 import Categories.Cocone
+
+-- The category of cocones under a diagram (functor)
+import Categories.Cocones
 
 -- Coends
 import Categories.Coend
@@ -164,6 +170,9 @@ import Categories.Morphisms
 -- Cartesian morphisms (used mostly for fibrations)
 import Categories.Morphism.Cartesian
 
+-- Families of morphisms indexed by a set
+import Categories.Morphism.Indexed
+
 -- Natural isomorphisms, defined as an isomorphism of natural transformations
 import Categories.NaturalIsomorphism
 
@@ -171,6 +180,9 @@ import Categories.NaturalIsomorphism
 import Categories.NaturalTransformation
 
 import Categories.DinaturalTransformation
+
+-- Properties of the opposite category
+import Categories.Opposite
 
 --------------------------------------------------------------------------------
 -- Objects
@@ -180,10 +192,16 @@ import Categories.DinaturalTransformation
 import Categories.Object.Coproduct
 
 -- A category has all binary coproducts
+import Categories.Object.BinaryCoproducts
+
+-- A category has all finite coproducts
 import Categories.Object.Coproducts
 
 -- An exponential object
 import Categories.Object.Exponential
+
+-- A family of objects indexed by a set
+import Categories.Object.Indexed
 
 -- An initial object
 import Categories.Object.Initial
@@ -192,7 +210,16 @@ import Categories.Object.Initial
 import Categories.Object.Product
 
 -- All binary products
+import Categories.Object.BinaryProducts
+
+-- All finite products
 import Categories.Object.Products
+
+-- The product of a family of objects
+import Categories.Object.IndexedProduct
+
+-- All products of indexed families
+import Categories.Object.IndexedProducts
 
 -- Subobject classifiers (for topoi)
 import Categories.Object.SubobjectClassifier
@@ -237,6 +264,7 @@ import Categories.Pushout
 import Categories.Slice
 
 -- Utilities for gluing together commutative squares (and triangles)
+-- (and other common patterns of equational reasoning)
 import Categories.Square
 
 -- The terminal category (a terminal object in the category of small categories)

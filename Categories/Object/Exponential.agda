@@ -7,9 +7,11 @@ open Category C
 
 open import Level
 
+open import Categories.Square
+
 import Categories.Object.Product
 open Categories.Object.Product C
-  hiding (Unique; convert; convert-Iso)
+  hiding (repack; repack≡id; repack∘; repack-cancel; up-to-iso; transport-by-iso)
 
 import Categories.Object.Product.Morphisms
 open Categories.Object.Product.Morphisms C
@@ -21,8 +23,10 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     B^A : Obj
     product : Product B^A A
 
+  module product = Product product
+
   B^A×A : Obj
-  B^A×A = Product.A×B product
+  B^A×A = product.A×B
   
   field
     eval : B^A×A ⇒ B
@@ -151,55 +155,74 @@ open Morphisms C
       g ∘ [ p₃ ⇒ p₄ ]second f
     ∎
 
-convert : ∀{A B} (e₁ e₂ : Exponential A B) → Exponential.B^A e₁ ⇒ Exponential.B^A e₂
-convert e₁ e₂ = e₂.λg e₁.product e₁.eval
+repack : ∀{A B} (e₁ e₂ : Exponential A B) → Exponential.B^A e₁ ⇒ Exponential.B^A e₂
+repack e₁ e₂ = e₂.λg e₁.product e₁.eval
   where
     module e₁ = Exponential e₁
     module e₂ = Exponential e₂
 
-convert-Iso : ∀{A B} (e₁ e₂ : Exponential A B) → Iso (convert e₁ e₂) (convert e₂ e₁)
-convert-Iso e₁ e₂ = record
-  { isoˡ = iso e₁ e₂
-  ; isoʳ = iso e₂ e₁
-  }
+.repack≡id : ∀{A B} (e : Exponential A B) → repack e e ≡ id
+repack≡id e = Exponential.η-id e
+
+.repack∘ : ∀{A B} (e₁ e₂ e₃ : Exponential A B) → repack e₂ e₃ ∘ repack e₁ e₂ ≡ repack e₁ e₃
+repack∘ {A} {B} e₁ e₂ e₃ = 
+  begin
+      [ e₃ ]λ p₂ [ e₂ ]eval
+    ∘ [ e₂ ]λ p₁ [ e₁ ]eval
+  ↓⟨ λ-cong e₃ p₂ (introʳ (second-id p₂)) ⟩∘⟨ refl ⟩
+      [ e₃ ]λ p₂ ([ e₂ ]eval ∘ [ p₂ ⇒ p₂ ]second id)
+    ∘ [ e₂ ]λ p₁ [ e₁ ]eval
+  ↑⟨ λ-distrib e₃ e₂ p₁ p₁ p₂ ⟩
+    [ e₃ ]λ p₁ ([ e₁ ]eval ∘ [ p₁ ⇒ p₁ ]second id)
+  ↑⟨ λ-cong e₃ p₁ (introʳ (second-id p₁)) ⟩
+    [ e₃ ]λ p₁ [ e₁ ]eval
+  ∎
   where
     open Equiv
+    open Exponential
     open HomReasoning
-    
-    .iso : ∀{A B} (e₁ e₂ : Exponential A B) → convert e₂ e₁ ∘ convert e₁ e₂ ≡ id
-    iso e₁ e₂ =
-      begin
-          [ e₁ ]λ p₂ [ e₂ ]eval
-        ∘ [ e₂ ]λ p₁ [ e₁ ]eval
-      ↓⟨ e₁.λ-cong p₂ (intro-second e₂) ⟩∘⟨ refl ⟩
-          [ e₁ ]λ p₂ ([ e₂ ]eval ∘ [ p₂ ⇒ p₂ ]second id)
-        ∘ [ e₂ ]λ p₁ [ e₁ ]eval
-      ↑⟨ λ-distrib e₁ e₂ p₁ p₁ p₂ ⟩
-          [ e₁ ]λ p₁ ([ e₁ ]eval ∘ [ p₁ ⇒ p₁ ]second id)
-      ↑⟨ e₁.λ-cong p₁ (intro-second e₁) ⟩
-          [ e₁ ]λ p₁ [ e₁ ]eval
-      ↓⟨ e₁.η-id ⟩
-        id
-      ∎
-      where
-        module e₁ = Exponential e₁
-        module e₂ = Exponential e₂
-        p₁ = e₁.product
-        p₂ = e₂.product
-        
-        intro-second : ∀ {X Y} → (e : Exponential X Y) → _
-        intro-second e =
-          begin
-              [ e ]eval
-          ↑⟨ identityʳ ⟩
-              [ e ]eval ∘ id
-          ↑⟨ refl ⟩∘⟨ second-id p ⟩
-              [ e ]eval ∘ [ p ⇒ p ]second id
-          ∎ where p = Exponential.product e
+    open GlueSquares C
+    p₁ = product e₁
+    p₂ = product e₂
 
-Unique : ∀{A B} (e₁ e₂ : Exponential A B) → Exponential.B^A e₁ ≅ Exponential.B^A e₂
-Unique e₁ e₂ = record
-  { f = convert e₁ e₂
-  ; g = convert e₂ e₁
-  ; iso = convert-Iso e₁ e₂
+.repack-cancel : ∀{A B} (e₁ e₂ : Exponential A B) → repack e₁ e₂ ∘ repack e₂ e₁ ≡ id
+repack-cancel e₁ e₂ = Equiv.trans (repack∘ e₂ e₁ e₂) (repack≡id e₂)
+
+up-to-iso : ∀{A B} (e₁ e₂ : Exponential A B) → Exponential.B^A e₁ ≅ Exponential.B^A e₂
+up-to-iso e₁ e₂ = record
+  { f = repack e₁ e₂
+  ; g = repack e₂ e₁
+  ; iso = record
+    { isoˡ = repack-cancel e₂ e₁
+    ; isoʳ = repack-cancel e₁ e₂
+    }
   }
+
+transport-by-iso : ∀{A B} (e : Exponential A B) → ∀ {X} → Exponential.B^A e ≅ X → Exponential A B
+transport-by-iso e {X} e≅X = record
+  { B^A = X
+  ; product = X×A
+  ; eval = e.eval
+  ; λg = λ Y×A y → f ∘ e.λg Y×A y
+  ; β = λ Y×A → let open HomReasoning in let open GlueSquares C in let open Equiv in begin
+      e.eval ∘ [ Y×A ⇒ X×A ]first (f ∘ e.λg Y×A _)
+    ↓⟨ ∘-resp-≡ʳ (e.product.⟨⟩-cong₂ (pullˡ (cancelLeft isoˡ)) (pullˡ identityˡ)) ⟩
+      e.eval ∘ [ Y×A ⇒ e.product ]first (e.λg Y×A _)
+    ↓⟨ (e.β Y×A) ⟩
+      _
+    ∎
+  ; λ-unique = λ Y×A y → let open GlueSquares C in
+    switch-gfˡ e≅X
+     (e.λ-unique Y×A
+      (Equiv.trans
+       (∘-resp-≡ʳ
+        (e.product.⟨⟩-cong₂
+         assoc
+         (Equiv.sym (pullˡ identityˡ))))
+      y)) -- look ma i can write lisp in agda  --xplat
+  }
+  where
+  module e = Exponential e
+  X×A = Mobile e.product e≅X idⁱ
+  open _≅_ e≅X
+

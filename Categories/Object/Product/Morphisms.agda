@@ -135,7 +135,8 @@ repack≡id⁂id p₁ p₂ = sym (Product.⟨⟩-cong₂ p₂ identityˡ identit
 .[_⇒_⇒_]repack∘repack : ∀{A B} 
   → (p₁ p₂ p₃ : Product A B)
   → repack p₂ p₃ ∘ repack p₁ p₂ ≡ repack p₁ p₃
-[_⇒_⇒_]repack∘repack p₁ p₂ p₃ =
+[_⇒_⇒_]repack∘repack = repack∘
+{-
   begin
     repack p₂ p₃ ∘ repack p₁ p₂
   ↓⟨ repack≡id⁂id p₂ p₃ ⟩∘⟨ repack≡id⁂id p₁ p₂ ⟩
@@ -147,6 +148,7 @@ repack≡id⁂id p₁ p₂ = sym (Product.⟨⟩-cong₂ p₂ identityˡ identit
   ↑⟨ repack≡id⁂id p₁ p₃ ⟩
     repack p₁ p₃
   ∎
+-}
 
 [_⇒_]first 
     : ∀ {A B C}

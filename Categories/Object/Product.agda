@@ -148,3 +148,32 @@ Associative : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Prod
 Associative p₁ p₂ p₃ p₄ = up-to-iso (Associable p₁ p₂ p₃) p₄
 
 open Lemmas public
+
+Mobile : ∀ {A₁ B₁ A₂ B₂} (p : Product A₁ B₁) → A₁ ≅ A₂ → B₁ ≅ B₂ → Product A₂ B₂
+Mobile p A₁≅A₂ B₁≅B₂ = record
+  { A×B = p.A×B
+  ; π₁ = f A₁≅A₂ ∘ p.π₁
+  ; π₂ = f B₁≅B₂ ∘ p.π₂
+  ; ⟨_,_⟩ = λ h k → p ⟨ g A₁≅A₂ ∘ h , g B₁≅B₂ ∘ k ⟩
+  ; commute₁ = let open HomReasoning in begin
+      (f A₁≅A₂ ∘ p.π₁) ∘ p ⟨ g A₁≅A₂ ∘ _ , g B₁≅B₂ ∘ _ ⟩
+    ↓⟨ pullʳ p.commute₁ ⟩
+      f A₁≅A₂ ∘ (g A₁≅A₂ ∘ _)
+    ↓⟨ cancelLeft (isoʳ A₁≅A₂) ⟩
+      _
+    ∎
+  ; commute₂ = let open HomReasoning in begin
+      (f B₁≅B₂ ∘ p.π₂) ∘ p ⟨ g A₁≅A₂ ∘ _ , g B₁≅B₂ ∘ _ ⟩
+    ↓⟨ pullʳ p.commute₂ ⟩
+      f B₁≅B₂ ∘ (g B₁≅B₂ ∘ _)
+    ↓⟨ cancelLeft (isoʳ B₁≅B₂) ⟩
+      _
+    ∎
+  ; universal = λ pfˡ pfʳ → p.universal 
+                              (switch-fgˡ A₁≅A₂ (trans (sym assoc) pfˡ))
+                              (switch-fgˡ B₁≅B₂ (trans (sym assoc) pfʳ))
+  }
+  where
+  module p = Product p
+  open Product renaming (⟨_,_⟩ to _⟨_,_⟩)
+  open _≅_

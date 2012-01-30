@@ -2,6 +2,7 @@
 module Categories.Limit where
 
 open import Level
+open import Data.Product using (Σ; _,_; uncurry; proj₂)
 
 open import Categories.Support.PropositionalEquality
 
@@ -19,10 +20,10 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
   open Category C
   open Category J using () renaming (Obj to Dot)
   open Functor F
-  open Mor C using (_≅_)
-  open Mor (Cones F) using () renaming (_≅_ to _⇿_)
-  open Category (Cones F) using () renaming (Obj to Cone; _≡_ to _≜₁_; _∘_ to _▵_; _⇒_ to _⇾_)
-  open ConeOver F using (_≜_; ≜-sym; ≜-trans; heterogenize; homogenize; ConeUnder; tether; untether; _≜′_)
+  open Mor C using (_≅_; _≡ⁱ_)
+  open Mor (Cones F) using () renaming (_≅_ to _⇿_; _≡ⁱ_ to _≜ⁱ_)
+  open Category (Cones F) using () renaming (Obj to Cone; _≡_ to _≜₁_; _∘_ to _▵_; _⇒_ to _⇾_; id to id▵)
+  open ConeOver F using (_≜_; ≜-refl; ≜-sym; ≜-trans; heterogenize; homogenize; ConeUnder; tether; untether; _≜′_) renaming (module _≜_ to ≜; module _≜′_ to ≜′)
   open Heterogeneous C
 
   -- Isomorphic to an terminal object, but worth keeping distinct in case we change its definition
@@ -44,8 +45,8 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
     proj-cone = terminal.⊤
     -}
 
-    open terminal using () renaming (⊤ to proj-cone)
-    open Cone proj-cone using () renaming (N to vertex; ψ to proj)
+    open terminal public using () renaming (⊤ to proj-cone)
+    open Cone proj-cone public using () renaming (N to vertex; ψ to proj)
 
     rep-cone : (K : Cone) → (K ⇾ proj-cone)
     rep-cone K = terminal.! {K}
@@ -115,13 +116,19 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
 
     rep-cong : ∀ {K₁ K₂} → K₁ ≜ K₂ → rep K₁ ∼ rep K₂
     rep-cong K₁≜K₂ = 
-      {!≡⇒∼!}
+      ≡⇒∼ʳ (≜.N-≣ K₁≜K₂) (rep-cone-cong K₁≜K₂)
 
     .rep-cone∘ : ∀ {K K′} {q : K′ ⇾ K} → Cones F [ Cones F [ rep-cone K ∘ q ] ≡ rep-cone K′ ]
-    rep-cone∘ = {!sym (universal (pullˡ commute₁) (pullˡ commute₂))!}
+    rep-cone∘ {K} {q = q} = Equiv.sym (terminal.!-unique (rep-cone K ▵ q))
 
     .rep∘ : ∀ {K K′} {q : K′ ⇾ K} → rep K ∘ ConeMorphism.f q ≡ rep K′
-    rep∘ = {!sym (universal (pullˡ commute₁) (pullˡ commute₂))!}
+    rep∘ {K} {K′} {q} = rep-cone∘ {K} {K′} {q}
+
+    .rep-cone-self-id : rep-cone proj-cone ≜₁ id▵
+    rep-cone-self-id = terminal.!-unique id▵
+
+    .rep-self-id : rep proj-cone ≡ id
+    rep-self-id = terminal.!-unique id▵
 
   open Limit
 
@@ -132,8 +139,71 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
 
   -- First, a lemma:
 
-  isos-lift-to-cones : ∀ (c₁ c₂ : Cone) → _
-  isos-lift-to-cones c₁ c₂ = {!!}
+  open import Categories.Square
 
-  up-to-iso : ∀ (c₁ c₂ : Cone) → _
-  up-to-iso = {!!}
+  -- do these lemmas belong in Cones?
+
+  isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → Σ[ κ′ ∶ Cone ] κ ⇿ κ′
+  isos-lift-to-cones κ {v} κ≅v =
+      record
+      { N = v
+      ; ψ = λ X → (Cone.ψ κ X) ∘ g
+      ; commute = λ f' → pullˡ (Cone.commute κ f')
+      } 
+    , record
+      { f = record { f = f; commute = Equiv.sym (cancelRight isoˡ) }
+      ; g = record { f = g; commute = Equiv.refl }
+      ; iso = record { isoˡ = isoˡ; isoʳ = isoʳ }
+      }
+    where
+    open Mor._≅_ C κ≅v
+    open GlueSquares C
+
+  isos-lower-from-cones : ∀ {κ₁ κ₂ : Cone} → κ₁ ⇿ κ₂ → Cone.N κ₁ ≅ Cone.N κ₂
+  isos-lower-from-cones κ₁⇿κ₂ = record
+    { f = ConeMorphism.f f
+    ; g = ConeMorphism.f g
+    ; iso = record { isoˡ = isoˡ; isoʳ = isoʳ }
+    }
+    where
+    open Mor._≅_ (Cones F) κ₁⇿κ₂
+
+  ≜ⁱ⇒≡ⁱ : ∀ {κ₁ κ₂} {i₁ i₂ : κ₁ ⇿ κ₂} → i₁ ≜ⁱ i₂
+        → isos-lower-from-cones i₁ ≡ⁱ isos-lower-from-cones i₂
+  ≜ⁱ⇒≡ⁱ pf = record { f-≡ = f-≡; g-≡ = g-≡ }
+    where open Mor._≡ⁱ_ (Cones F) pf
+
+  up-to-iso-cone : (L₁ L₂ : Limit) → proj-cone L₁ ⇿ proj-cone L₂
+  up-to-iso-cone L₁ L₂ = T.up-to-iso (Cones F) (terminal L₁) (terminal L₂)
+
+  up-to-iso : (L₁ L₂ : Limit) → vertex L₁ ≅ vertex L₂
+  up-to-iso L₁ L₂ = isos-lower-from-cones (up-to-iso-cone L₁ L₂)
+
+  transport-by-iso-cone : (L : Limit) {κ : Cone} → proj-cone L ⇿ κ → Limit
+  transport-by-iso-cone L L⇿κ = record
+    { terminal = T.transport-by-iso (Cones F) (terminal L) L⇿κ
+    }
+
+  transport-by-iso : (L : Limit) {v : Obj} → vertex L ≅ v → Limit
+  transport-by-iso L L≅v = transport-by-iso-cone L (proj₂ p)
+    where p = isos-lift-to-cones (proj-cone L) L≅v
+
+  .up-to-iso-cone-unique : ∀ L L′ → (i : proj-cone L ⇿ proj-cone L′) → up-to-iso-cone L L′ ≜ⁱ i
+  up-to-iso-cone-unique L L′ i = T.up-to-iso-unique (Cones F) (terminal L) (terminal L′) i
+
+  -- XXX probably not true -- what is?  only the above?
+  -- .up-to-iso-unique : ∀ L L′ → (i : vertex L ≅ vertex L′) → up-to-iso L L′ ≡ⁱ i
+  -- up-to-iso-unique L L′ i = ≜ⁱ⇒≡ⁱ {!up-to-iso-unique-cone L L′ !}
+
+  .up-to-iso-cone-invˡ : ∀ {L κ} {i : proj-cone L ⇿ κ} → up-to-iso-cone L (transport-by-iso-cone L i) ≜ⁱ i
+  up-to-iso-cone-invˡ {L} {i = i} = up-to-iso-cone-unique L (transport-by-iso-cone L i) i
+
+  .up-to-iso-invˡ : ∀ {L X} {i : vertex L ≅ X} → up-to-iso L (transport-by-iso L i) ≡ⁱ i
+  up-to-iso-invˡ {L} {i = i} = ≜ⁱ⇒≡ⁱ (up-to-iso-cone-invˡ {L} {i = proj₂ p})
+    where p = isos-lift-to-cones (proj-cone L) i
+
+  up-to-iso-cone-invʳ : ∀ {L L′} → proj-cone (transport-by-iso-cone L (up-to-iso-cone L L′)) ≜ proj-cone L′
+  up-to-iso-cone-invʳ {L} {L′} = ≜-refl
+
+  up-to-iso-invʳ : ∀ {L L′} → vertex (transport-by-iso L (up-to-iso L L′)) ≣ vertex L′
+  up-to-iso-invʳ {t} {t′} = ≣-refl

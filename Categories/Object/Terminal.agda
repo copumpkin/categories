@@ -30,6 +30,11 @@ record Terminal : Set (o ⊔ ℓ ⊔ e) where
   .⊤-id : (f : ⊤ ⇒ ⊤) → f ≡ id
   ⊤-id f = !-unique₂ f id
 
+  open Heterogeneous C
+
+  !-unique∼ : ∀ {A A′} → (f : A′ ⇒ ⊤) → (A ≣ A′) → ! {A} ∼ f
+  !-unique∼ f ≣-refl = Heterogeneous.≡⇒∼ (!-unique f)
+
 import Categories.Morphisms
 open Categories.Morphisms C
 open import Categories.Square

@@ -73,6 +73,25 @@ Cones {C = C} F = record
       where
       open HomReasoning
 
+-- Equality of cone morphisms is equality of the underlying arrows in the
+-- base category, but the same is not (directly) true of the heterogeneous
+-- equality.  These functions make the equivalence manifest.
+
+module Heteroconic {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) where
+  open Heterogeneous C
+  module ▵ = Heterogeneous (Cones F)
+  open ▵ public using () renaming (_∼_ to _▵̃_)
+  open ConeMorphism using () renaming (f to ⌞_⌝)
+
+  demote-∼ : ∀ {K L K′ L′} {f : ConeMorphism K L} {g : ConeMorphism K′ L′}
+           → f ▵̃ g → ⌞ f ⌝ ∼ ⌞ g ⌝
+  demote-∼ (≡⇒∼ y) = Heterogeneous.≡⇒∼ y
+
+  -- XXX probably need another argument or something to nail things down
+  -- promote-∼ : ∀ {K L K′ L′} {f : ConeMorphism {C = C} K L} {g : ConeMorphism {C = C} K′ L′}
+  --           → ⌞ f ⌝ ∼ ⌞ g ⌝ → f ▵̃ g
+  -- promote-∼ h = {!h!}
+
 -- The category of cones comes with an equivalence of objects, which can be
 -- used to float morphisms from one to another.  Really it should have a
 -- setoid of objects, but we're not equipped for that.

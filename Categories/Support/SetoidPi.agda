@@ -6,7 +6,7 @@ open import Level
 open import Function as Fun using (_on_; type-signature)
 open import Relation.Binary as B using () renaming (_=[_]⇒_ to _=[_]⇒₀_; _⇒_ to _⊆_)
 open import Relation.Binary.PropositionalEquality as PE using (_≡_)
-open import Relation.Binary.HeterogeneousEquality using (_≅_)
+open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to ≅-refl)
 open import Relation.Binary.Indexed as I using (_=[_]⇒_)
 open import Categories.Support.Equivalence
 open import Categories.Support.SetoidFunctions as SF using (_⟶_) renaming (_⟨$⟩_ to _⟨$⟩₀_; cong to cong₀)
@@ -61,7 +61,7 @@ record IndexedSetoid {i iℓ} (I : Set i) (_∼_ : B.Rel I iℓ) c ℓ : Set (su
     .resp          : Resp-Type
 
 resp-per : ∀ {c ℓ} {C₁ C₂ : Set c} {_≈₁_ : B.Rel C₁ ℓ} {_≈₂_ : B.Rel C₂ ℓ} {equiv₁ : B.IsEquivalence _≈₁_} {equiv₂ : B.IsEquivalence _≈₂_} → C₁ ≡ C₂ → _≈₁_ ≅ _≈₂_ → _≡_ {A = Setoid c ℓ} record {Carrier = C₁; _≈_ = _≈₁_; isEquivalence = equiv₁} record {Carrier = C₂; _≈_ = _≈₂_; isEquivalence = equiv₂}
-resp-per _≡_.refl _≅_.refl = _≡_.refl
+resp-per _≡_.refl ≅-refl = _≡_.refl
 
 .resp-per′ : ∀ {c ℓ} (S T : Setoid c ℓ) → (Carrier₀ S ≡ Carrier₀ T) → (Setoid._≈_ S ≅ Setoid._≈_ T) → S ≡ T
 resp-per′ S T = resp-per {equiv₁ = Setoid.isEquivalence S} {equiv₂ = Setoid.isEquivalence T}
@@ -153,7 +153,7 @@ asIndexed ct ℓt {From} To = record
   resp-helper i∼j = PE.cong Carrier₀ (cong₀ To i∼j)
 
   .resp-helper₃ : (S T : Setoid ct ℓt) → S ≡ T → _≈∗_ {S} {S} ≅ _≈∗_ {T} {T}
-  resp-helper₃ S .S _≡_.refl = _≅_.refl 
+  resp-helper₃ S .S _≡_.refl = ≅-refl 
 
   .resp-helper₂ : ∀ {i j} → From [ i ≈ j ] → _≈⋆_ {i} {i} ≅ _≈⋆_ {j} {j}
   resp-helper₂ {i} {j} i∼j = resp-helper₃ (To$ i) (To$ j) (cong₀ To i∼j)

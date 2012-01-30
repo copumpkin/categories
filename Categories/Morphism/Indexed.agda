@@ -119,5 +119,5 @@ assoc-◽⋉ {f = f} {g} {h} {i} i≈j | ._ | ≣-refl | ._ | ≣-refl | ._ | �
     fj ∘ (gj ∘ hj)
   ∎)
   where 
-  open Heterogeneous C
+  open Heterogeneous C hiding (≡⇒∼)
   open HomReasoning

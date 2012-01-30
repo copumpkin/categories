@@ -41,6 +41,7 @@ ISetoidsCocomplete {o} {ℓ} {e} {c} {cℓ} = record { colimit = colimit }
     .my-!-unique : (A : Cocone F) (φ : CoconeMorphism ⊥ A) (x : vertex-carrier) → (_≈_ (Cocone.N A) (CoconeMorphism.f (! {A}) ⟨$⟩ x) (CoconeMorphism.f φ ⟨$⟩ x))
     my-!-unique A φ (X , x) = sym (Cocone.N A) (CoconeMorphism.commute φ (refl (F₀ X)))
 
+    my-initial-cocone : Initial (Cocones F)
     my-initial-cocone = record
       { ⊥ = ⊥
       ; ! = !

@@ -6,7 +6,7 @@ open import Relation.Binary using (Setoid; module Setoid; Preorder; module Preor
 open import Data.Product using (Σ; _,_)
 -- import Relation.Binary.EqReasoning as EqReasoning
 
-open import Categories.Support.Equivalence using (module I→R-Wrapper; setoid-i→r) renaming (Setoid to ISetoid; module Setoid to ISetoid)
+open import Categories.Support.Equivalence using (module I→R-Wrapper; setoid-i→r; squash) renaming (Setoid to ISetoid; module Setoid to ISetoid)
 open import Categories.Support.SetoidFunctions using (module _⟶_)
 open import Categories.Support.PropositionalEquality
 import Categories.Support.ZigZag as ZigZag
@@ -92,6 +92,7 @@ module ColimitCocone {o ℓ e c ℓ′} {J : Category o ℓ e} (F : Functor J (I
  
   vertex = ZigZag.isetoid ↝-preorder
 
+  ⊥ : Cocone F
   ⊥ = record
     { N = vertex
     ; ψ = λ X → record
@@ -100,7 +101,7 @@ module ColimitCocone {o ℓ e c ℓ′} {J : Category o ℓ e} (F : Functor J (I
     -- cong would be easier if i'd used the proper dotwise equality for
     -- ↝-preorder above ... since this is basically the proof ↝ respects it
     }
-    ; commute = λ {X Y} f {x} {y} x≈y → ZigZag.disorient (ZigZag.slish (f , (squash (cong (F₁ f) x≈y))))
+    ; commute = λ {X Y} f {x : _} {y : _} (x≈y : _) → ZigZag.disorient (ZigZag.slish (f , (squash (cong (F₁ f) x≈y))))
     }
 
   ! : {A : Cocone F} → CoconeMorphism {F = F} ⊥ A
@@ -117,4 +118,4 @@ module ColimitCocone {o ℓ e c ℓ′} {J : Category o ℓ e} (F : Functor J (I
     my-f (X , x) = A.ψ X ⟨$⟩ x
 
     .my-precong : _↝_ =[ my-f ]⇒ (_≈_ A.N)
-    my-precong {X , x} {Y , y} (f , squash fx≈y) = trans A.N (A.commute f (refl (F₀ X))) (cong (A.ψ Y) fx≈y)
+    my-precong {X , x} {Y , y} (f , squash fx≈y) = trans A.N (A.commute f (refl (F₀ X))) (cong (A.ψ Y) (irr fx≈y))

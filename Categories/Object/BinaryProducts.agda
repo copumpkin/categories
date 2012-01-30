@@ -9,9 +9,12 @@ open Equiv
 open import Level
 
 import Categories.Object.Product as Product
+import Categories.Object.Product.Morphisms as ProductMorphisms
+
 open import Categories.Morphisms
 
 open Product C
+open ProductMorphisms C
 
 record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   infix 10 _⁂_
@@ -54,6 +57,12 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   assocʳ : ∀ {A B C} → ((A × (B × C)) ⇒ ((A × B) × C))
   assocʳ = _≅_.f C ×-assoc
 
+  .assocʳ∘assocˡ : ∀ {A B C} → assocʳ {A}{B}{C} ∘ assocˡ {A}{B}{C} ≡ id
+  assocʳ∘assocˡ = Iso.isoʳ C (_≅_.iso C ×-assoc)
+  
+  .assocˡ∘assocʳ : ∀ {A B C} → assocˡ {A}{B}{C} ∘ assocʳ {A}{B}{C} ≡ id
+  assocˡ∘assocʳ = Iso.isoˡ C (_≅_.iso C ×-assoc)
+  
   .g-η : ∀ {A B C} {f : C ⇒ (A × B)} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
   g-η = Product.g-η product
 
@@ -63,11 +72,18 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   .⟨⟩-cong₂ : ∀ {A B C} → {f f′ : C ⇒ A} {g g′ : C ⇒ B} → f ≡ f′ → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g′ ⟩
   ⟨⟩-cong₂ = Product.⟨⟩-cong₂ product
   
-  -- If I _really_ wanted to, I could do this for a specific pair of products like the rest above, but I'll write that one
-  -- when I need it.
+  .⟨⟩-congˡ : ∀ {A B C} → {f f′ : C ⇒ A} {g : C ⇒ B} → f ≡ f′ → ⟨ f , g ⟩ ≡ ⟨ f′ , g ⟩
+  ⟨⟩-congˡ pf = ⟨⟩-cong₂ pf refl
+  
+  .⟨⟩-congʳ : ∀ {A B C} → {f : C ⇒ A} {g g′ : C ⇒ B} → g ≡ g′ → ⟨ f , g ⟩ ≡ ⟨ f , g′ ⟩
+  ⟨⟩-congʳ pf = ⟨⟩-cong₂ refl pf
+  
   _⁂_ : ∀ {A B C D} → (A ⇒ B) → (C ⇒ D) → ((A × C) ⇒ (B × D))
-  f ⁂ g = ⟨ f ∘ π₁ , g ∘ π₂ ⟩
-
+  f ⁂ g = [ product ⇒ product ] f ⁂ g
+  
+  swap : ∀ {A B} → ((A × B) ⇒ (B × A))
+  swap = ⟨ π₂ , π₁ ⟩
+  
   -- TODO: this is probably harder to use than necessary because of this definition. Maybe make a version
   -- that doesn't have an explicit id in it, too?
   first : ∀ {A B C} → (A ⇒ B) → ((A × C) ⇒ (B × C))
@@ -83,76 +99,132 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   .π₂∘⁂ : ∀ {A B C D} → {f : A ⇒ B} → {g : C ⇒ D} → π₂ ∘ (f ⁂ g) ≡ g ∘ π₂
   π₂∘⁂ {f = f} {g} = commute₂
 
-  .⁂∘⟨⟩ : ∀ {A B C D E} → {f : B ⇒ C} {f′ : A ⇒ B} {g : D ⇒ E} {g′ : A ⇒ D} → (f ⁂ g) ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f ∘ f′ , g ∘ g′ ⟩
-  ⁂∘⟨⟩ {f = f} {f′} {g} {g′} = sym (universal helper₁ helper₂)
-    where
-    helper₁ : π₁ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩) ≡ f ∘ f′
-    helper₁ = 
-      begin
-        π₁ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩)
-      ↑⟨ assoc ⟩
-        (π₁ ∘ (f ⁂ g)) ∘ ⟨ f′ , g′ ⟩
-      ↓⟨ ∘-resp-≡ˡ π₁∘⁂ ⟩
-        (f ∘ π₁) ∘ ⟨ f′ , g′ ⟩
-      ↓⟨ assoc ⟩
-        f ∘ (π₁ ∘ ⟨ f′ , g′ ⟩)
-      ↓⟨ ∘-resp-≡ʳ commute₁ ⟩
-        f ∘ f′
-      ∎
-      where
-      open HomReasoning
+  .⁂-cong₂ : ∀ {A B C D}{f g : A ⇒ B}{h i : C ⇒ D}
+    → f ≡ g → h ≡ i → f ⁂ h ≡ g ⁂ i
+  ⁂-cong₂ = [ product ⇒ product ]⁂-cong₂
 
-    helper₂ : π₂ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩) ≡ g ∘ g′
-    helper₂ = 
-      begin
-        π₂ ∘ ((f ⁂ g) ∘ ⟨ f′ , g′ ⟩)
-      ↑⟨ assoc ⟩
-        (π₂ ∘ (f ⁂ g)) ∘ ⟨ f′ , g′ ⟩
-      ↓⟨ ∘-resp-≡ˡ π₂∘⁂ ⟩
-        (g ∘ π₂) ∘ ⟨ f′ , g′ ⟩
-      ↓⟨ assoc ⟩
-        g ∘ (π₂ ∘ ⟨ f′ , g′ ⟩)
-      ↓⟨ ∘-resp-≡ʳ commute₂ ⟩
-        g ∘ g′
-      ∎
-      where
-      open HomReasoning
+  .⁂∘⟨⟩ : ∀ {A B C D E} → {f : B ⇒ C} {f′ : A ⇒ B} {g : D ⇒ E} {g′ : A ⇒ D} → (f ⁂ g) ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f ∘ f′ , g ∘ g′ ⟩
+  ⁂∘⟨⟩ = [ product ⇒ product ]⁂∘⟨⟩
 
   .first∘⟨⟩ : ∀ {A B C D} → {f : B ⇒ C} {f′ : A ⇒ B} {g′ : A ⇒ D} → first f ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f ∘ f′ , g′ ⟩
-  first∘⟨⟩ {f = f} {f′} {g′} = 
-    begin
-      first f ∘ ⟨ f′ , g′ ⟩
-    ↓⟨ ⁂∘⟨⟩ ⟩
-      ⟨ f ∘ f′ , id ∘ g′ ⟩ 
-    ↓⟨ ⟨⟩-cong₂ refl identityˡ ⟩
-      ⟨ f ∘ f′ , g′ ⟩
-    ∎
-    where
-    open HomReasoning
+  first∘⟨⟩ = [ product ⇒ product ]first∘⟨⟩
 
   .second∘⟨⟩ : ∀ {A B D E} → {f′ : A ⇒ B} {g : D ⇒ E} {g′ : A ⇒ D} → second g ∘ ⟨ f′ , g′ ⟩ ≡ ⟨ f′ , g ∘ g′ ⟩
-  second∘⟨⟩ {f′ = f′} {g} {g′} = 
-    begin
-      second g ∘ ⟨ f′ , g′ ⟩
-    ↓⟨ ⁂∘⟨⟩ ⟩
-      ⟨ id ∘ f′ , g ∘ g′ ⟩ 
-    ↓⟨ ⟨⟩-cong₂ identityˡ refl ⟩
-      ⟨ f′ , g ∘ g′ ⟩
-    ∎
-    where
-    open HomReasoning
+  second∘⟨⟩ = [ product ⇒ product ]second∘⟨⟩
 
   .⁂∘⁂ : ∀ {A B C D E F} → {f : B ⇒ C} → {f′ : A ⇒ B} {g : E ⇒ F} {g′ : D ⇒ E} → (f ⁂ g) ∘ (f′ ⁂ g′) ≡ (f ∘ f′) ⁂ (g ∘ g′)
-  ⁂∘⁂ {B = B} {E = E} {f = f} {f′} {g} {g′} = 
-    begin
-      (f ⁂ g) ∘ (f′ ⁂ g′)
-    ↓⟨ ⁂∘⟨⟩ ⟩
-      ⟨ f ∘ (f′ ∘ π₁) , g ∘ (g′ ∘ π₂) ⟩
-    ↑⟨ ⟨⟩-cong₂ assoc assoc ⟩
-      (f ∘ f′) ⁂ (g ∘ g′)
-    ∎
-    where
-    open HomReasoning
-
+  ⁂∘⁂ = [ product ⇒ product ⇒ product ]⁂∘⁂
+  
   .⟨⟩∘ : ∀ {A B C D} {f : A ⇒ B} {g : A ⇒ C} {q : D ⇒ A} → ⟨ f , g ⟩ ∘ q ≡ ⟨ f ∘ q , g ∘ q ⟩
   ⟨⟩∘ = sym (universal (trans (sym assoc) (∘-resp-≡ˡ commute₁)) (trans (sym assoc) (∘-resp-≡ˡ commute₂)))
+  
+  .first∘first : ∀ {A B C D}{f : B ⇒ C} {g : A ⇒ B}
+    → first f ∘ first g ≡ first {C = D} (f ∘ g)
+  first∘first = [ product ⇒ product ⇒ product ]first∘first
+  
+  .second∘second : ∀ {A B C D}{f : B ⇒ C} {g : A ⇒ B}
+    → second f ∘ second g ≡ second {A = D} (f ∘ g)
+  second∘second = [ product ⇒ product ⇒ product ]second∘second
+    
+  .first↔second : ∀ {A B C D}{f : A ⇒ B}{g : C ⇒ D}
+    → first f ∘ second g ≡ second g ∘ first f
+  first↔second = [ product ⇒ product , product ⇒ product ]first↔second
+  
+  .swap∘⟨⟩ : ∀ {A B C} {f : A ⇒ B} {g : A ⇒ C}
+    → swap ∘ ⟨ f , g ⟩ ≡ ⟨ g , f ⟩
+  swap∘⟨⟩ {A}{B}{C}{f}{g} =
+    begin
+      ⟨ π₂ , π₁ ⟩ ∘ ⟨ f , g ⟩
+    ↓⟨ ⟨⟩∘ ⟩
+      ⟨ π₂ ∘ ⟨ f , g ⟩ , π₁ ∘ ⟨ f , g ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ commute₂ commute₁ ⟩
+      ⟨ g , f ⟩
+    ∎ where open HomReasoning
+
+  .swap∘⁂ : ∀ {A B C D} {f : A ⇒ B} {g : C ⇒ D}
+    → swap ∘ (f ⁂ g) ≡ (g ⁂ f) ∘ swap
+  swap∘⁂ {f = f}{g} =
+    begin
+      swap ∘ (f ⁂ g)
+    ↓⟨ swap∘⟨⟩ ⟩
+      ⟨ g ∘ π₂ , f ∘ π₁ ⟩
+    ↑⟨ ⁂∘⟨⟩ ⟩
+      (g ⁂ f) ∘ swap
+    ∎ where open HomReasoning
+  
+  .swap∘swap : ∀ {A B} → (swap {A}{B}) ∘ (swap {B}{A}) ≡ id
+  swap∘swap = trans swap∘⟨⟩ η
+  
+  .assocʳ∘⟨⟩ : ∀ {A B C D} {f : A ⇒ B} {g : A ⇒ C} {h : A ⇒ D}
+    → assocʳ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ ≡ ⟨ ⟨ f , g ⟩ , h ⟩
+  assocʳ∘⟨⟩ {f = f}{g}{h} =
+    begin
+      assocʳ ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↓⟨ ⟨⟩∘ ⟩
+      ⟨ ⟨ π₁ , π₁ ∘ π₂ ⟩ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+      , (π₂ ∘ π₂) ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+      ⟩
+    ↓⟨ ⟨⟩-cong₂ ⟨⟩∘ assoc ⟩
+      ⟨ ⟨ π₁        ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+        , (π₁ ∘ π₂) ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+        ⟩
+      , π₂ ∘ π₂ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ 
+      ⟩
+    ↓⟨ ⟨⟩-cong₂ (⟨⟩-cong₂ commute₁ assoc ) (∘-resp-≡ʳ commute₂) ⟩
+      ⟨ ⟨ f , π₁ ∘ π₂ ∘ ⟨ f , ⟨ g , h ⟩ ⟩ ⟩
+      , π₂ ∘ ⟨ g , h ⟩ 
+      ⟩
+    ↓⟨ ⟨⟩-cong₂ (⟨⟩-congʳ (∘-resp-≡ʳ commute₂)) commute₂ ⟩
+      ⟨ ⟨ f , π₁ ∘ ⟨ g , h ⟩ ⟩ , h ⟩
+    ↓⟨ ⟨⟩-congˡ (⟨⟩-congʳ commute₁) ⟩
+      ⟨ ⟨ f , g ⟩ , h ⟩
+    ∎ where open HomReasoning
+  
+  .assocˡ∘⟨⟩ : ∀ {A B C D} {f : A ⇒ B} {g : A ⇒ C} {h : A ⇒ D}
+    → assocˡ ∘ ⟨ ⟨ f , g ⟩ , h ⟩ ≡ ⟨ f , ⟨ g , h ⟩ ⟩
+  assocˡ∘⟨⟩ {f = f}{g}{h} =
+    begin
+      assocˡ ∘ ⟨ ⟨ f , g ⟩ , h ⟩
+    ↑⟨ refl ⟩∘⟨ assocʳ∘⟨⟩ ⟩
+      assocˡ ∘ assocʳ ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↑⟨ assoc ⟩
+      (assocˡ ∘ assocʳ) ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↓⟨ assocˡ∘assocʳ ⟩∘⟨ refl ⟩
+      id ∘ ⟨ f , ⟨ g , h ⟩ ⟩
+    ↓⟨ identityˡ ⟩
+      ⟨ f , ⟨ g , h ⟩ ⟩
+    ∎ where open HomReasoning
+  
+  .assocʳ∘⁂ : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
+    → assocʳ ∘ (f ⁂ (g ⁂ h)) ≡ ((f ⁂ g) ⁂ h) ∘ assocʳ
+  assocʳ∘⁂ {f = f}{g}{h} = 
+    begin
+      assocʳ ∘ (f ⁂ (g ⁂ h))
+    ↓⟨ refl ⟩∘⟨ ⟨⟩-congʳ ⟨⟩∘ ⟩
+      assocʳ ∘ ⟨ f ∘ π₁ , ⟨ (g ∘ π₁) ∘ π₂ , (h ∘ π₂) ∘ π₂ ⟩ ⟩
+    ↓⟨ assocʳ∘⟨⟩ ⟩
+      ⟨ ⟨ f ∘ π₁ , (g ∘ π₁) ∘ π₂ ⟩ , (h ∘ π₂) ∘ π₂ ⟩
+    ↓⟨ ⟨⟩-cong₂ (⟨⟩-congʳ assoc) assoc ⟩
+      ⟨ ⟨ f ∘ π₁ , g ∘ π₁ ∘ π₂ ⟩ , h ∘ π₂ ∘ π₂ ⟩
+    ↑⟨ ⟨⟩-congˡ ⁂∘⟨⟩ ⟩
+      ⟨ (f ⁂ g) ∘ ⟨ π₁ , π₁ ∘ π₂ ⟩ , h ∘ π₂ ∘ π₂ ⟩
+    ↑⟨ ⁂∘⟨⟩ ⟩
+      ((f ⁂ g) ⁂ h) ∘ assocʳ
+    ∎ where open HomReasoning
+  
+  .assocˡ∘⁂ : ∀ {A₁ A₂ B₁ B₂ C₁ C₂} {f : A₁ ⇒ A₂} {g : B₁ ⇒ B₂} {h : C₁ ⇒ C₂}
+    → assocˡ ∘ ((f ⁂ g) ⁂ h) ≡ (f ⁂ (g ⁂ h)) ∘ assocˡ
+  assocˡ∘⁂ {f = f}{g}{h} = 
+    begin
+      assocˡ ∘ ((f ⁂ g) ⁂ h)
+    ↓⟨ refl ⟩∘⟨ ⟨⟩-congˡ ⟨⟩∘ ⟩
+      assocˡ ∘ ⟨ ⟨ (f ∘ π₁) ∘ π₁ , (g ∘ π₂) ∘ π₁ ⟩ , h ∘ π₂ ⟩
+    ↓⟨ assocˡ∘⟨⟩ ⟩
+      ⟨ (f ∘ π₁) ∘ π₁ , ⟨ (g ∘ π₂) ∘ π₁ , h ∘ π₂ ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ assoc (⟨⟩-congˡ assoc) ⟩
+      ⟨ f ∘ π₁ ∘ π₁ , ⟨ g ∘ π₂ ∘ π₁ , h ∘ π₂ ⟩ ⟩
+    ↑⟨ ⟨⟩-congʳ ⁂∘⟨⟩ ⟩
+      ⟨ f ∘ π₁ ∘ π₁ , (g ⁂ h) ∘ ⟨ π₂ ∘ π₁ , π₂ ⟩ ⟩
+    ↑⟨ ⁂∘⟨⟩ ⟩
+      (f ⁂ (g ⁂ h)) ∘ assocˡ
+    ∎ where open HomReasoning

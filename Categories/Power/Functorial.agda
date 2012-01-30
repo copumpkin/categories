@@ -122,7 +122,7 @@ exp≅functor ext id-propositionally-unique {I} =
   ≣-cong′ f ≣-refl = ≣-refl
 
   squash-does-nothing : (A : Obj FDIC) → squash A ≣ A
-  squash-does-nothing A = ≣-cong′ (λ f eq → record {
+  squash-does-nothing A = ≣-cong′ {B = Obj FDIC} (λ f eq → record {
                              F₀ = map₀ A;
                              F₁ = λ {i j : I} → f i j;
                              identity = λ {i} → ≣-subst (λ f → f i i ≣-refl ≡ C.id) eq (Functor.identity A {i});

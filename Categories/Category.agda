@@ -8,6 +8,7 @@ open import Function using (flip)
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
 open import Categories.Support.EqReasoning
+open import Data.Product
 
 postulate
   .irr : ∀ {a} {A : Set a} → .A → A
@@ -116,7 +117,7 @@ _[_∘_] = Category._∘_
 -- Should this live in the Category record itself? It doesn't seem terribly useful for most situations
 module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
   open Category C
-  open Equiv renaming (refl to refl′; sym to sym′; trans to trans′)
+  open Equiv renaming (refl to refl′; sym to sym′; trans to trans′; reflexive to reflexive′)
 
   data _∼_ {A B} (f : A ⇒ B) : ∀ {X Y} → (X ⇒ Y) → Set (ℓ ⊔ e) where
     ≡⇒∼ : {g : A ⇒ B} → .(f ≡ g) → f ∼ g
@@ -132,6 +133,9 @@ module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
              {F G} {h : F ⇒ G}
           → f ∼ g → g ∼ h → f ∼ h
   trans (≡⇒∼ f≡g) (≡⇒∼ g≡h) = ≡⇒∼ (trans′ f≡g g≡h)
+
+  reflexive : ∀ {A B} {f g : A ⇒ B} → f ≣ g → f ∼ g
+  reflexive f≣g = ≡⇒∼ (reflexive′ f≣g)
 
   ∘-resp-∼ : ∀ {A B C A′ B′ C′} {f : B ⇒ C} {h : B′ ⇒ C′} {g : A ⇒ B} {i : A′ ⇒ B′} → f ∼ h → g ∼ i → (f ∘ g) ∼ (h ∘ i)
   ∘-resp-∼ (≡⇒∼ f≡h) (≡⇒∼ g≡i) = ≡⇒∼ (∘-resp-≡ f≡h g≡i)
@@ -183,6 +187,9 @@ module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
   .∼⇒≡ʳ : ∀ {A A′ B} {f : A ⇒ B} {f′ : A′ ⇒ B} → f ∼ f′ → (A≣A′ : A ≣ A′) → floatʳ A≣A′ f ≡ f′
   ∼⇒≡ʳ pf ≣-refl = ∼⇒≡ pf
 
+  ≡⇒∼ʳ : ∀ {A A′ B} {f : A ⇒ B} {f′ : A′ ⇒ B} → (A≣A′ : A ≣ A′) → .(floatʳ A≣A′ f ≡ f′) → f ∼ f′
+  ≡⇒∼ʳ ≣-refl pf = ≡⇒∼ pf
+
   float₂-resp-∼ : ∀ {A A′ B B′} (A≣A′ : A ≣ A′) (B≣B′ : B ≣ B′) {f : C [ A , B ]} → f ∼ float₂ A≣A′ B≣B′ f
   float₂-resp-∼ ≣-refl ≣-refl = refl
 
@@ -191,6 +198,6 @@ module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
 
   floatʳ-resp-∼ : ∀ {A A′ B} (A≣A′ : A ≣ A′) {f : C [ A , B ]} → f ∼ floatʳ A≣A′ f
   floatʳ-resp-∼ ≣-refl = refl
-
+  
 _[_∼_] : ∀ {o ℓ e} (C : Category o ℓ e) {A B} (f : C [ A , B ]) {X Y} (g : C [ X , Y ]) → Set (ℓ ⊔ e)
 C [ f ∼ g ] = Heterogeneous._∼_ C f g

@@ -6,6 +6,7 @@ module Categories.Object.Product {o ℓ e} (C : Category o ℓ e) where
 open Category C
 open Equiv
 
+open import Function using (flip)
 open import Level
 open import Function using (flip)
 open import Categories.Support.PropositionalEquality
@@ -38,7 +39,7 @@ record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 
   .⟨⟩∘ : ∀ {C D} {f : C ⇒ A} {g : C ⇒ B} {q : D ⇒ C} → ⟨ f , g ⟩ ∘ q ≡ ⟨ f ∘ q , g ∘ q ⟩
   ⟨⟩∘ = sym (universal (pullˡ commute₁) (pullˡ commute₂))
-    
+
 
 import Categories.Morphisms
 open Categories.Morphisms C
@@ -55,11 +56,11 @@ private
       (glueTrianglesʳ (commute₁ p₃) (commute₁ p₂))
       (glueTrianglesʳ (commute₂ p₃) (commute₂ p₂)))
 
-    .repack-id : (p : Product A B) → repack p p ≡ id
-    repack-id p = η p
+    .repack≡id : (p : Product A B) → repack p p ≡ id
+    repack≡id p = η p
 
     .repack-cancel : (p₁ p₂ : Product A B) → repack p₁ p₂ ∘ repack p₂ p₁ ≡ id
-    repack-cancel p₁ p₂ = trans (repack∘ p₂ p₁ p₂) (repack-id p₂)
+    repack-cancel p₁ p₂ = trans (repack∘ p₂ p₁ p₂) (repack≡id p₂)
 
 up-to-iso : ∀ {A B} → (p₁ p₂ : Product A B) → Product.A×B p₁ ≅ Product.A×B p₂
 up-to-iso p₁ p₂ = record
@@ -145,3 +146,5 @@ Associable p₁ p₂ p₃ = record
 
 Associative : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → (Product.A×B p₃) ≅ (Product.A×B p₄)
 Associative p₁ p₂ p₃ p₄ = up-to-iso (Associable p₁ p₂ p₃) p₄
+
+open Lemmas public

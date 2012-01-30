@@ -3,8 +3,11 @@ module Categories.Functor where
 
 open import Level
 open import Relation.Binary using (IsEquivalence)
+open import Relation.Binary.PropositionalEquality
+  using ()
+  renaming (_≡_ to _≣_)
 open import Relation.Nullary using (¬_)
-open import Data.Product using (Σ; _×_; ∃)
+open import Data.Product using (Σ; _×_; ∃; proj₁)
 open import Categories.Category
 open import Categories.Functor.Core public
 import Categories.Morphisms as Morphisms
@@ -14,6 +17,14 @@ infix  4 _≡_
 _≡_ : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → (F G : Functor C D) → Set (e′ ⊔ ℓ′ ⊔ ℓ ⊔ o)
 _≡_ {C = C} {D} F G = ∀ {A B} → (f : C [ A , B ]) → Functor.F₁ F f ∼ Functor.F₁ G f
   where open Heterogeneous D
+
+≡⇒≣ : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′}
+  → (F G : Functor C D)
+  → F ≡ G
+  → (∀ x → Functor.F₀ F x ≣ Functor.F₀ G x)
+≡⇒≣ {C = C} {D} F G F≡G x = proj₁ (∼⇒≣ (F≡G (Category.id C {x})))
+  where
+    open Heterogeneous D
 
 .assoc : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} 
            {C₀ : Category o₀ ℓ₀ e₀} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃} 

@@ -20,7 +20,7 @@ open import Relation.Binary.PropositionalEquality
   using ()
   renaming (_≡_ to _≣_; refl to ≣-refl)
 open import Data.Star
-open import Data.Star.Equality
+open import Categories.Support.StarEquality
 open import Data.Star.Properties
   using (gmap-◅◅)
 open import Level using (_⊔_)

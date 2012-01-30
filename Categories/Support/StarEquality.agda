@@ -1,5 +1,5 @@
 {-# OPTIONS --universe-polymorphism #-}
-module Data.Star.Equality where
+module Categories.Support.StarEquality where
 
 open import Categories.Support.Equivalence
 open import Data.Star

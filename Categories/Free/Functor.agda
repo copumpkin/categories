@@ -19,7 +19,7 @@ open import Graphs.GraphMorphism
 open import Data.Star
 open import Data.Star.Properties
   using (gmap-◅◅; gmap-id)
-open import Data.Star.Equality
+open import Categories.Support.StarEquality
 open import Level using (_⊔_)
 
 ε∼ε : ∀{o₁ ℓ₁ e₁}{X : Graph o₁ ℓ₁ e₁}

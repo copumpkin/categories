@@ -50,12 +50,8 @@ id⁂id p =
   where
   open Product p
 
-.convert≡id⁂id : ∀{X Y}(p₁ p₂ : Product X Y) → convert p₁ p₂ ≡ [ p₁ ⇒ p₂ ] id ⁂ id
-convert≡id⁂id p₁ p₂ = sym (Product.⟨⟩-cong₂ p₂ identityˡ identityˡ)
-    where open Equiv
-
-.convert≡id : ∀{X Y}(p : Product X Y) → convert p p ≡ id
-convert≡id p = trans (convert≡id⁂id p p) (id⁂id p)
+.repack≡id⁂id : ∀{X Y}(p₁ p₂ : Product X Y) → repack p₁ p₂ ≡ [ p₁ ⇒ p₂ ] id ⁂ id
+repack≡id⁂id p₁ p₂ = sym (Product.⟨⟩-cong₂ p₂ identityˡ identityˡ)
     where open Equiv
 
 .[_⇒_]π₁∘⁂ : ∀ {A B C D} → {f : A ⇒ B} → {g : C ⇒ D} 
@@ -88,7 +84,7 @@ convert≡id p = trans (convert≡id⁂id p p) (id⁂id p)
 [_⇒_]⁂∘⟨⟩ {A}{B}{C}{D}{X}{f}{f′}{g}{g′} p₁ p₂ =
   begin
     [ p₂ ]⟨ f ∘ p₁.π₁ , g ∘ p₁.π₂ ⟩ ∘ [ p₁ ]⟨ f′ , g′ ⟩ 
-  ↓⟨ p₂.⟨⟩-distrib ⟩
+  ↓⟨ p₂.⟨⟩∘ ⟩
     [ p₂ ]⟨ (f ∘ p₁.π₁) ∘ p₁.⟨_,_⟩ f′ g′ 
           , (g ∘ p₁.π₂) ∘ p₁.⟨_,_⟩ f′ g′ ⟩
   ↓⟨ p₂.⟨⟩-cong₂ assoc assoc ⟩
@@ -120,15 +116,15 @@ convert≡id p = trans (convert≡id⁂id p p) (id⁂id p)
     module p₂ = Product p₂
     module p₃ = Product p₃
 
-.[_⇒_⇒_]convert∘⁂ : ∀ {A B C D}{f g}
+.[_⇒_⇒_]repack∘⁂ : ∀ {A B C D}{f g}
     → (p₁ : Product A B)
     → (p₂ : Product C D)
     → (p₃ : Product C D)
-    → convert p₂ p₃ ∘ [ p₁ ⇒ p₂ ] f ⁂ g ≡ [ p₁ ⇒ p₃ ] f ⁂ g
-[_⇒_⇒_]convert∘⁂ {A}{B}{C}{D}{f}{g} p₁ p₂ p₃ =
+    → repack p₂ p₃ ∘ [ p₁ ⇒ p₂ ] f ⁂ g ≡ [ p₁ ⇒ p₃ ] f ⁂ g
+[_⇒_⇒_]repack∘⁂ {A}{B}{C}{D}{f}{g} p₁ p₂ p₃ =
   begin
-    convert p₂ p₃ ∘ [ p₁ ⇒ p₂ ] f ⁂ g
-  ↓⟨ convert≡id⁂id p₂ p₃ ⟩∘⟨ refl ⟩
+    repack p₂ p₃ ∘ [ p₁ ⇒ p₂ ] f ⁂ g
+  ↓⟨ repack≡id⁂id p₂ p₃ ⟩∘⟨ refl ⟩
     ([ p₂ ⇒ p₃ ] id ⁂ id) ∘ ([ p₁ ⇒ p₂ ] f ⁂ g)
   ↓⟨ [ p₁ ⇒ p₂ ⇒ p₃ ]⁂∘⁂ ⟩
     [ p₁ ⇒ p₃ ] (id ∘ f) ⁂ (id ∘ g)
@@ -136,20 +132,20 @@ convert≡id p = trans (convert≡id⁂id p p) (id⁂id p)
     [ p₁ ⇒ p₃ ] f ⁂ g
   ∎
 
-.[_⇒_⇒_]convert∘convert : ∀{A B} 
+.[_⇒_⇒_]repack∘repack : ∀{A B} 
   → (p₁ p₂ p₃ : Product A B)
-  → convert p₂ p₃ ∘ convert p₁ p₂ ≡ convert p₁ p₃
-[_⇒_⇒_]convert∘convert p₁ p₂ p₃ =
+  → repack p₂ p₃ ∘ repack p₁ p₂ ≡ repack p₁ p₃
+[_⇒_⇒_]repack∘repack p₁ p₂ p₃ =
   begin
-    convert p₂ p₃ ∘ convert p₁ p₂
-  ↓⟨ convert≡id⁂id p₂ p₃ ⟩∘⟨ convert≡id⁂id p₁ p₂ ⟩
+    repack p₂ p₃ ∘ repack p₁ p₂
+  ↓⟨ repack≡id⁂id p₂ p₃ ⟩∘⟨ repack≡id⁂id p₁ p₂ ⟩
     ([ p₂ ⇒ p₃ ] id ⁂ id) ∘ ([ p₁ ⇒ p₂ ] id ⁂ id)
   ↓⟨ [ p₁ ⇒ p₂ ⇒ p₃ ]⁂∘⁂ ⟩
     [ p₁ ⇒ p₃ ] (id ∘ id) ⁂ (id ∘ id)
   ↓⟨ [ p₁ ⇒ p₃ ]⁂-cong₂ identityˡ identityˡ ⟩
     [ p₁ ⇒ p₃ ] id ⁂ id
-  ↑⟨ convert≡id⁂id p₁ p₃ ⟩
-    convert p₁ p₃
+  ↑⟨ repack≡id⁂id p₁ p₃ ⟩
+    repack p₁ p₃
   ∎
 
 [_⇒_]first 

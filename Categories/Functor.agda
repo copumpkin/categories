@@ -22,7 +22,7 @@ _≡_ {C = C} {D} F G = ∀ {A B} → (f : C [ A , B ]) → Functor.F₁ F f ∼
   → (F G : Functor C D)
   → F ≡ G
   → (∀ x → Functor.F₀ F x ≣ Functor.F₀ G x)
-≡⇒≣ {C = C} {D} F G F≡G x = proj₁ (∼⇒≣ (F≡G (Category.id C {x})))
+≡⇒≣ {C = C} {D} F G F≡G x = domain-≣ (F≡G (Category.id C {x}))
   where
     open Heterogeneous D
 

@@ -3,6 +3,8 @@
 -- Proof that 'Free' is a functor
 module Categories.Free.Functor where
 
+open import Categories.Support.PropositionalEquality
+
 open import Categories.Categories
 open import Categories.Category
   renaming (_[_∼_] to _[_~C_])
@@ -28,8 +30,13 @@ open import Level using (_⊔_)
   → F ≈ G
   → {x : Graph.Obj X}
   → Free₀ Y [ ε {x = GraphMorphism.F₀ F x} ~C ε {x = GraphMorphism.F₀ G x} ]
+ε∼ε {Y = Y} F G (F≈G₀ , F≈G₁) {x} = ≣-subst (λ z → Free₀ Y [ ε {x = GraphMorphism.F₀ F x} ~C ε {x = z} ]) (F≈G₀ x) (Heterogeneous.refl (Free₀ Y))
+-- the below should probably work, but there's an agda bug
+-- XXX bug id?  mokus?  anybody?  bueller?
+{-
 ε∼ε {Y = Y} F G F≈G {x} rewrite proj₁ F≈G x = refl
   where open Heterogeneous (Free₀ Y)
+-}
 
 _◅~◅_ : 
   ∀ {o ℓ e}{G : Graph o ℓ e}

@@ -27,6 +27,9 @@ import Categories.Bifunctor.NaturalTransformation
 -- The category of (small) categories
 import Categories.Categories
 
+-- Cat has products
+import Categories.Categories.Products
+
 -- Closed categories
 import Categories.Closed
 
@@ -78,6 +81,12 @@ import Categories.Equivalence.Strong
 -- Fibrations
 import Categories.Fibration
 
+-- Free category on a graph
+import Categories.Free
+
+-- The free category construction is a functor from Gph to Cat
+import Categories.Free.Functor
+
 -- Functors
 import Categories.Functor
 
@@ -99,6 +108,10 @@ import Categories.Functor.Coalgebras
 -- The diagonal functor (C → C × C, or same thing with an arbitrary indexed product)
 import Categories.Functor.Diagonal
 
+-- Strong functor equivalence
+-- XXX doesn't seem to work because of the double negative in Full?
+-- import Categories.Functor.Equivalence.Strong
+
 -- The hom functor, mapping pairs of objects to the morphisms between them
 import Categories.Functor.Hom
 
@@ -117,6 +130,12 @@ import Categories.Functor.Representable
 -- Functor categories (of functors between two categories and natural transformations between them)
 import Categories.FunctorCategory
 
+-- The category of graphs and graph homomorphisms (Gph)
+import Categories.Graphs
+
+-- The underlying graph of a category (forgetful functor Cat ⇒ Gph)
+import Categories.Graphs.Underlying
+
 -- The Grothendieck construction on categories (taking a Sets-valued functor and building a category containing all values)
 import Categories.Grothendieck
 
@@ -128,6 +147,9 @@ import Categories.GlobularSet
 
 -- Left Kan extensions
 import Categories.Lan
+
+-- Small categories exist as large categories too
+import Categories.Lift
 
 -- Limits
 import Categories.Limit
@@ -146,6 +168,9 @@ import Categories.Monad.EilenbergMoore
 
 -- The Kleisli category for any monad
 import Categories.Monad.Kleisli
+
+-- Strong monads
+import Categories.Monad.Strong
 
 -- Monoidal categories, with an associative bi(endo)functor and an identity object
 import Categories.Monoidal
@@ -200,6 +225,15 @@ import Categories.Object.Coproducts
 -- An exponential object
 import Categories.Object.Exponential
 
+-- A choice of B^A for a given B and any A
+import Categories.Object.Exponentiating
+
+-- B^— is adjoint to its opposite
+import Categories.Object.Exponentiating.Adjunction
+
+-- B^— as a functor
+import Categories.Object.Exponentiating.Functor
+
 -- A family of objects indexed by a set
 import Categories.Object.Indexed
 
@@ -209,11 +243,21 @@ import Categories.Object.Initial
 -- The product of two objects
 import Categories.Object.Product
 
+-- The usual nice constructions on products, conditionalized on existence
+import Categories.Object.Product.Morphisms
+
 -- All binary products
 import Categories.Object.BinaryProducts
 
+-- Products of a nonempty list of objects and the ability to reassociate them massively
+import Categories.Object.BinaryProducts.N-ary
+
 -- All finite products
 import Categories.Object.Products
+import Categories.Object.Products.Properties
+
+-- Products of a list of objects and the ability to reassociate them massively
+import Categories.Object.Products.N-ary
 
 -- The product of a family of objects
 import Categories.Object.IndexedProduct
@@ -226,6 +270,15 @@ import Categories.Object.SubobjectClassifier
 
 -- Terminal object
 import Categories.Object.Terminal
+
+-- A^1 and 1^A always exist
+import Categories.Object.Terminal.Exponentials
+
+-- A chosen 1^A exists
+import Categories.Object.Terminal.Exponentiating
+
+-- A×1 always exists
+import Categories.Object.Terminal.Products
 
 -- Zero object (initial and terminal)
 import Categories.Object.Zero
@@ -250,6 +303,10 @@ import Categories.Presheaves
 
 -- The product of two categories
 import Categories.Product
+import Categories.Product.Properties
+
+-- Projection functors from a product category to its factors
+import Categories.Product.Projections
 
 -- Profunctors
 import Categories.Profunctor

@@ -16,7 +16,7 @@ import Categories.Object.Product
 import Categories.Object.Product.Morphisms
 import Categories.Object.Terminal.Products
 
-open Categories.Object.Exponential C hiding (convert)
+open Categories.Object.Exponential C hiding (repack)
 open Categories.Object.Product C
 open Categories.Object.Product.Morphisms C
 open Categories.Object.Terminal.Products C T
@@ -29,7 +29,7 @@ open Categories.Object.Terminal.Products C T
     { B^A       = [ B ↑⊤]
     ; product   = [ B ×⊤]-product
     ; eval      = id
-    ; λg        = λ {X} p g → g ∘ convert [ X ×⊤]-product p
+    ; λg        = λ {X} p g → g ∘ repack [ X ×⊤]-product p
     ; β         = λ {X} p {g} → 
         begin
             id ∘ (g ∘ [ p ]⟨ id , ! ⟩) ∘ [ p ]π₁
@@ -37,7 +37,7 @@ open Categories.Object.Terminal.Products C T
             (g ∘ [ p ]⟨ id , ! ⟩) ∘ [ p ]π₁
         ↓⟨ assoc ⟩
             g ∘ [ p ]⟨ id , ! ⟩ ∘ [ p ]π₁
-        ↓⟨ refl ⟩∘⟨ Product.⟨⟩-distrib p ⟩
+        ↓⟨ refl ⟩∘⟨ Product.⟨⟩∘ p ⟩
             g ∘ [ p ]⟨ id ∘ [ p ]π₁ , ! ∘ [ p ]π₁ ⟩
         ↓⟨ refl ⟩∘⟨ Product.⟨⟩-cong₂ p identityˡ (!-unique₂ (! ∘ [ p ]π₁) [ p ]π₂) ⟩
             g ∘ [ p ]⟨ [ p ]π₁ , [ p ]π₂ ⟩
@@ -58,7 +58,7 @@ open Categories.Object.Terminal.Products C T
         ↑⟨ identityˡ ⟩∘⟨ refl ⟩
             (id ∘ h ∘ [ p ]π₁) ∘ [ p ]⟨ id , ! ⟩
         ↓⟨ h-commutes ⟩∘⟨ refl ⟩
-            g ∘ convert [ X ×⊤]-product p
+            g ∘ repack [ X ×⊤]-product p
         ∎
     } 
     where

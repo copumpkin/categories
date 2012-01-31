@@ -43,7 +43,7 @@ sym : ∀ {o ℓ e o′ ℓ′ e′} → {C : Category o ℓ e} {D : Category o�
 sym {C = C} {D = D} Op = record
   { C⇒D = record
     { F₀ = λ d → proj₁ (Op.eso d)
-    ; F₁ = {!!}
+    ; F₁ = λ f → {!rev (proj₂ (Op.eso _)) ∘ f ∘ ?!}
     ; identity = {!!}
     ; homomorphism = {!!}
     ; F-resp-≡ = {!!}
@@ -58,6 +58,7 @@ sym {C = C} {D = D} Op = record
   module Op = StronglyEquivalent Op
   open Op using () renaming (C⇒D to F)
   open Functor F
+  open Morphisms._≅_ C renaming (f to fwd; g to rev)
 
 trans : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃} → StronglyEquivalent C₁ C₂ → StronglyEquivalent C₂ C₃ → StronglyEquivalent C₁ C₃
 trans {C₁ = C₁} {C₂} {C₃} C₁⇒C₂ C₂⇒C₃ = record
@@ -65,7 +66,7 @@ trans {C₁ = C₁} {C₂} {C₃} C₁⇒C₂ C₂⇒C₃ = record
   ; strong-equivalence = record
     { full = λ {X Y} → my-full X Y
     ; faithful = λ f g → C₁⇒C₂.faithful _ _ ∙ C₂⇒C₃.faithful _ _
-    ; eso = {!my-eso!} }
+    ; eso = my-eso }
   }
   where
   module C₁⇒C₂ = StronglyEquivalent C₁⇒C₂
@@ -89,7 +90,7 @@ trans {C₁ = C₁} {C₂} {C₃} C₁⇒C₂ C₂⇒C₃ = record
   my-eso : ∀ c₃ → ∃ (λ c₁ → G₀ (F₀ c₁) ≅ c₃)
   my-eso c₃ with C₂⇒C₃.eso c₃
   my-eso c₃ | c₂ , ff₃ with C₁⇒C₂.eso c₂
-  my-eso c₃ | c₂ , ff₃ | c₁ , ff₂ = c₁ , (ff₃ ⓘ resp-≅ {!ff₂!})
+  my-eso c₃ | c₂ , ff₃ | c₁ , ff₂ = c₁ , (ff₃ ⓘ resp-≅ ff₂)
     where open FunctorsAlways G
 
 equiv : ∀ {o ℓ e} → IsEquivalence (StronglyEquivalent {o} {ℓ} {e})

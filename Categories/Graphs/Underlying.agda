@@ -1,6 +1,8 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Graphs.Underlying where
 
+open import Categories.Support.PropositionalEquality
+
 open import Categories.Category
   hiding (module Heterogeneous)
 open import Categories.Categories
@@ -11,8 +13,6 @@ open import Categories.Functor
 open import Data.Product
 open import Graphs.Graph
 open import Graphs.GraphMorphism
-open import Relation.Binary.PropositionalEquality
-  renaming (_≡_ to _≣_; refl to ≣-refl)
 
 Underlying₀ : ∀ {o ℓ e} → Category o ℓ e → Graph o ℓ e
 Underlying₀ C = record
@@ -61,4 +61,3 @@ Underlying {o}{ℓ}{e} = record
         
         convert-~ : ∀ {a b c d}{x : B [ a , b ]}{y : B [ c , d ]} → x ~₁ y → x ~₂ y
         convert-~ (≡⇒∼ foo) = ≈⇒~ foo
-      

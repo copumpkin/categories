@@ -175,3 +175,10 @@ interchange {C₀ = C₀} {C₁} {C₂} {F₀} {F₁} {F₅} {F₂} {F₃} {F₄
                {f h : NaturalTransformation B C} {g i : NaturalTransformation A B} 
           → f ≡ h → g ≡ i → f ∘₁ g ≡ h ∘₁ i
 ∘₁-resp-≡ {E = E} f≡h g≡i = Category.∘-resp-≡ E f≡h g≡i
+
+.∘₀-resp-≡ : ∀ {o ℓ e} {o′ ℓ′ e′} {o″ ℓ″ e″}
+               {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {E : Category o″ ℓ″ e″}
+               {F F′ : Functor C D} {G G′ : Functor D E}
+               {f h : NaturalTransformation G G′} {g i : NaturalTransformation F F′}
+           → f ≡ h → g ≡ i → f ∘₀ g ≡ h ∘₀ i
+∘₀-resp-≡ {E = E} {G′ = G′} f≡h g≡i = Category.∘-resp-≡ E (Functor.F-resp-≡ G′ g≡i) f≡h

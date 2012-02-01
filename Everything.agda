@@ -4,7 +4,12 @@ module Everything where
 import Categories.Category
 
 -- 2-categories
+-- XXX need to finish the last 3 laws
 import Categories.2-Category
+
+-- The strict 2-category of categories
+-- XXX laws not proven yet
+-- import Categories.2-Category.Categories
 
 -- Adjunctions between functors
 import Categories.Adjunction

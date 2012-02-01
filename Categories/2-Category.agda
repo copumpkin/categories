@@ -3,7 +3,7 @@ module Categories.2-Category where
 
 open import Level
 open import Data.Product using (curry; _,_)
-open import Function using () renaming (_∘_ to _∙_)
+open import Function using () renaming (_∘_ to _·_)
 
 open import Categories.Support.PropositionalEquality
 
@@ -82,7 +82,7 @@ record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
 
       .identity₁ˡ : {- ∀ {A B} {f : A ⇒₁ B} → -} id₁ ∘₁ f ≣ f
       identity₁ˡ = ≡F-on-objects (id {B} ∘ idF {C = A ⇒ B}) (πʳ {C = ⊤} {A ⇒ B}) identityˡ (unit , f)
-{-
+
   .identity₁ʳ : ∀ {A B} {f : A ⇒₁ B} → f ∘₁ id₁ ≣ f
   identity₁ʳ {A} {B} {f} = ≡F-on-objects (idF {C = A ⇒ B} ∘ id {A}) (πˡ {C = A ⇒ B} {⊤}) identityʳ (f , unit)
 
@@ -97,16 +97,94 @@ record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
   hidentityʳ {A} {B} {f} {f′} {η} = Equiv.trans (loosely (∘₂-resp-≡′ Equiv′.refl (Equiv′.sym (Functor.identity id)))) (identityʳ (η , unit))
 
   .im-id₂-closed-under-∘₂′ : ∀ {A B C} {f : A ⇒₁ B} {g : B ⇒₁ C} → id₂ {A = g} ∘₂ id₂ {A = f} ≡′ id₂ {A = g ∘₁ f}
-  im-id₂-closed-under-∘₂′ = ?
+  im-id₂-closed-under-∘₂′ = Functor.identity —∘—
 
   .im-id₂-closed-under-∘₂ : ∀ {A B C} {f : A ⇒₁ B} {g : B ⇒₁ C} → (id₂ {A = g} ∘₂ id₂ {A = f}) ≡ id₂ {A = g ∘₁ f}
   im-id₂-closed-under-∘₂ = loosely im-id₂-closed-under-∘₂′
 
   .lidentityˡ′ : ∀ {A B C} {f : A ⇒₁ B} {g : B ⇒₁ C} → id₂ {A = g} ◃ f ≡′ id₂
-  lidentityˡ′ = {!!}
+  lidentityˡ′ = Functor.identity —∘—
 
   .lidentityˡ : ∀ {A B C} {f : A ⇒₁ B} {g : B ⇒₁ C} → (id₂ {A = g} ◃ f) ≡ id₂ {A = g ∘₁ f}
   lidentityˡ = loosely lidentityˡ′
+
+  .ridentityʳ′ : ∀ {A B C} {f : A ⇒₁ B} {g : B ⇒₁ C} → g ▹ id₂ {A = f} ≡′ id₂
+  ridentityʳ′ = Functor.identity —∘—
+
+  .ridentityʳ : ∀ {A B C} {f : A ⇒₁ B} {g : B ⇒₁ C} → (g ▹ id₂ {A = f}) ≡ id₂ {A = g ∘₁ f}
+  ridentityʳ = loosely ridentityʳ′
+
+  -- .lidentityʳ′ : ∀ {A B} {f f′ : A ⇒₁ B} {η : f ⇒₂ f′} → (η ◃ id₁) ≡′ η
+  -- lidentityʳ′ = ?
+
+  .lidentityʳ : ∀ {A B} {f f′ : A ⇒₁ B} {η : f ⇒₂ f′} → (η ◃ id₁) ≡ η
+  lidentityʳ {η = η} = Equiv.trans (∘₂-resp-≡ Equiv.refl (Equiv.sym (loosely (Functor.identity id)))) (identityʳ (η , unit))
+
+  -- .ridentityˡ′ : ∀ {A B} {f f′ : A ⇒₁ B} {η : f ⇒₂ f′} → (id₁ ▹ η) ≡′ η
+  -- ridentityˡ′ = ?
+
+  .ridentityˡ : ∀ {A B} {f f′ : A ⇒₁ B} {η : f ⇒₂ f′} → (id₁ ▹ η) ≡ η
+  ridentityˡ {η = η} = Equiv.trans (∘₂-resp-≡ (Equiv.sym (loosely (Functor.identity id))) Equiv.refl) (identityˡ (unit , η))
+
+  .interchange′ : ∀ {A B C} {f g h : A ⇒₁ B} {i j k : B ⇒₁ C} {α : f ⇒₂ g} {β : g ⇒₂ h} {γ : i ⇒₂ j} {δ : j ⇒₂ k} → ((δ • γ) ∘₂ (β • α)) ≡′ ((δ ∘₂ β) • (γ ∘₂ α))
+  interchange′ = Functor.homomorphism —∘—
+
+  .interchange : ∀ {A B C} {f g h : A ⇒₁ B} {i j k : B ⇒₁ C} {α : f ⇒₂ g} {β : g ⇒₂ h} {γ : i ⇒₂ j} {δ : j ⇒₂ k} → ((δ • γ) ∘₂ (β • α)) ≡ ((δ ∘₂ β) • (γ ∘₂ α))
+  interchange = loosely interchange′
+
+  .lvdistrib′ : ∀ {A B C} {f : A ⇒₁ B} {g h i : B ⇒₁ C} {η : g ⇒₂ h} {θ : h ⇒₂ i} → (θ • η) ◃ f ≡′ ((θ ◃ f) • (η ◃ f))
+  lvdistrib′ = Equiv′.trans (∘₂-resp-≡′ Equiv′.refl (Equiv′.sym videntityˡ′)) interchange′
+
+  .lvdistrib : ∀ {A B C} {f : A ⇒₁ B} {g h i : B ⇒₁ C} {η : g ⇒₂ h} {θ : h ⇒₂ i} → ((θ • η) ◃ f) ≡ ((θ ◃ f) • (η ◃ f))
+  lvdistrib = loosely lvdistrib′
+
+  .rvdistrib′ : ∀ {A B C} {f g h : A ⇒₁ B} {i : B ⇒₁ C} {η : f ⇒₂ g} {θ : g ⇒₂ h} → (i ▹ (θ • η)) ≡′ ((i ▹ θ) • (i ▹ η))
+  rvdistrib′ = Equiv′.trans (∘₂-resp-≡′ (Equiv′.sym videntityˡ′) Equiv′.refl) interchange′
+
+  .rvdistrib : ∀ {A B C} {f g h : A ⇒₁ B} {i : B ⇒₁ C} {η : f ⇒₂ g} {θ : g ⇒₂ h} → (i ▹ (θ • η)) ≡ ((i ▹ θ) • (i ▹ η))
+  rvdistrib = loosely rvdistrib′
+
+  -- XXX mixed assocs still need proving
+  {-
+  -- XXX not well-typed without a subst or something
+  -- .lhassoc′ : ∀ {A B C D} {f : A ⇒₁ B} {g : B ⇒₁ C} {h i : C ⇒₁ D} {η : h ⇒₂ i} → (η ◃ (g ∘₁ f)) ≡′ {!((η ◃ g) ◃ f)!}
+  -- lhassoc′ = {!!}
+
+  .lhassoc : ∀ {A B C D} {f : A ⇒₁ B} {g : B ⇒₁ C} {h i : C ⇒₁ D} {η : h ⇒₂ i} → (η ◃ (g ∘₁ f)) ≡ ((η ◃ g) ◃ f)
+  lhassoc = {!!}
+
+  -- XXX ditto
+  -- .rlassoc′ : ∀ {A B C D} {f : A ⇒₁ B} {g h : B ⇒₁ C} {i : C ⇒₁ D} {η : g ⇒₂ h} → (i ▹ (η ◃ f)) ≡′ {!((i ▹ η) ◃ f)!}
+  -- rlassoc′ = {!!}
+
+  .rlassoc : ∀ {A B C D} {f : A ⇒₁ B} {g h : B ⇒₁ C} {i : C ⇒₁ D} {η : g ⇒₂ h} → (i ▹ (η ◃ f)) ≡ ((i ▹ η) ◃ f)
+  rlassoc = {!!}
+
+  -- XXX tritto
+  -- .hrassoc′ : ∀ {A B C D} {f g : A ⇒₁ B} {h : B ⇒₁ C} {i : C ⇒₁ D} {η : f ⇒₂ g} → (i ▹ (h ▹ η)) ≡′ {!((i ∘₁ h) ▹ η)!}
+  -- hrassoc′ = {!!}
+
+  .hrassoc : ∀ {A B C D} {f g : A ⇒₁ B} {h : B ⇒₁ C} {i : C ⇒₁ D} {η : f ⇒₂ g} → (i ▹ (h ▹ η)) ≡ ((i ∘₁ h) ▹ η)
+  hrassoc = {!!}
+  -}
+
+  .lrsmoosh′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((θ ◃ g) • (h ▹ η)) ≡′ (θ ∘₂ η)
+  lrsmoosh′ = Equiv′.trans (Equiv′.sym interchange′) (∘₂-resp-≡′ videntityʳ′ videntityˡ′)
+
+  .lrsmoosh : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((θ ◃ g) • (h ▹ η)) ≡ (θ ∘₂ η)
+  lrsmoosh = loosely lrsmoosh′
+
+  .rlsmoosh′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡′ (θ ∘₂ η)
+  rlsmoosh′ = Equiv′.trans (Equiv′.sym interchange′) (∘₂-resp-≡′ videntityˡ′ videntityʳ′)
+
+  .rlsmoosh : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡ (θ ∘₂ η)
+  rlsmoosh = loosely rlsmoosh′
+
+  .lrexch′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡′ ((θ ◃ g) • (h ▹ η))
+  lrexch′ = Equiv′.trans rlsmoosh′ (Equiv′.sym lrsmoosh′)
+
+  .lrexch : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡ ((θ ◃ g) • (h ▹ η))
+  lrexch = loosely lrexch′
 
   module Hom₁Reasoning = ≣-reasoning
 
@@ -117,5 +195,3 @@ record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
     infixr 4 _⟩∘₂⟨_
     ._⟩∘₂⟨_ : ∀ {C} {h i : C ⇒₁ A} {α β : f ⇒₂ g} {γ δ : h ⇒₂ i} → α ≡′ β → γ ≡′ δ → (α ∘₂ γ) ≡′ (β ∘₂ δ)
     _⟩∘₂⟨_ = ∘₂-resp-≡′
-
--}

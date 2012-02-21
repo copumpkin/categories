@@ -9,19 +9,19 @@ open import Categories.Support.PropositionalEquality
 open import Categories.Category
 open import Categories.Functor hiding (_≡_; _∘_)
 
-module ConeOver {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) where
+module ConeOver {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) where
   module J = Category J
   open Category C
   open Functor F
-  record Cone : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where
+  record Cone : Set (o ⊔ a ⊔ o′ ⊔ a′) where
     field
       N : Obj
       ψ : ∀ X → (N ⇒ F₀ X)
-      .commute : ∀ {X Y} (f : J [ X , Y ]) → F₁ f ∘ ψ X ≡ ψ Y
+      .commute : ∀ {X Y} (f : J [ X , Y ]) → F₁ f ∘ ψ X ≣ ψ Y
 
   Cone′ = Cone
 
-  record _≜_ (X Y : Cone) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where
+  record _≜_ (X Y : Cone) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
     module X = Cone X
     module Y = Cone Y
     field
@@ -52,7 +52,7 @@ module ConeOver {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
     ; isEquivalence = ≜-is-equivalence
     }
 
-  record ConeUnder (N : Obj) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where
+  record ConeUnder (N : Obj) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
     field
       ψ′ : ∀ X → (N ⇒ F₀ X)
       .commute : ∀ {X Y} (f : J [ X , Y ]) → F₁ f ∘ ψ′ X ≡ ψ′ Y
@@ -67,7 +67,7 @@ module ConeOver {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
   tether : ∀ {N} → (K : Cone) → (N ≣ Cone.N K) → ConeUnder N
   tether K ≣-refl = record { ψ′ = Cone.ψ K; commute = Cone.commute K }
 
-  record _≜′_ {N} (X Y : ConeUnder N) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where
+  record _≜′_ {N} (X Y : ConeUnder N) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
     module X = ConeUnder X
     module Y = ConeUnder Y
     field
@@ -119,4 +119,4 @@ module ConeOver {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
 
 open ConeOver public using (cone-setoid) renaming (_≜_ to _[_≜_]; Cone′ to Cone; _≜′_ to _[_≜′_]; ConeUnder′ to ConeUnder)
 
-module Cone {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} {F : Functor J C} (K : ConeOver.Cone F) = ConeOver.Cone F K
+module Cone {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} {F : Functor J C} (K : ConeOver.Cone F) = ConeOver.Cone F K

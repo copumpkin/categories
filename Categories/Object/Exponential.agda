@@ -1,7 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Categories.Category
 
-module Categories.Object.Exponential {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.Exponential {o a} (C : Category o a) where
 
 open Category C
 
@@ -18,7 +18,7 @@ open Categories.Object.Product.Morphisms C
 
 import Categories.Morphisms as Morphisms
 
-record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
+record Exponential (A B : Obj) : Set (o ⊔ a) where
   field
     B^A : Obj
     product : Product B^A A

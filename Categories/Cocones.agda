@@ -3,11 +3,13 @@ module Categories.Cocones where
 
 open import Level
 
+open import Categories.Support.PropositionalEquality
+
 open import Categories.Category
 open import Categories.Functor hiding (_∘_; _≡_; equiv; id; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Categories.Cocone
 
-record CoconeMorphism {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} {F : Functor J C} (c₁ c₂ : Cocone F) : Set (ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where
+record CoconeMorphism {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} {F : Functor J C} (c₁ c₂ : Cocone F) : Set (a ⊔ o′ ⊔ a′) where
   module c₁ = Cocone c₁
   module c₂ = Cocone c₂
   module C = Category C
@@ -17,8 +19,8 @@ record CoconeMorphism {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : C
     f : C [ c₁.N , c₂.N ]
     .commute : ∀ {X} → f ∘ c₁.ψ X ≡ c₂.ψ X
 
-Cocones : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) → Category (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) (ℓ ⊔ e ⊔ o′ ⊔ ℓ′) e
-Cocones {C = C} F = record 
+Coconesᵉ : ∀ {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) → EasyCategory (o ⊔ a ⊔ o′ ⊔ a′) (a ⊔ o′ ⊔ a′) a
+Coconesᵉ {C = C} F = record 
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
@@ -27,12 +29,8 @@ Cocones {C = C} F = record
   ; assoc = assoc
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
-  ; equiv = record 
-    { refl = Equiv.refl
-    ; sym = Equiv.sym
-    ; trans = Equiv.trans
-    }
-  ; ∘-resp-≡ = ∘-resp-≡
+  ; promote = promote′
+  ; REFL = Equiv.refl
   }
   where
   open Category C
@@ -71,3 +69,11 @@ Cocones {C = C} F = record
       where
       open HomReasoning
 
+  promote′ : ∀ {A B : Obj′} (f f′ : Hom′ A B) → f ≡′ f′ → f ≣ f′
+  promote′ {A} {B} g g′ g≡g′ = lemma (f g′) g≡g′
+    where
+    lemma : ∀ f′ → (f≣f′ : f g ≣ f′) → g ≣ record { f = f′; commute = ≣-subst (λ f″ → ∀ {X} → f″ ∘ ψ A X ≣ ψ B X) f≣f′ (CoconeMorphism.commute g) }
+    lemma .(f g) ≣-refl = ≣-refl 
+
+Cocones : ∀ {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) → Category (o ⊔ a ⊔ o′ ⊔ a′) (a ⊔ o′ ⊔ a′)
+Cocones F = EASY Coconesᵉ F

@@ -5,8 +5,8 @@ open import Categories.Object.Products
 open import Categories.Object.Terminal
 open import Level
 
-module Categories.Object.Terminal.Exponentiating {o ℓ e : Level}
-    (C : Category o ℓ e)
+module Categories.Object.Terminal.Exponentiating {o a : Level}
+    (C : Category o a)
     (P : Products C) where
 
 open Category C

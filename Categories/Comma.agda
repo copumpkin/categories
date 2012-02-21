@@ -6,19 +6,20 @@ open import Categories.Functor
 open import Data.Product using (_×_; ∃; _,_; proj₁; proj₂; zip; map)
 open import Level
 open import Relation.Binary using (Rel)
+open import Categories.Support.PropositionalEquality
 open import Categories.Support.EqReasoning
 
-Comma :
-    {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃ : Level}
-    {A : Category o₁ ℓ₁ e₁}
-    {B : Category o₂ ℓ₂ e₂}
-    {C : Category o₃ ℓ₃ e₃}
+Commaᵉ :
+    {o₁ a₁ o₂ a₂ o₃ a₃ : Level}
+    {A : Category o₁ a₁}
+    {B : Category o₂ a₂}
+    {C : Category o₃ a₃}
     → Functor A C → Functor B C
-    → Category (o₁ ⊔ o₂ ⊔ ℓ₃) (ℓ₁ ⊔ ℓ₂ ⊔ e₃) (e₁ ⊔ e₂)
-Comma {o₁}{ℓ₁}{e₁}
-      {o₂}{ℓ₂}{e₂}
-      {o₃}{ℓ₃}{e₃}
-      {A}{B}{C} T S
+    → EasyCategory (o₁ ⊔ o₂ ⊔ a₃) (a₁ ⊔ a₂ ⊔ a₃) (a₁ ⊔ a₂)
+Commaᵉ {o₁}{a₁}
+       {o₂}{a₂}
+       {o₃}{a₃}
+       {A}{B}{C} T S
   = record
   { Obj         = Obj′
   ; _⇒_         = Hom′
@@ -28,12 +29,8 @@ Comma {o₁}{ℓ₁}{e₁}
   ; assoc       = A.assoc , B.assoc
   ; identityˡ   = A.identityˡ , B.identityˡ
   ; identityʳ   = A.identityʳ , B.identityʳ
-  ; equiv = record 
-    { refl  = A.Equiv.refl , B.Equiv.refl
-    ; sym   = map A.Equiv.sym B.Equiv.sym
-    ; trans = zip A.Equiv.trans B.Equiv.trans
-    }          
-  ; ∘-resp-≡    = zip A.∘-resp-≡ B.∘-resp-≡
+  ; promote     = promote′
+  ; REFL        = A.Equiv.refl , B.Equiv.refl
   } where
     module A = Category A
     module B = Category B
@@ -47,14 +44,14 @@ Comma {o₁}{ℓ₁}{e₁}
     infixr 9 _∘′_
     infix  4 _≡′_
     
-    record Obj′ : Set (o₁ ⊔ o₂ ⊔ ℓ₃) where
+    record Obj′ : Set (o₁ ⊔ o₂ ⊔ a₃) where
         constructor _,_,_
         field
             α : A.Obj
             β : B.Obj
             f : C [ T₀ α , S₀ β ]
     
-    record Hom′ (X₁ X₂ : Obj′) : Set (ℓ₁ ⊔ ℓ₂ ⊔ e₃) where
+    record Hom′ (X₁ X₂ : Obj′) : Set (a₁ ⊔ a₂ ⊔ a₃) where
         constructor _,_[_]
         open Obj′ X₁ renaming (α to α₁; β to β₁; f to f₁)
         open Obj′ X₂ renaming (α to α₂; β to β₂; f to f₂)
@@ -68,7 +65,7 @@ Comma {o₁}{ℓ₁}{e₁}
     (g₁ , h₁ [ _ ]) ≡′ (g₂ , h₂ [ _ ]) 
         = A [ g₁ ≡ g₂ ]
         × B [ h₁ ≡ h₂ ]
-    
+
     id′ : {A : Obj′} → Hom′ A A
     id′ { A } = A.id , B.id
         [ begin
@@ -116,10 +113,22 @@ Comma {o₁}{ℓ₁}{e₁}
             open Obj′ X₂ renaming (α to α₂; β to β₂; f to f₂)
             open Obj′ X₃ renaming (α to α₃; β to β₃; f to f₃)
 
-_↓_ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃}
-      → {A : Category o₁ ℓ₁ e₁}
-      → {B : Category o₂ ℓ₂ e₂}
-      → {C : Category o₃ ℓ₃ e₃}
+    promote′ : EasyLaws.Promote Hom′ _∘′_ id′ _≡′_
+    promote′ (g , h [ _ ]) (.g , .h [ _ ]) (≣-refl , ≣-refl) = ≣-refl
+
+Comma :
+    {o₁ a₁ o₂ a₂ o₃ a₃ : Level}
+    {A : Category o₁ a₁}
+    {B : Category o₂ a₂}
+    {C : Category o₃ a₃}
+    → Functor A C → Functor B C
+    → Category (o₁ ⊔ o₂ ⊔ a₃) (a₁ ⊔ a₂ ⊔ a₃)
+Comma T S = EASY Commaᵉ T S
+
+_↓_ : ∀ {o₁ a₁ o₂ a₂ o₃ a₃}
+      → {A : Category o₁ a₁}
+      → {B : Category o₂ a₂}
+      → {C : Category o₃ a₃}
       → (S : Functor B C) (T : Functor A C)
-      → Category _ _ _
+      → Category _ _
 T ↓ S = Comma T S

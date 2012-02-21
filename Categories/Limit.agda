@@ -13,7 +13,7 @@ open import Categories.Object.Terminal as T using (Terminal; module Terminal)
 import Categories.Morphisms as Mor
 open import Categories.Cone using (module Cone; module ConeOver)
 
-module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) where
+module LimitsOf {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) where
 
   private module L = Terminal (Cones F)
 
@@ -27,7 +27,7 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
   open Heterogeneous C
 
   -- Isomorphic to an terminal object, but worth keeping distinct in case we change its definition
-  record Limit : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+  record Limit : Set (o ⊔ a ⊔ o′ ⊔ a′) where
     field
       terminal : Terminal (Cones F)
 
@@ -86,7 +86,7 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
     universal-cone {K} {i} pf = terminal.!-unique i
 
     .universal : ∀ {K : Cone} {i : Cone.N K ⇒ vertex} → unrep i ≜ K → rep K ≡ i
-    universal {K} {i} pf = terminal.!-unique (Fl.floatʳ (heterogenize (homogenize pf ≣-refl)) (conify i))
+    universal {K} {i} pf = ≣-cong ConeMorphism.f (terminal.!-unique (Fl.floatʳ (heterogenize (homogenize pf ≣-refl)) (conify i)))
     -- complicated, isn't it?  but it's necessary in order to make the float
     --   compute enough for the !-unique to typecheck.  by replacing the
     --   N-≣ in pf with ≣-refl we can make it happen!
@@ -98,37 +98,37 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
     g-η-cone {κ = κ} = terminal.!-unique (Fl.floatʳ (g-η-cone₀ {κ = κ}) κ)
 
     .g-η : ∀ {X} {f : X ⇒ vertex} → rep (unrep f) ≡ f
-    g-η {f = f} = terminal.!-unique (conify f)
+    g-η {f = f} = ≣-cong ConeMorphism.f (terminal.!-unique (conify f))
 
     .η-cone : Cones F [ rep-cone proj-cone ≡ Category.id (Cones F) ]
     η-cone = terminal.⊤-id (rep-cone proj-cone)
 
     .η : rep proj-cone ≡ id
-    η = η-cone
+    η = ≣-cong ConeMorphism.f η-cone
 
     .rep-cone-cong : ∀ {K₁ K₂} (K₁≜K₂ : K₁ ≜ K₂) → Cones F [ Fl.floatʳ K₁≜K₂ (rep-cone K₁) ≡ rep-cone K₂ ]
     rep-cone-cong {K₁} {K₂} K₁≜K₂ = 
-      Equiv.sym (terminal.!-unique (Fl.floatʳ K₁≜K₂ (rep-cone K₁)))
+      ≣-sym (terminal.!-unique (Fl.floatʳ K₁≜K₂ (rep-cone K₁)))
 
     .rep-cong′ : ∀ {N} {K₁ K₂ : ConeUnder N} → K₁ ≜′ K₂ → rep (untether K₁) ≡ rep (untether K₂)
     rep-cong′ {N} {K₁} {K₂} K₁≜′K₂ = 
-      Equiv.sym (terminal.!-unique (Fl.floatʳ (heterogenize K₁≜′K₂) (rep-cone (untether K₁))))
+      Equiv.sym (≣-cong ConeMorphism.f (terminal.!-unique (Fl.floatʳ (heterogenize K₁≜′K₂) (rep-cone (untether K₁)))))
 
     rep-cong : ∀ {K₁ K₂} → K₁ ≜ K₂ → rep K₁ ∼ rep K₂
     rep-cong K₁≜K₂ = 
-      ≡⇒∼ʳ (≜.N-≣ K₁≜K₂) (rep-cone-cong K₁≜K₂)
+      ≡⇒∼ʳ (≜.N-≣ K₁≜K₂) (≣-cong ConeMorphism.f (rep-cone-cong K₁≜K₂))
 
     .rep-cone∘ : ∀ {K K′} {q : K′ ⇾ K} → Cones F [ Cones F [ rep-cone K ∘ q ] ≡ rep-cone K′ ]
-    rep-cone∘ {K} {q = q} = Equiv.sym (terminal.!-unique (rep-cone K ▵ q))
+    rep-cone∘ {K} {q = q} = ≣-sym (terminal.!-unique (rep-cone K ▵ q))
 
     .rep∘ : ∀ {K K′} {q : K′ ⇾ K} → rep K ∘ ConeMorphism.f q ≡ rep K′
-    rep∘ {K} {K′} {q} = rep-cone∘ {K} {K′} {q}
+    rep∘ {K} {K′} {q} = ≣-cong ConeMorphism.f (rep-cone∘ {K} {K′} {q})
 
     .rep-cone-self-id : rep-cone proj-cone ≜₁ id▵
     rep-cone-self-id = terminal.!-unique id▵
 
     .rep-self-id : rep proj-cone ≡ id
-    rep-self-id = terminal.!-unique id▵
+    rep-self-id = ≣-cong ConeMorphism.f (terminal.!-unique id▵)
 
   open Limit
 
@@ -145,32 +145,43 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
 
   isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → Σ[ κ′ ∶ Cone ] κ ⇿ κ′
   isos-lift-to-cones κ {v} κ≅v =
-      record
-      { N = v
-      ; ψ = λ X → (Cone.ψ κ X) ∘ g
-      ; commute = λ f' → pullˡ (Cone.commute κ f')
-      } 
-    , record
-      { f = record { f = f; commute = Equiv.sym (cancelRight isoˡ) }
-      ; g = record { f = g; commute = Equiv.refl }
-      ; iso = record { isoˡ = isoˡ; isoʳ = isoʳ }
+    κ′ , record
+      { f = f′
+      ; g = g′
+      ; iso = record { isoˡ = promote (g′ ▵ f′) id▵ isoˡ; isoʳ = promote (f′ ▵ g′) id▵ isoʳ }
       }
     where
     open Mor._≅_ C κ≅v
     open GlueSquares C
+    open EasyCategory (Conesᵉ F) using (promote)
+
+    κ′ : Cone
+    κ′ = record
+      { N = v
+      ; ψ = λ X → (Cone.ψ κ X) ∘ g
+      ; commute = λ f' → pullˡ (Cone.commute κ f')
+      }
+
+    f′ : ConeMorphism κ κ′
+    f′ = record { f = f; commute = Equiv.sym (cancelRight isoˡ) }
+
+    g′ : ConeMorphism κ′ κ
+    g′ = record { f = g; commute = Equiv.refl }
 
   isos-lower-from-cones : ∀ {κ₁ κ₂ : Cone} → κ₁ ⇿ κ₂ → Cone.N κ₁ ≅ Cone.N κ₂
   isos-lower-from-cones κ₁⇿κ₂ = record
     { f = ConeMorphism.f f
     ; g = ConeMorphism.f g
-    ; iso = record { isoˡ = isoˡ; isoʳ = isoʳ }
+    ; iso = record { isoˡ = ≣-cong ConeMorphism.f isoˡ
+                   ; isoʳ = ≣-cong ConeMorphism.f isoʳ }
     }
     where
     open Mor._≅_ (Cones F) κ₁⇿κ₂
 
   ≜ⁱ⇒≡ⁱ : ∀ {κ₁ κ₂} {i₁ i₂ : κ₁ ⇿ κ₂} → i₁ ≜ⁱ i₂
         → isos-lower-from-cones i₁ ≡ⁱ isos-lower-from-cones i₂
-  ≜ⁱ⇒≡ⁱ pf = record { f-≡ = f-≡; g-≡ = g-≡ }
+  ≜ⁱ⇒≡ⁱ pf = record { f-≡ = ≣-cong ConeMorphism.f f-≡
+                    ; g-≡ = ≣-cong ConeMorphism.f g-≡ }
     where open Mor._≡ⁱ_ (Cones F) pf
 
   up-to-iso-cone : (L₁ L₂ : Limit) → proj-cone L₁ ⇿ proj-cone L₂

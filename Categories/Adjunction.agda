@@ -8,7 +8,7 @@ open import Categories.Functor renaming (id to idF; _≡_ to _≡F_; _∘_ to _�
 open import Categories.NaturalTransformation
 open import Categories.Monad
 
-record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} (F : Functor D C) (G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o₁ ⊔ ℓ₁ ⊔ e₁) where
+record Adjunction {o a} {o₁ a₁} {C : Category o a} {D : Category o₁ a₁} (F : Functor D C) (G : Functor C D) : Set (o ⊔ a ⊔ o₁ ⊔ a₁) where
   field
     unit   : NaturalTransformation idF (G ∘F F)
     counit : NaturalTransformation (F ∘F G) idF
@@ -74,7 +74,7 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
 
 
 {-
-_∘_ : ∀ {o ℓ e} {o₁ ℓ₁ e₁} {o₂ ℓ₂ e₂} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂} 
+_∘_ : ∀ {o a} {o₁ a₁} {o₂ a₂} {C : Category o a} {D : Category o₁ a₁} {E : Category o₂ a₂} 
       {F : Functor D C} {G : Functor C D} {H : Functor E D} {I : Functor D E} → 
       Adjunction F G → Adjunction H I → Adjunction (F ∘F H) (I ∘F G)
 _∘_ X Y = record 

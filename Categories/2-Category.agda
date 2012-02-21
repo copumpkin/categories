@@ -15,14 +15,14 @@ open import Categories.Functor using (Functor) renaming (_∘_ to _∘F_; _≡_ 
 open import Categories.Bifunctor using (Bifunctor; reduce-×)
 open import Categories.Product using (assocʳ; πˡ; πʳ)
 
-record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
-  open Terminal (Categories ℓ t e) (One {ℓ} {t} {e})
+record 2-Category (o a t : Level) : Set (suc (o ⊔ a ⊔ t)) where
+  open Terminal (Categories a t) (One {a} {t})
   field
     Obj : Set o
-    _⇒_ : (A B : Obj) → Category ℓ t e
+    _⇒_ : (A B : Obj) → Category a t
     id : {A : Obj} → Functor ⊤ (A ⇒ A)
     —∘— : {A B C : Obj} → Bifunctor (B ⇒ C) (A ⇒ B) (A ⇒ C)
-  _∘_ : {A B C : Obj} {L R : Category ℓ t e} → Functor L (B ⇒ C) → Functor R (A ⇒ B) → Bifunctor L R (A ⇒ C)
+  _∘_ : {A B C : Obj} {L R : Category a t} → Functor L (B ⇒ C) → Functor R (A ⇒ B) → Bifunctor L R (A ⇒ C)
   _∘_ {A} {B} {C} F G = reduce-× {D₁ = B ⇒ C} {D₂ = A ⇒ B} —∘— F G
   field
     .assoc : ∀ {A B C D : Obj} → ((—∘— ∘ idF) ∘F assocʳ (C ⇒ D) (B ⇒ C) (A ⇒ B)) ≡F idF ∘ —∘—
@@ -55,7 +55,7 @@ record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
   _∘₂_ = curry (Functor.F₁ —∘—)
 
   .∘₂-resp-≡′ : ∀ {A B C} {f h : B ⇒₁ C} {g i : A ⇒₁ B} {α γ : f ⇒₂ h} {β δ : g ⇒₂ i} → α ≡′ γ → β ≡′ δ → α ∘₂ β ≡′ γ ∘₂ δ
-  ∘₂-resp-≡′ = curry (Functor.F-resp-≡ —∘—)
+  ∘₂-resp-≡′ = ≣-cong₂ _∘₂_
 
   .∘₂-resp-≡ : ∀ {A B C} {f f′ h h′ : B ⇒₁ C} {g g′ i i′ : A ⇒₁ B} {α : f ⇒₂ h} {γ : f′ ⇒₂ h′} {β : g ⇒₂ i} {δ : g′ ⇒₂ i′} → α ≡ γ → β ≡ δ → (α ∘₂ β) ≡ (γ ∘₂ δ)
   ∘₂-resp-≡ (loosely a) (loosely b) = loosely (∘₂-resp-≡′ a b)
@@ -71,7 +71,7 @@ record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
   g ▹ α = id₂ ∘₂ α
 
   private
-    ≡F-on-objects : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → (F ≡F G) → (X : Category.Obj C) → Functor.F₀ F X ≣ Functor.F₀ G X
+    ≡F-on-objects : ∀ {o a} {o′ a′} {C : Category o a} {D : Category o′ a′} (F G : Functor C D) → (F ≡F G) → (X : Category.Obj C) → Functor.F₀ F X ≣ Functor.F₀ G X
     ≡F-on-objects {C = C} F G eq X with Functor.F₀ F X | Functor.F₁ F (Category.id C {X}) | eq (Category.id C {X})
     ≡F-on-objects {C = C} F G eq X | ._ | _ | Heterogeneous.≡⇒∼ _ = ≣-refl
 

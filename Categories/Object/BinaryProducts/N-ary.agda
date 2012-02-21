@@ -2,8 +2,8 @@
 open import Categories.Category
 open import Categories.Object.BinaryProducts
 
-module Categories.Object.BinaryProducts.N-ary {o ℓ e}
-  (C : Category o ℓ e) 
+module Categories.Object.BinaryProducts.N-ary {o a}
+  (C : Category o a) 
   (BP : BinaryProducts C)
   where
 

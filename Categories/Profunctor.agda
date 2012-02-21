@@ -10,14 +10,14 @@ open import Categories.Functor.Hom
 open import Categories.Lan
 open import Categories.Yoneda
 
-Profunctor : ∀ {o ℓ e} {o′ ℓ′ e′} → Category o ℓ e → Category o′ ℓ′ e′ → Set _
-Profunctor {ℓ = ℓ} {e} {ℓ′ = ℓ′} {e′} C D = Bifunctor (Category.op D) C (ISetoids (ℓ ⊔ ℓ′) (e ⊔ e′))
+Profunctor : ∀ {o a} {o′ a′} → Category o a → Category o′ a′ → Set _
+Profunctor {a = a} {a′ = a′} C D = Bifunctor (Category.op D) C (Sets (a ⊔ a′))
 
-id : ∀ {o ℓ e} → {C : Category o ℓ e} → Profunctor C C
+id : ∀ {o a} → {C : Category o a} → Profunctor C C
 id {C = C} = Hom[ C ][-,-]
 
 {-
-_∘_ : ∀ {o ℓ e} {o′ ℓ′ e′} {o′′ ℓ′′ e′′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {E : Category o′′ ℓ′′ e′′} 
+_∘_ : ∀ {o a} {o′ a′} {o′′ a′′} {C : Category o a} {D : Category o′ a′} {E : Category o′′ a′′} 
     → Profunctor D E → Profunctor C D → Profunctor C E
 F ∘ G = {!!}
 -}

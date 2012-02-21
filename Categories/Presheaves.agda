@@ -7,5 +7,5 @@ open import Categories.Category
 open import Categories.Agda
 open import Categories.FunctorCategory
 
-Presheaves : ∀ {o ℓ e : Level} → Category o ℓ e → Category _ _ _
-Presheaves {o} {ℓ} {e} C = Functors (Category.op C) (ISetoids ℓ e)
+Presheaves : ∀ {o a : Level} → Category o a → Category _ _
+Presheaves {o} {a} C = Functors (Category.op C) (Sets a)

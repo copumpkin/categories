@@ -2,13 +2,13 @@
 
 open import Categories.Category
 
-module Categories.Object.Initial {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.Initial {o a} (C : Category o a) where
 
 open Category C
 
 open import Level
 
-record Initial : Set (o ⊔ ℓ ⊔ e) where
+record Initial : Set (o ⊔ a) where
   field
     ⊥ : Obj
     ! : ∀ {A} → (⊥ ⇒ A)

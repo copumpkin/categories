@@ -1,13 +1,13 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Categories.Category
 
-module Categories.Pullback {o ℓ e} (C : Category o ℓ e) where
+module Categories.Pullback {o a} (C : Category o a) where
 
 open Category C
 
 open import Level
 
-record Pullback {X Y Z}(f : X ⇒ Z)(g : Y ⇒ Z) : Set (o ⊔ ℓ ⊔ e) where
+record Pullback {X Y Z}(f : X ⇒ Z)(g : Y ⇒ Z) : Set (o ⊔ a) where
   field
     P  : Obj
     p₁ : P ⇒ X

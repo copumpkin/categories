@@ -6,12 +6,12 @@ open import Categories.Product
 
 -- Parameterize over the categories in whose product we are working
 module Categories.Product.Properties
-    {o ℓ e o′ ℓ′ e′}
-    (C : Category o ℓ e)
-    (D : Category o′ ℓ′ e′)
+    {o a o′ a′}
+    (C : Category o a)
+    (D : Category o′ a′)
     where
 
-C×D : Category _ _ _
+C×D : Category _ _
 C×D = Product C D
 module C×D = Category C×D
 
@@ -33,9 +33,9 @@ open import Relation.Binary.PropositionalEquality as PropEq
     where open Heterogeneous C×D
 
 ※-distrib' :
-    ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
-    → {A : Category o₁ ℓ₁ e₁}
-    → {B : Category o₂ ℓ₂ e₂}
+    ∀ {o₁ a₁ o₂ a₂}
+    → {A : Category o₁ a₁}
+    → {B : Category o₂ a₂}
     → {F : Functor B C}
     → {G : Functor B D}
     → {H : Functor A B}
@@ -43,9 +43,9 @@ open import Relation.Binary.PropositionalEquality as PropEq
 ※-distrib' = PropEq.refl
 
 ※-distrib : 
-    ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
-    → {A : Category o₁ ℓ₁ e₁}
-    → {B : Category o₂ ℓ₂ e₂}
+    ∀ {o₁ a₁ o₂ a₂}
+    → {A : Category o₁ a₁}
+    → {B : Category o₂ a₂}
     → (F : Functor B C)
     → (G : Functor B D)
     → (H : Functor A B)
@@ -54,11 +54,17 @@ open import Relation.Binary.PropositionalEquality as PropEq
     where open Heterogeneous C×D
 
 ∏₁※∏₂-distrib : 
-    ∀ {o₁ ℓ₁ e₁}{A : Category o₁ ℓ₁ e₁}
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
     → (F : Functor A C×D)
     → ((∏₁ ∘ F) ※ (∏₂ ∘ F)) ≡ F
 ∏₁※∏₂-distrib F h = refl
     where open Heterogeneous C×D
+
+∏₁※∏₂-distrib' :
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
+    → (F : Functor A C×D)
+    → ((∏₁ ∘ F) ※ (∏₂ ∘ F)) ≣ F
+∏₁※∏₂-distrib' F = PropEq.refl
 
 module Lemmas where
     open Heterogeneous C×D
@@ -71,7 +77,7 @@ module Lemmas where
         → (g : D [ x₃ , y₃ ])
         → C   [ f₁ ∼ f₂ ]
         → C×D [ (f₁ , g) ∼ (f₂ , g) ]
-    lem₁ f₁ f₂ g (≡⇒∼ f₁≡f₂) = ≡⇒∼ (f₁≡f₂ , Category.Equiv.refl D)
+    lem₁ f₁ f₂ g (≡⇒∼ f₁≡f₂) = ≡⇒∼ (PropEq.cong (λ f → f , g) f₁≡f₂)
     
     lem₂ : {x₁ y₁ x₂ y₂ : Category.Obj D}
         → {x₃ y₃ : Category.Obj C}
@@ -80,12 +86,12 @@ module Lemmas where
         → (g₂ : D [ x₂ , y₂ ])
         → D   [ g₁ ∼ g₂ ]
         → C×D [ (f , g₁) ∼ (f , g₂) ]
-    lem₂ f g₁ g₂ (≡⇒∼ g₁≡g₂) = ≡⇒∼ (Category.Equiv.refl C , g₁≡g₂)
+    lem₂ f g₁ g₂ (≡⇒∼ g₁≡g₂) = ≡⇒∼ (PropEq.cong (_,_ f) g₁≡g₂)
 open Lemmas
 
 ※-preserves-≡ˡ :
-    ∀ {o₁ ℓ₁ e₁}
-    → {A : Category o₁ ℓ₁ e₁}
+    ∀ {o₁ a₁}
+    → {A : Category o₁ a₁}
     → (F₁ : Functor A C)
     → (F₂ : Functor A C)
     → (G  : Functor A D)
@@ -94,8 +100,8 @@ open Lemmas
     lem₁ (Functor.F₁ F₁ h) (Functor.F₁ F₂ h) (Functor.F₁ G  h) (F₁≡F₂ h)
 
 ※-preserves-≡ʳ :
-    ∀ {o₁ ℓ₁ e₁}
-    → {A : Category o₁ ℓ₁ e₁}
+    ∀ {o₁ a₁}
+    → {A : Category o₁ a₁}
     → (F  : Functor A C)
     → (G₁ : Functor A D)
     → (G₂ : Functor A D)
@@ -105,8 +111,8 @@ open Lemmas
     where open Heterogeneous C×D
 
 .※-preserves-≡ :
-    ∀ {o₁ ℓ₁ e₁}
-    → {A : Category o₁ ℓ₁ e₁}
+    ∀ {o₁ a₁}
+    → {A : Category o₁ a₁}
     → (F : Functor A C)
     → (G : Functor A C)
     → (H : Functor A D)
@@ -118,23 +124,51 @@ open Lemmas
         (※-preserves-≡ʳ G H I H≡I)
     where open IsEquivalence (equiv {C = A}{D = C×D})
 
+.※-universal' : 
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
+    → {F : Functor A C}
+    → {G : Functor A D}
+    → {I : Functor A C×D}
+    → (∏₁ ∘ I ≣ F)
+    → (∏₂ ∘ I ≣ G)
+    → ((F ※ G) ≣ I)
+※-universal' {_}{_}{A}{F}{G}{I} p₁ p₂ =
+    PropEq.trans {i = F ※ G}{j = (∏₁ ∘ I) ※ (∏₂ ∘ I)}{k = I}
+        (PropEq.sym {i = (∏₁ ∘ I) ※ (∏₂ ∘ I)}{j = F ※ G}
+            (PropEq.cong₂ _※_ p₁ p₂))
+        (∏₁※∏₂-distrib' I)
+
 .※-universal : 
-    ∀ {o₁ ℓ₁ e₁}{A : Category o₁ ℓ₁ e₁}
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
     → {F : Functor A C}
     → {G : Functor A D}
     → {I : Functor A C×D}
     → (∏₁ ∘ I ≡ F)
     → (∏₂ ∘ I ≡ G)
     → ((F ※ G) ≡ I)
-※-universal {_}{_}{_}{A}{F}{G}{I} p₁ p₂ =
+※-universal {_}{_}{A}{F}{G}{I} p₁ p₂ =
     trans {i = F ※ G}{j = (∏₁ ∘ I) ※ (∏₂ ∘ I)}{k = I}
         (sym {i = (∏₁ ∘ I) ※ (∏₂ ∘ I)}{j = F ※ G}
             (※-preserves-≡ (∏₁ ∘ I) F (∏₂ ∘ I) G p₁ p₂))
         (∏₁※∏₂-distrib I)
     where open IsEquivalence (equiv {C = A}{D = C×D})
 
+※-commute₁' : 
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
+    → {F : Functor A C}
+    → {G : Functor A D}
+    → (∏₁ ∘ (F ※ G) ≣ F)
+※-commute₁' = PropEq.refl
+
+※-commute₂' : 
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
+    → {F : Functor A C}
+    → {G : Functor A D}
+    → (∏₂ ∘ (F ※ G) ≣ G)
+※-commute₂' = PropEq.refl
+
 ※-commute₁ : 
-    ∀ {o₁ ℓ₁ e₁}{A : Category o₁ ℓ₁ e₁}
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
     → {F : Functor A C}
     → {G : Functor A D}
     → (∏₁ ∘ (F ※ G) ≡ F)
@@ -142,7 +176,7 @@ open Lemmas
     where open Heterogeneous C
 
 ※-commute₂ : 
-    ∀ {o₁ ℓ₁ e₁}{A : Category o₁ ℓ₁ e₁}
+    ∀ {o₁ a₁}{A : Category o₁ a₁}
     → {F : Functor A C}
     → {G : Functor A D}
     → (∏₂ ∘ (F ※ G) ≡ G)

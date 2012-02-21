@@ -12,19 +12,19 @@ open import Categories.Functor hiding (equiv)
 open import Categories.Functor.Properties
 import Categories.Morphisms as Morphisms
 
-record StrongEquivalence {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record StrongEquivalence {o a o′ a′} {C : Category o a} {D : Category o′ a′} (F : Functor C D) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   field
     .full : Full F
     .faithful : Faithful F
     eso : EssentiallySurjective F
 
-record StronglyEquivalent {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record StronglyEquivalent {o a o′ a′} (C : Category o a) (D : Category o′ a′) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   field
     C⇒D : Functor C D
     strong-equivalence : StrongEquivalence C⇒D
   open StrongEquivalence strong-equivalence public
 
-refl : ∀ {o ℓ e} {C : Category o ℓ e} → StronglyEquivalent C C
+refl : ∀ {o a} {C : Category o a} → StronglyEquivalent C C
 refl {C = C} = record
   { C⇒D = id
   ; strong-equivalence = record
@@ -39,7 +39,7 @@ refl {C = C} = record
   .my-full : ∀ X Y → ¬ Σ (X ⇒ Y) (λ f → ¬ ∃ (λ g → C [ g ≡ f ]))
   my-full X Y (f , elim) = elim (f , Equiv.refl)
 
-sym : ∀ {o ℓ e o′ ℓ′ e′} → {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → StronglyEquivalent C D → StronglyEquivalent D C
+sym : ∀ {o a o′ a′} → {C : Category o a} {D : Category o′ a′} → StronglyEquivalent C D → StronglyEquivalent D C
 sym {C = C} {D = D} Op = record
   { C⇒D = record
     { F₀ = λ d → proj₁ (Op.eso d)
@@ -60,7 +60,7 @@ sym {C = C} {D = D} Op = record
   open Functor F
   open Morphisms._≅_ C renaming (f to fwd; g to rev)
 
-trans : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃} → StronglyEquivalent C₁ C₂ → StronglyEquivalent C₂ C₃ → StronglyEquivalent C₁ C₃
+trans : ∀ {o₁ a₁ o₂ a₂ o₃ a₃} {C₁ : Category o₁ a₁} {C₂ : Category o₂ a₂} {C₃ : Category o₃ a₃} → StronglyEquivalent C₁ C₂ → StronglyEquivalent C₂ C₃ → StronglyEquivalent C₁ C₃
 trans {C₁ = C₁} {C₂} {C₃} C₁⇒C₂ C₂⇒C₃ = record
   { C⇒D = G ∘ F
   ; strong-equivalence = record
@@ -93,7 +93,7 @@ trans {C₁ = C₁} {C₂} {C₃} C₁⇒C₂ C₂⇒C₃ = record
   my-eso c₃ | c₂ , ff₃ | c₁ , ff₂ = c₁ , (ff₃ ⓘ resp-≅ ff₂)
     where open FunctorsAlways G
 
-equiv : ∀ {o ℓ e} → IsEquivalence (StronglyEquivalent {o} {ℓ} {e})
+equiv : ∀ {o a} → IsEquivalence (StronglyEquivalent {o} {ℓ} {e})
 equiv = record
   { refl = refl
   ; sym = sym

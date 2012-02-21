@@ -4,8 +4,10 @@ module Categories.Lift where
 open import Level
 open import Function using () renaming (_∘_ to _∙_)
 
-open import Categories.Category using (Category; module Category)
-open import Categories.Functor using (Functor; module Functor)
+open import Categories.Support.PropositionalEquality
+
+open import Categories.Category using (Category; module Category; EasyCategory; EASY_)
+open import Categories.Functor using (Functor; module Functor; module EasyFunctor)
 open import Categories.NaturalTransformation using (NaturalTransformation; module NaturalTransformation)
 
 private
@@ -15,58 +17,58 @@ private
   lifted₂ : ∀ {a a′ b b′} {A A′ : Set a} {B : Set b} → (A → A′ → B) → Lift {ℓ = a′} A → Lift {ℓ = a′} A′ → Lift {ℓ = b′} B
   lifted₂ f x y = lift (f (lower x) (lower y))
 
-LiftC : ∀ {o ℓ e} o′ ℓ′ e′ → Category o ℓ e → Category (o ⊔ o′) (ℓ ⊔ ℓ′) (e ⊔ e′)
-LiftC o′ ℓ′ e′ C =
-  record
+LiftCᵉ : ∀ {o a} o′ a′ → Category o a → EasyCategory (o ⊔ o′) (a ⊔ a′) (a ⊔ a′)
+LiftCᵉ o′ a′ C = record
   { Obj = Lift {ℓ = o′} Obj
-  ; _⇒_ = Lifted₂ ℓ′ _⇒_
-  ; _≡_ = Lifted₂ e′ _≡_
+  ; _⇒_ = Lifted₂ a′ _⇒_
+  ; _≡_ = Lifted₂ a′ _≡_
   ; id = lift id
   ; _∘_ = lifted₂ _∘_
   ; assoc = lift assoc
   ; identityˡ = lift identityˡ
   ; identityʳ = lift identityʳ
-  ; equiv = record { refl = lift Equiv.refl
-                   ; sym = lift ∙ Equiv.sym ∙ lower
-                   ; trans = lifted₂ Equiv.trans
-                   }
-  ; ∘-resp-≡ = lifted₂ ∘-resp-≡
+  ; promote = promote′
+  ; REFL = lift ≣-refl
   }
-  where open Category C
+  where
+  open Category C
 
-LiftF : ∀ {oC ℓC eC oD ℓD eD} oC′ ℓC′ eC′ oD′ ℓD′ eD′ {C : Category oC ℓC eC} {D : Category oD ℓD eD} → Functor C D → Functor (LiftC oC′ ℓC′ eC′ C) (LiftC oD′ ℓD′ eD′ D)
-LiftF _ _ _ _ _ _ F =
+  promote′ : ∀ {A B : Lift {ℓ = o′} Obj} (f g : Lifted₂ a′ _⇒_ A B) → (Lifted₂ a′ _≡_ f g) → f ≣ g
+  promote′ (lift f) (lift .f) (lift ≣-refl) = ≣-refl
+
+LiftC : ∀ {o a} o′ a′ → Category o a → Category (o ⊔ o′) (a ⊔ a′)
+LiftC o′ a′ C = EASY LiftCᵉ o′ a′ C
+
+LiftF : ∀ {oC aC oD aD} oC′ aC′ oD′ aD′ {C : Category oC aC} {D : Category oD aD} → Functor C D → Functor (LiftC oC′ aC′ C) (LiftC oD′ aD′ D)
+LiftF _ _ _ _ {C} {D} F = EasyFunctor.functor {C = LiftC _ _ C} {D = LiftCᵉ _ _ D}
   record
   { F₀ = lift ∙ F₀ ∙ lower
   ; F₁ = lift ∙ F₁ ∙ lower
   ; identity = lift identity
   ; homomorphism = lift homomorphism
-  ; F-resp-≡ = lift ∙ F-resp-≡ ∙ lower
   }
   where open Functor F
 
-LiftFˡ : ∀ {oC ℓC eC oD ℓD eD} {C : Category oC ℓC eC} {D : Category oD ℓD eD} → Functor C D → Functor (LiftC oD ℓD eD C) D
+LiftFˡ : ∀ {oC aC oD aD} {C : Category oC aC} {D : Category oD aD} → Functor C D → Functor (LiftC oD aD C) D
 LiftFˡ F = 
   record
   { F₀ = F₀ ∙ lower
   ; F₁ = F₁ ∙ lower
   ; identity = identity
   ; homomorphism = homomorphism
-  ; F-resp-≡ = F-resp-≡ ∙ lower
   }
   where open Functor F
 
-LiftFʳ : ∀ {oC ℓC eC oD ℓD eD} {C : Category oC ℓC eC} {D : Category oD ℓD eD} → Functor C D → Functor C (LiftC oC ℓC eC D)
-LiftFʳ F = 
+LiftFʳ : ∀ {oC aC oD aD} {C : Category oC aC} {D : Category oD aD} → Functor C D → Functor C (LiftC oC aC D)
+LiftFʳ {C = C} {D} F = EasyFunctor.functor {C = C} {D = LiftCᵉ _ _ D}
   record
   { F₀ = lift ∙ F₀
   ; F₁ = lift ∙ F₁
   ; identity = lift identity
   ; homomorphism = lift homomorphism
-  ; F-resp-≡ = lift ∙ F-resp-≡
   }
   where open Functor F
 
-LiftNT : ∀ {oC ℓC eC oD ℓD eD oC′ ℓC′ eC′ oD′ ℓD′ eD′} {C : Category oC ℓC eC} {D : Category oD ℓD eD} {F G : Functor C D} → NaturalTransformation F G → NaturalTransformation (LiftF oC′ ℓC′ eC′ oD′ ℓD′ eD′ F) (LiftF oC′ ℓC′ eC′ oD′ ℓD′ eD′ G)
-LiftNT α = record { η = lift ∙ η ∙ lower; commute = lift ∙ commute ∙ lower }
+LiftNT : ∀ {oC aC oD aD oC′ aC′ oD′ aD′} {C : Category oC aC} {D : Category oD aD} {F G : Functor C D} → NaturalTransformation F G → NaturalTransformation (LiftF oC′ aC′ oD′ aD′ F) (LiftF oC′ aC′ oD′ aD′ G)
+LiftNT α = record { η = lift ∙ η ∙ lower; commute = ≣-cong lift ∙ commute ∙ lower }
   where open NaturalTransformation α 

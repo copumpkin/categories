@@ -16,7 +16,7 @@ open import Categories.Morphisms
 open import Categories.Square
 import Categories.Monoidal.Cartesian.Pentagon as Pentagon
 
-Cartesian : ∀ {o ℓ e} (C : Category o ℓ e) → Products C → Monoidal C
+Cartesian : ∀ {o a} (C : Category o a) → Products C → Monoidal C
 Cartesian C Ps = record
   { ⊗ = ⊗
   ; id = ⊤
@@ -74,14 +74,10 @@ Cartesian C Ps = record
     ; F₁ = λ x → proj₁ x ⁂ proj₂ x
     ; identity = identity
     ; homomorphism = Equiv.sym ⁂∘⁂
-    ; F-resp-≡ = λ {A B F G} x → F-resp-≡ {A} {B} {F} {G} x
     }
     where
     .identity : ∀ {A : Obj ×₀ Obj} → (id {proj₁ A} ⁂ id {proj₂ A}) ≡ id 
     identity = universal (id-comm {f = π₁}) (id-comm {f = π₂})
-    
-    .F-resp-≡ : ∀ {A B F G} F≡G → _
-    F-resp-≡ {F = F} {G} x = ⟨⟩-cong₂ (∘-resp-≡ˡ (proj₁ x)) (∘-resp-≡ˡ (proj₂ x))
 
   -- The implicit x is actually used implicitly by the rest of the expression, so don't take it out,
   -- or Agda will complain about something referring to something to which it has no access.

@@ -7,10 +7,10 @@ open import Data.Product
 open import Categories.Category
 open import Categories.Bifunctor hiding (equiv) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 
-record DinaturalTransformation {o ℓ e o′ ℓ′ e′}
-                               {C : Category o ℓ e}
-                               {D : Category o′ ℓ′ e′}
-                               (F G : Bifunctor (Category.op C) C D) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record DinaturalTransformation {o a o′ a′}
+                               {C : Category o a}
+                               {D : Category o′ a′}
+                               (F G : Bifunctor (Category.op C) C D) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   module C = Category C
   module D = Category D
   open Functor F

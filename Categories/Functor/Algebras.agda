@@ -3,11 +3,14 @@ module Categories.Functor.Algebras where
 
 open import Level hiding (lift)
 
+open import Categories.Support.PropositionalEquality
+
 open import Categories.Category
 open import Categories.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Categories.Functor.Algebra
+open import Function using (_on_)
 
-record F-Algebra-Morphism {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (X Y : F-Algebra F) : Set (ℓ ⊔ e) where
+record F-Algebra-Morphism {o a} {C : Category o a} {F : Endofunctor C} (X Y : F-Algebra F) : Set (a) where
   constructor _,_
   open Category C
   module X = F-Algebra X
@@ -17,8 +20,8 @@ record F-Algebra-Morphism {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (
     f : X.A ⇒ Y.A
     .commutes : f ∘ X.α ≡ Y.α ∘ F₁ f
 
-F-Algebras : ∀ {o ℓ e} {C : Category o ℓ e} → Endofunctor C → Category (ℓ ⊔ o) (e ⊔ ℓ) e
-F-Algebras {C = C} F = record 
+F-Algebrasᵉ : ∀ {o a} {C : Category o a} → Endofunctor C → EasyCategory (a ⊔ o) a a
+F-Algebrasᵉ {C = C} F = record 
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
@@ -27,12 +30,8 @@ F-Algebras {C = C} F = record
   ; assoc = assoc
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
-  ; equiv = record
-    { refl = refl
-    ; sym = sym
-    ; trans = trans
-    }
-  ; ∘-resp-≡ = ∘-resp-≡
+  ; promote = promote′
+  ; REFL = refl
   }
   where
   open Category C
@@ -91,13 +90,18 @@ F-Algebras {C = C} F = record
       where
       open HomReasoning
 
+  promote′ : EasyLaws.Promote Hom′ _∘′_ id′ _≡′_
+  promote′ (f , _) (.f , _) ≣-refl = ≣-refl
+
+F-Algebras : ∀ {o a} {C : Category o a} → Endofunctor C → Category (a ⊔ o) a
+F-Algebras F = EASY F-Algebrasᵉ F
 
 open import Categories.Object.Initial
 
-module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial (F-Algebras F)) where
+module Lambek {o a} {C : Category o a} {F : Endofunctor C} (I : Initial (F-Algebras F)) where
   open Category C
   open Equiv
-  module FA = Category (F-Algebras F) renaming (_∘_ to _∘FA_; _≡_ to _≡FA_)
+  module FA = EasyCategory (F-Algebrasᵉ F) renaming (_∘_ to _∘FA_; _≡_ to _≡FA_)
   open Functor F
   import Categories.Morphisms as Morphisms
   open Morphisms C
@@ -136,6 +140,6 @@ module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial 
       open FA hiding (id; module HomReasoning)
       open HomReasoning
 
-      isoˡ′ = ⊥-id ((_,_ {C = C} {F} g′ refl) ∘FA !)
+      isoˡ′ = FA.demote _ _ (⊥-id ((_,_ {C = C} {F} g′ refl) ∘FA !))
 
 open Lambek public

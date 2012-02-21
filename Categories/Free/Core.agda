@@ -12,6 +12,7 @@ open import Categories.Category
 open import Categories.Functor
   using (Functor)
 open import Categories.Support.Equivalence
+open import Categories.Support.PropositionalEquality
 open import Graphs.Graph
 open import Graphs.GraphMorphism
 open import Relation.Binary
@@ -20,50 +21,36 @@ open import Relation.Binary.PropositionalEquality
   using ()
   renaming (_≡_ to _≣_; refl to ≣-refl)
 open import Data.Star
-open import Categories.Support.StarEquality
 open import Data.Star.Properties
-  using (gmap-◅◅)
+  using (gmap-◅◅; ◅◅-assoc)
 open import Level using (_⊔_)
 
-EdgeSetoid : ∀ {o ℓ e} → (G : Graph o ℓ e) (A B : Graph.Obj G) → Setoid ℓ e
-EdgeSetoid G A B = Graph.edge-setoid G {A}{B}
-
-module PathEquality {o ℓ e} (G : Graph o ℓ e) = StarEquality (EdgeSetoid G)
-
-Free₀ : ∀ {o ℓ e} → Graph o ℓ e → Category o (o ⊔ ℓ) (o ⊔ ℓ ⊔ e)
-Free₀ {o}{ℓ}{e} G = record
+Free₀ : ∀ {o a} → Graph o a → Category o (o ⊔ a)
+Free₀ {o}{a} G = record
   { Obj       = Obj
   ; _⇒_       = Star _↝_
   ; id        = ε
   ; _∘_       = _▻▻_
-  ; _≡_       = _≡_
-  ; equiv     = equiv
-  ; assoc     = λ{A}{B}{C}{D} {f}{g}{h} → ▻▻-assoc {A}{B}{C}{D} f g h
-  ; identityˡ = IsEquivalence.reflexive equiv f◅◅ε≣f
-  ; identityʳ = IsEquivalence.reflexive equiv ≣-refl
-  ; ∘-resp-≡  = _▻▻-cong_
+  ; ASSOC     = λ f g h → ≣-sym (◅◅-assoc f g h)
+  ; IDENTITYˡ = λ f → f◅◅ε≣f
+  ; IDENTITYʳ = λ _ → ≣-refl
   }
   where
     open Graph G
-      hiding (equiv)
-    
-    open PathEquality G
-      renaming (_≈_ to _≡_; isEquivalence to equiv)
     
     f◅◅ε≣f : ∀ {A B}{f : Star _↝_ A B} -> (f ◅◅ ε) ≣ f
     f◅◅ε≣f {f = ε} = ≣-refl
     f◅◅ε≣f {f = x ◅ xs} rewrite f◅◅ε≣f {f = xs}  = ≣-refl
 
-Free₁ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
-  {A : Graph o₁ ℓ₁ e₁}
-  {B : Graph o₂ ℓ₂ e₂}
+Free₁ : ∀ {o₁ a₁ o₂ a₂}
+  {A : Graph o₁ a₁}
+  {B : Graph o₂ a₂}
   → GraphMorphism A B → Functor (Free₀ A) (Free₀ B)
-Free₁ {o₁}{ℓ₁}{e₁}{o₂}{ℓ₂}{e₂}{A}{B} G = record
+Free₁ {o₁}{a₁}{o₂}{a₂}{A}{B} G = record
   { F₀            = G₀
   ; F₁            = gmap G₀ G₁
   ; identity      = refl
   ; homomorphism  = λ {X}{Y}{Z}{f}{g} → homomorphism {X}{Y}{Z}{f}{g}
-  ; F-resp-≡      = F-resp-≡
   }
   where
     open GraphMorphism G
@@ -75,12 +62,3 @@ Free₁ {o₁}{ℓ₁}{e₁}{o₂}{ℓ₂}{e₂}{A}{B} G = record
       {g : Free₀ A [ Y , Z ]}
       → Free₀ B [ gmap G₀ G₁ (f ◅◅ g) ≡ gmap G₀ G₁ f ◅◅ gmap G₀ G₁ g ]
     homomorphism {f = f}{g} = reflexive (gmap-◅◅ G₀ G₁ f g)
-    
-    .F-resp-≡ : ∀ {X Y}
-        {f g : Free₀ A [ X , Y ]}
-        → Free₀ A [ f ≡ g ]
-        → Free₀ B [ gmap G₀ G₁ f ≡ gmap G₀ G₁ g ]
-    F-resp-≡ {X}{Y}{f}{g} f≡g 
-      = gmap-cong G₀ G₁ G₁ (λ x y x≈y → G-resp-≈ x≈y) f g f≡g
-      where
-        open StarCong₂ (EdgeSetoid A) (EdgeSetoid B)

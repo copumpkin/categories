@@ -2,7 +2,7 @@
 
 open import Categories.Category
 
-module Categories.Object.SubobjectClassifier {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.SubobjectClassifier {o a} (C : Category o a) where
 
 open Category C
 
@@ -12,7 +12,7 @@ open import Categories.Object.Terminal
 open import Categories.Morphisms
 open import Categories.Pullback
 
-record SubobjectClassifier : Set (o ⊔ ℓ ⊔ e) where
+record SubobjectClassifier : Set (o ⊔ a) where
   field
     Ω : Obj
     χ : ∀ {U X} → (j : U ⇒ X) → (X ⇒ Ω)

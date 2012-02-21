@@ -11,7 +11,7 @@ open import Categories.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming
 open import Categories.NaturalIsomorphism
 open import Categories.NaturalTransformation using (_∘₀_; _∘₁_; _∘ˡ_; _∘ʳ_; NaturalTransformation) renaming (_≡_ to _≡ⁿ_; id to idⁿ)
 
-module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifunctor C C C) (id : Category.Obj C) where
+module MonoidalHelperFunctors {o a} (C : Category o a) (—⊗— : Bifunctor C C C) (id : Category.Obj C) where
   private module C = Category C
   open C hiding (id; identityˡ; identityʳ)
 

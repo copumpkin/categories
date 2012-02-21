@@ -22,7 +22,6 @@ Trivial = record
     ; F₁ = λ x y → y
     ; identity = ≣-refl
     ; homomorphism = ≣-refl
-    ; F-resp-≡ = λ x → ≣-refl
     }
   }
 

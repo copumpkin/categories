@@ -3,6 +3,9 @@ module Everything where
 -- Categories
 import Categories.Category
 
+-- Categories with an arrow equivalence not equivalent to equality
+import Categories.Category.Quotient
+
 -- 2-categories
 -- XXX need to finish the last 3 laws
 import Categories.2-Category
@@ -17,8 +20,9 @@ import Categories.Adjunction
 -- The Agda Set category
 import Categories.Agda
 
+-- XXX port this to Sets and fix it up
 -- The fact that one version of it is cocomplete
-import Categories.Agda.ISetoids.Cocomplete
+-- import Categories.Agda.ISetoids.Cocomplete
 
 -- The arrow category construction on any category
 import Categories.Arrow
@@ -295,7 +299,8 @@ import Categories.Object.Zero
 import Categories.Power
 
 -- Demonstrations that Power categories are the same as functors from discrete categories
-import Categories.Power.Functorial
+-- XXX metas waiting on Agda Issue 574
+-- import Categories.Power.Functorial
 
 -- Natural transformations for functors to/from power categories
 import Categories.Power.NaturalTransformation

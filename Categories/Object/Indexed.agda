@@ -2,7 +2,7 @@
 open import Categories.Category
 open import Categories.Support.Equivalence
 
-module Categories.Object.Indexed {o ℓ e c q} (C : Category o ℓ e) (B : Setoid c q) where
+module Categories.Object.Indexed {o a c q} (C : Category o a) (B : Setoid c q) where
 
 open import Categories.Support.SetoidFunctions
 open Category C

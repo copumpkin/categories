@@ -3,7 +3,7 @@ open import Categories.Category
 
 -- small indexed products of specific shapes
 
-module Categories.Object.IndexedProducts {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.IndexedProducts {o a} (C : Category o a) where
 
 open Category C
 -- open Equiv
@@ -17,7 +17,7 @@ import Categories.Object.IndexedProduct as IProduct
 import Categories.Morphism.Indexed as IArrow
 import Categories.Morphisms as Morphisms
 
-record IndexedProducts {c q} {Shape : Setoid c q} : Set (o ⊔ ℓ ⊔ e ⊔ c ⊔ q) where
+record IndexedProducts {c q} {Shape : Setoid c q} : Set (o ⊔ a ⊔ c ⊔ q) where
   open IObj C Shape
   open IArrow C Shape
   open IProduct C

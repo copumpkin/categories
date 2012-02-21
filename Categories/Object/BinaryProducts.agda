@@ -1,7 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Categories.Category
 
-module Categories.Object.BinaryProducts {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.BinaryProducts {o a} (C : Category o a) where
 
 open Category C
 open Equiv
@@ -16,7 +16,7 @@ open import Categories.Morphisms
 open Product C
 open ProductMorphisms C
 
-record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
+record BinaryProducts : Set (o ⊔ a) where
   infix 10 _⁂_
 
   field

@@ -15,7 +15,7 @@ open import Categories.Monoidal.Braided.Helpers
 
 open import Categories.Monoidal
 
-record Braided {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) : Set (o ⊔ ℓ ⊔ e) where
+record Braided {o a} {C : Category o a} (M : Monoidal C) : Set (o ⊔ a) where
   private module C = Category C
   private module M = Monoidal M
   open C hiding (id; identityˡ; identityʳ; assoc)

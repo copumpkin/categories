@@ -2,7 +2,7 @@
 
 open import Categories.Category
 
-module Categories.Object.Terminal {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.Terminal {o a} (C : Category o a) where
 
 open import Level
 open import Relation.Binary using (IsEquivalence; Setoid)
@@ -10,7 +10,7 @@ open import Categories.Support.PropositionalEquality
 
 open Category C
 
-record Terminal : Set (o ⊔ ℓ ⊔ e) where
+record Terminal : Set (o ⊔ a) where
   field
     ⊤ : Obj
     ! : ∀ {A} → (A ⇒ ⊤)

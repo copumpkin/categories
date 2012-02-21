@@ -12,22 +12,18 @@ open import Categories.Agda
 
 -- TODO: don't use sigmas
 -- Break into modules Strict and Weak using Sets and Setoids?
-Grothendieck : ∀ {o ℓ e o′} {C : Category o ℓ e} → Functor C (Sets o′) → Category _ _ _
-Grothendieck {o′ = o′} {C = C} F = record 
+Grothendieckᵉ : ∀ {o a o′} {C : Category o a} → Functor C (Sets o′) → EasyCategory _ _ _
+Grothendieckᵉ {o′ = o′} {C = C} F = record 
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
   ; _∘_ = _∘′_
-  ; id = id , identity
+  ; id = id , ≣-app identity _
   ; assoc = assoc
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
-  ; equiv = record
-    { refl = refl
-    ; sym = sym
-    ; trans = trans
-    }
-  ; ∘-resp-≡ = ∘-resp-≡
+  ; promote = promote′
+  ; REFL = refl
   }
   where
   open Category C
@@ -47,5 +43,10 @@ Grothendieck {o′ = o′} {C = C} F = record
     where
     -- This could be a lot prettier...
     .pf : F₁ (f ∘ g) (proj₂ X) ≣ proj₂ Z
-    pf = ≣-trans homomorphism (≣-sym (≣-trans (≣-sym pf₁) (≣-cong (F₁ f) (≣-sym pf₂))))
+    pf = ≣-trans (≣-app homomorphism _) (≣-sym (≣-trans (≣-sym pf₁) (≣-cong (F₁ f) (≣-sym pf₂))))
 
+  promote′ : ∀ {X Y} (f g : Hom′ X Y) → f ≡′ g → f ≣ g
+  promote′ (f , _) (.f , _) ≣-refl = ≣-refl
+
+Grothendieck : ∀ {o a o′} {C : Category o a} → Functor C (Sets o′) → Category _ _
+Grothendieck F = EASY Grothendieckᵉ F

@@ -24,9 +24,9 @@ open I→R-Wrapper
 ding : Level → Level
 ding ℓ = ℓ
 
-module ColimitCocone {o ℓ e c ℓ′} {J : Category o ℓ e} (F : Functor J (ISetoids (c ⊔ ding (o ⊔ ℓ ⊔ e)) (c ⊔ ℓ′ ⊔ ding (o ⊔ ℓ ⊔ e)))) where
-  c′ = c ⊔ ding (o ⊔ ℓ ⊔ e)
-  ℓ″ = c ⊔ ℓ′ ⊔ ding (o ⊔ ℓ ⊔ e)
+module ColimitCocone {o a c ℓ′} {J : Category o a} (F : Functor J (ISetoids (c ⊔ ding (o ⊔ a)) (c ⊔ ℓ′ ⊔ ding (o ⊔ a)))) where
+  c′ = c ⊔ ding (o ⊔ a)
+  ℓ″ = c ⊔ ℓ′ ⊔ ding (o ⊔ a)
   C = ISetoids c′ ℓ″
   D = Cocones F
   module J = Category J

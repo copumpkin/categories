@@ -5,14 +5,15 @@ module Categories.NaturalTransformation.Core where
 open import Level
 open import Relation.Binary using (Rel; IsEquivalence)
 
+open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
 open import Categories.Category
 open import Categories.Functor.Core renaming (id to idF; _∘_ to _∘F_)
 
-record NaturalTransformation {o ℓ e o′ ℓ′ e′}
-                             {C : Category o ℓ e}
-                             {D : Category o′ ℓ′ e′}
-                             (F G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record NaturalTransformation {o a o′ a′}
+                             {C : Category o a}
+                             {D : Category o′ a′}
+                             (F G : Functor C D) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   private module C = Category C
   private module D = Category D
   private module F = Functor F
@@ -30,7 +31,7 @@ record NaturalTransformation {o ℓ e o′ ℓ′ e′}
     ; commute = λ f → D.Equiv.sym (commute f)
     }
 
-id : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F : Functor C D} → NaturalTransformation F F
+id : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F : Functor C D} → NaturalTransformation F F
 id {C = C} {D} {F} = record 
   { η = λ _ → D.id
   ; commute = commute′
@@ -53,8 +54,8 @@ id {C = C} {D} {F} = record
     open D.HomReasoning
 
 -- "Vertical composition"
-_∘₁_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁}
-        {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁}
+_∘₁_ : ∀ {o₀ a₀ o₁ a₁}
+        {C : Category o₀ a₀} {D : Category o₁ a₁}
         {F G H : Functor C D}
     → NaturalTransformation G H → NaturalTransformation F G → NaturalTransformation F H
 _∘₁_ {C = C} {D} {F} {G} {H} X Y = record 
@@ -92,8 +93,8 @@ _∘₁_ {C = C} {D} {F} {G} {H} X Y = record
     open D.HomReasoning
 
 -- "Horizontal composition"
-_∘₀_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} 
-        {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+_∘₀_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂} 
+        {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
         {F G : Functor C D} {H I : Functor D E}
     → NaturalTransformation H I → NaturalTransformation F G → NaturalTransformation (H ∘F F) (I ∘F G)
 _∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record 
@@ -140,10 +141,21 @@ _∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record
 
 infix 4 _≡_
 
-_≡_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → Rel (NaturalTransformation F G) (o ⊔ e′)
+_≡_ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} → Rel (NaturalTransformation F G) (o ⊔ a′)
 _≡_ {D = D} X Y = ∀ {x} → D [ NaturalTransformation.η X x ≡ NaturalTransformation.η Y x ]
 
-.equiv : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → IsEquivalence (_≡_ {F = F} {G})
+promote : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} (α β : NaturalTransformation F G) → α ≡ β → α ≣ β
+promote {C = C} {D} {F} {G} α β α≡β = lemma (≣-ext (λ _ → α≡β))
+  where
+  module F = Functor F
+  module G = Functor G
+  module α = NaturalTransformation α
+  module β = NaturalTransformation β
+
+  lemma : ∀ {η′} (eq : α.η ≣ η′) → α ≣ record { η = η′; commute = ≣-subst (λ η″ → ∀ {X Y} (f : C [ X , Y ]) → D [ η″ Y ∘ F.F₁ f ] ≣ D [ G.F₁ f ∘ η″ X ]) eq α.commute }
+  lemma ≣-refl = ≣-refl
+
+.equiv : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} → IsEquivalence (_≡_ {F = F} {G})
 equiv {C = C} {D} {F} {G} = record 
   { refl = refl
   ; sym = λ f → sym f
@@ -152,7 +164,7 @@ equiv {C = C} {D} {F} {G} = record
   where
   open Category.Equiv D
 
-setoid : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → Setoid _ _
+setoid : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} → Setoid _ _
 setoid {F = F} {G} = record 
   { Carrier = NaturalTransformation F G
   ; _≈_ = _≡_

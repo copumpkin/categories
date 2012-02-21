@@ -5,6 +5,7 @@ module Categories.NaturalIsomorphism where
 open import Level
 open import Relation.Binary using (IsEquivalence)
 
+open import Categories.Support.Irrelevance
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
 open import Categories.Category
@@ -14,10 +15,10 @@ open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_)
 import Categories.Morphisms as Morphisms
 open import Categories.Functor.Properties using (module FunctorsAlways)
 
-record NaturalIsomorphism {o ℓ e o′ ℓ′ e′}
-                          {C : Category o ℓ e}
-                          {D : Category o′ ℓ′ e′}
-                          (F G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record NaturalIsomorphism {o a o′ a′}
+                          {C : Category o a}
+                          {D : Category o′ a′}
+                          (F G : Functor C D) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   private module C = Category C
   private module D = Category D
   private module F = Functor F
@@ -37,7 +38,7 @@ record NaturalIsomorphism {o ℓ e o′ ℓ′ e′}
   field
     .iso : ∀ X → Iso (⇒.η X) (⇐.η X)
 
-equiv : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → IsEquivalence (NaturalIsomorphism {C = C} {D})
+equiv : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → IsEquivalence (NaturalIsomorphism {C = C} {D})
 equiv {C = C} {D} = record 
   { refl = record
     { F⇒G = id
@@ -115,15 +116,15 @@ equiv {C = C} {D} = record
         where
         open D.HomReasoning
 
-setoid : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Setoid _ _
+setoid : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → Setoid _ _
 setoid {C = C} {D} = record 
   { Carrier = Functor C D
   ; _≈_ = NaturalIsomorphism
   ; isEquivalence = equiv {C = C} {D}
   }
 
-_ⓘˡ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
-     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+_ⓘˡ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
+     → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D}
      → (H : Functor D E) → (η : NaturalIsomorphism F G) → NaturalIsomorphism (H ∘F F) (H ∘F G)
 _ⓘˡ_ {C = C} {D} {E} {F} {G} H η = record
@@ -134,8 +135,8 @@ _ⓘˡ_ {C = C} {D} {E} {F} {G} H η = record
   where
   module η = NaturalIsomorphism η
 
-_ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
-     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+_ⓘʳ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
+     → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D}
      → (η : NaturalIsomorphism F G) → (K : Functor E C) → NaturalIsomorphism (F ∘F K) (G ∘F K)
 η ⓘʳ K = record
@@ -147,7 +148,7 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
   module η = NaturalIsomorphism η
   module K = Functor K
 
-≡→iso : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → F ≡F G → NaturalIsomorphism F G
+≡→iso : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} (F G : Functor C D) → F ≡F G → NaturalIsomorphism F G
 ≡→iso {C = C} {D} F G F≡G =
   record
   { F⇒G = oneway F G F≡G

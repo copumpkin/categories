@@ -6,9 +6,9 @@ open import Categories.Category
 open import Categories.Functor hiding (_≡_)
 open import Categories.NaturalTransformation
 
-record Lan {o₀ ℓ₀ e₀} {o₁ ℓ₁ e₁} {o₂ ℓ₂ e₂} 
-           {A : Category o₀ ℓ₀ e₀} {B : Category o₁ ℓ₁ e₁} {C : Category o₂ ℓ₂ e₂}
-           (X : Functor A C) (F : Functor A B) : Set (o₀ ⊔ ℓ₀ ⊔ e₀ ⊔ o₁ ⊔ ℓ₁ ⊔ e₁ ⊔ o₂ ⊔ ℓ₂ ⊔ e₂) where
+record Lan {o₀ a₀} {o₁ a₁} {o₂ a₂} 
+           {A : Category o₀ a₀} {B : Category o₁ a₁} {C : Category o₂ a₂}
+           (X : Functor A C) (F : Functor A B) : Set (o₀ ⊔ a₀ ⊔ o₁ ⊔ a₁ ⊔ o₂ ⊔ a₂) where
   field
     L : Functor B C
     ε : NaturalTransformation X (L ∘ F)

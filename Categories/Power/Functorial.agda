@@ -1,18 +1,19 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Level
 open import Categories.Category
-module Categories.Power.Functorial {o ℓ e : Level} (C : Category o ℓ e) where
+module Categories.Power.Functorial {o a : Level} (C : Category o a) where
 
 open import Relation.Binary.PropositionalEquality using (proof-irrelevance)
 open import Data.Unit using (⊤; tt)
 open import Function using () renaming (_∘_ to _∙_)
 open import Relation.Binary using (module IsEquivalence)
 
+open import Categories.Support.Irrelevance
 open import Categories.Support.PropositionalEquality
 import Categories.Power as Power
 open Power C
-open import Categories.Functor hiding (identityˡ) renaming (_≡_ to _≡F_; _∘_ to _∘F_; id to idF)
-open import Categories.NaturalTransformation using (NaturalTransformation; module NaturalTransformation)
+open import Categories.Functor hiding (identityˡ) renaming (_≡_ to _≡F_; _∘_ to _∘F_; id to idF; promote to promoteF)
+open import Categories.NaturalTransformation using (NaturalTransformation; module NaturalTransformation; EASED-NT_⇒_VIA_AS_) renaming (promote to promoteNT)
 open import Categories.Discrete
 open import Categories.Equivalence.Strong hiding (module Equiv)
 
@@ -25,11 +26,11 @@ open Functor using () renaming (F₀ to map₀; F₁ to map₁)
 open NaturalTransformation using (η)
 
 z : Level
-z = o ⊔ ℓ ⊔ e
+z = o ⊔ a
 
 open import Categories.Categories using (Categories)
 import Categories.Morphisms as M
-open M (Categories z z e) using (_≅_)
+open M (Categories z z) using (_≅_)
 
 exp→functor₀ : ∀ {I} → Obj (Exp I) → Functor (Discrete I) C
 exp→functor₀ X =
@@ -38,7 +39,6 @@ exp→functor₀ X =
   ; F₁ = my-F₁
   ; identity = Equiv.refl
   ; homomorphism = λ {_ _ _ A≣B B≣C} → my-homomorphism A≣B B≣C
-  ; F-resp-≡ = λ {_ _ e1 e2} _ → Equiv.reflexive (≣-cong my-F₁ (proof-irrelevance e1 e2))
   }
   where
   my-F₁ : ∀ {A B} → (A ≣ B) → (X A ⇒ X B)
@@ -52,24 +52,26 @@ exp→functor₁ {X = X} {Y} F = record { η = F; commute = my-commute }
   .my-commute : ∀ {A B} (A≣B : A ≣ B) → F B ∘ map₁ (exp→functor₀ X) A≣B ≡ map₁ (exp→functor₀ Y) A≣B ∘ F A
   my-commute ≣-refl = Equiv.trans C.identityʳ (Equiv.sym C.identityˡ)
 
-exp→functor : ∀ {I} → Functor (Exp I) (Functors (Discrete I) C)
-exp→functor =
+-- XXX can this just be done with refls?
+exp→functorᵉ : ∀ {I} → EasyFunctor (Exp I) (Functorsᵉ (Discrete I) C)
+exp→functorᵉ =
   record
   { F₀ = exp→functor₀
   ; F₁ = exp→functor₁
   ; identity = Equiv.refl
   ; homomorphism = Equiv.refl
-  ; F-resp-≡ = λ eqs {x} → eqs x
   }
+
+exp→functor : ∀ {I} → Functor (Exp I) (Functors (Discrete I) C)
+exp→functor = EasyFunctor.functor exp→functorᵉ
 
 functor→exp : ∀ {I} → Functor (Functors (Discrete I) C) (Exp I)
 functor→exp =
   record
   { F₀ = Functor.F₀
   ; F₁ = NaturalTransformation.η
-  ; identity = λ _ → Equiv.refl
-  ; homomorphism = λ _ → Equiv.refl
-  ; F-resp-≡ = λ eqs i → eqs {i}
+  ; identity = ≣-refl
+  ; homomorphism = ≣-refl
   }
 
 semicanonical : ∀ {I} → (F : Functor (Discrete I) C) → F ≡F (exp→functor₀ (map₀ F))
@@ -84,15 +86,15 @@ exp≋functor {I} = record
   ; G = functor→exp
   ; weak-inverse = record
     { F∘G≅id = record
-      { F⇒G = record
+      { F⇒G = EASED-NT _ ⇒ _ VIA {!Functors-rel (Discrete I) C!} AS record
         { η = Sc.F⇐G
         ; commute = λ f → Equiv.trans C.identityˡ (Equiv.sym C.identityʳ)
         }
       ; F⇐G = record
         { η = Sc.F⇒G
-        ; commute = λ f → Equiv.trans C.identityˡ (Equiv.sym C.identityʳ)
+        ; commute = λ f → promoteNT _ _ (Equiv.trans C.identityˡ (Equiv.sym C.identityʳ))
         }
-      ; iso = λ X → record { isoˡ = C.identityˡ; isoʳ = C.identityˡ }
+      ; iso = λ X → record { isoˡ = promoteNT _ _ C.identityˡ; isoʳ = promoteNT _ _ C.identityˡ }
       }
     ; G∘F≅id = IsEquivalence.refl NI.equiv
     }
@@ -101,14 +103,14 @@ exp≋functor {I} = record
   FDIC = Functors (Discrete I) C
   module Sc (X : Obj FDIC) = NaturalIsomorphism (NI.≡→iso X (exp→functor₀ (map₀ X)) (semicanonical X))
 
-exp≅functor : (ext : ∀ {a b} {A : Set a} {B : A → Set b} (f g : (x : A) → B x) → (∀ x → f x ≣ g x) → f ≣ g) → (id-propositionally-unique : (A : C.Obj) (f : A ⇒ A) → .(f ≡ C.id) → f ≣ C.id) → ∀ {I} → LiftC z z e (Exp I) ≅ Functors (Discrete I) C
-exp≅functor ext id-propositionally-unique {I} =
+exp≅functor : ∀ {I} → LiftC z z (Exp I) ≅ Functors (Discrete I) C
+exp≅functor {I} =
   record
   { f = LiftFˡ exp→functor
   ; g = LiftFʳ functor→exp
   ; iso = record
-    { isoˡ = λ f → Heterogeneous.refl _
-    ; isoʳ = λ {A B} f → ir A B f
+    { isoˡ = ≣-refl
+    ; isoʳ = promoteF f∘g idF (λ {A B} f → ir A B f)
     }
   }
   where
@@ -126,26 +128,23 @@ exp≅functor ext id-propositionally-unique {I} =
                              F₀ = map₀ A;
                              F₁ = λ {i j : I} → f i j;
                              identity = λ {i} → ≣-subst (λ f → f i i ≣-refl ≡ C.id) eq (Functor.identity A {i});
-                             homomorphism = λ {i j k i≣j j≣k} → ≣-subst (λ f → f i k (≣-trans i≣j j≣k) ≡ f j k j≣k ∘ f i j i≣j) eq (Functor.homomorphism A {f = i≣j} {j≣k});
-                             F-resp-≡ = λ {i j ij ji} → ≣-subst (λ f → ⊤ → f i j ij ≡ f i j ji) eq (Functor.F-resp-≡ A {i} {j} {ij} {ji}) })
+                             homomorphism = λ {i j k i≣j j≣k} → ≣-subst (λ f → f i k (≣-trans i≣j j≣k) ≡ f j k j≣k ∘ f i j i≣j) eq (Functor.homomorphism A {f = i≣j} {j≣k})})
                     lemma₃
     where
-    .lemma₁ : (i : I) (eq : i ≣ i) → map₁ A eq ≡ C.id
-    lemma₁ i eq = Equiv.trans (Functor.F-resp-≡ A tt) (Functor.identity A)
+    lemma₁ : (i : I) (eq : i ≣ i) → map₁ A eq ≡ C.id
+    lemma₁ i ≣-refl = ≣-trans (Functor.F-resp-≡ A ≣-refl) (Functor.identity-relevant A)
 
     lemma₂ : (i j : I) (eq : i ≣ j) → map₁ (squash A) eq ≣ map₁ A eq
-    lemma₂ i .i ≣-refl = ≣-sym (id-propositionally-unique (map₀ A i) (map₁ A ≣-refl) (lemma₁ i ≣-refl))
+    lemma₂ i .i ≣-refl = {!≣-sym (lemma₁ i ≣-refl)!}
 
     lemma₃ : (λ (i j : I) → map₁ (squash A) {i} {j}) ≣ (λ (i j : I) → map₁ A {i} {j})
-    lemma₃ = ext (λ (i j : I) → map₁ (squash A)) (λ (i j : I) → map₁ A)
-      (λ (i : I) → ext (λ (j : I) → map₁ (squash A)) (λ (j : I) → map₁ A)
-        (λ (j : I) → ext (map₁ (squash A)) (map₁ A) (lemma₂ i j)))
+    lemma₃ = ≣-ext (λ (i : I) → ≣-ext (λ (j : I) → ≣-ext (lemma₂ i j)))
 
-  ∼-subst : ∀ {o ℓ e} {C : Category o ℓ e} {A B A′ B′ : Obj C} (f : C [ A , B ]) (g : C [ A′ , B′ ]) (A′≣A : A′ ≣ A) (B′≣B : B′ ≣ B) → .(C [ ≣-subst (λ X → C [ X , B ]) A′≣A (≣-subst (λ Y → C [ A′ , Y ]) B′≣B g) ≡ f ]) → C [ g ∼ f ]
+  ∼-subst : ∀ {o a} {C : Category o a} {A B A′ B′ : Obj C} (f : C [ A , B ]) (g : C [ A′ , B′ ]) (A′≣A : A′ ≣ A) (B′≣B : B′ ≣ B) → .(C [ ≣-subst (λ X → C [ X , B ]) A′≣A (≣-subst (λ Y → C [ A′ , Y ]) B′≣B g) ≡ f ]) → C [ g ∼ f ]
   ∼-subst {C = C} f g ≣-refl ≣-refl eq = ≡⇒∼ eq
     where open Heterogeneous C
 
-  .∼-unsubst : ∀ {o ℓ e} {C : Category o ℓ e} {A B A′ B′ : Obj C} (f : C [ A , B ]) (g : C [ A′ , B′ ]) (A′≣A : A′ ≣ A) (B′≣B : B′ ≣ B) → C [ g ∼ f ] → C [ ≣-subst (λ X → C [ X , B ]) A′≣A (≣-subst (λ Y → C [ A′ , Y ]) B′≣B g) ≡ f ]
+  .∼-unsubst : ∀ {o a} {C : Category o a} {A B A′ B′ : Obj C} (f : C [ A , B ]) (g : C [ A′ , B′ ]) (A′≣A : A′ ≣ A) (B′≣B : B′ ≣ B) → C [ g ∼ f ] → C [ ≣-subst (λ X → C [ X , B ]) A′≣A (≣-subst (λ Y → C [ A′ , Y ]) B′≣B g) ≡ f ]
   ∼-unsubst f g ≣-refl ≣-refl (Heterogeneous.≡⇒∼ eq) = irr eq
     where open Heterogeneous C
 
@@ -158,12 +157,13 @@ exp≅functor ext id-propositionally-unique {I} =
   ≣-subst-fatten : ∀ {a a′ p} {A : Set a} {A′ : Set a′} (P′ : A′ → Set p) (f : A → A′) {x y : A} (eq : x ≣ y) (eq′ : f x ≣ f y) → ∀ {it} → ≣-subst (P′ ∙ f) eq it ≣ ≣-subst P′ eq′ it
   ≣-subst-fatten P′ f eq eq′ = ≣-trans (≣-subst-cong P′ f eq) (≣-subst-irrel P′ (≣-cong f eq) eq′)
 
-  η-under-substˡ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F F′ G : Functor C D} (α : NaturalTransformation F′ G) (F′≣F : F′ ≣ F) (c : Obj C) → η (≣-subst (λ H → NaturalTransformation H G) F′≣F α) c ≣ (≣-subst (λ (H : Functor C D) → D [ map₀ H c , map₀ G c ]) F′≣F (η α c))
+  η-under-substˡ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F F′ G : Functor C D} (α : NaturalTransformation F′ G) (F′≣F : F′ ≣ F) (c : Obj C) → η (≣-subst (λ H → NaturalTransformation H G) F′≣F α) c ≣ (≣-subst (λ (H : Functor C D) → D [ map₀ H c , map₀ G c ]) F′≣F (η α c))
   η-under-substˡ α ≣-refl c = ≣-refl
 
-  η-under-substʳ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G G′ : Functor C D} (α : NaturalTransformation F G′) (G′≣G : G′ ≣ G) (c : Obj C) → η (≣-subst (λ H → NaturalTransformation F H) G′≣G α) c ≣ (≣-subst (λ (H : Functor C D) → D [ map₀ F c , map₀ H c ]) G′≣G (η α c))
+  η-under-substʳ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G G′ : Functor C D} (α : NaturalTransformation F G′) (G′≣G : G′ ≣ G) (c : Obj C) → η (≣-subst (λ H → NaturalTransformation F H) G′≣G α) c ≣ (≣-subst (λ (H : Functor C D) → D [ map₀ F c , map₀ H c ]) G′≣G (η α c))
   η-under-substʳ α ≣-refl c = ≣-refl
 
+  -- XXX doubtful use of irr?
   .lemma : (A B : Obj FDIC) (f : FDIC [ A , B ]) (i : I) → C [ η (≣-subst (λ X → FDIC [ X , B ]) (squash-does-nothing A) (≣-subst (λ Y → FDIC [ squash A , Y ]) (squash-does-nothing B) (map₁ f∘g f))) i ≡ η f i ]
   lemma A B f i = C.Equiv.reflexive (
       begin
@@ -188,4 +188,7 @@ exp≅functor ext id-propositionally-unique {I} =
     MESS = ≣-subst (λ Y → FDIC [ squash A , Y ]) sqdnB (map₁ f∘g f)
 
   ir : (A B : Obj FDIC) (f : FDIC [ A , B ]) → FDIC [ map₁ f∘g f ∼ f ]
-  ir A B f = ∼-subst {C = FDIC} f (map₁ f∘g f) (squash-does-nothing A) (squash-does-nothing B) (λ {x} → lemma A B f x)
+  ir A B f = ∼-subst {C = FDIC} f (map₁ f∘g f) (squash-does-nothing A) (squash-does-nothing B) (promoteNT
+    (≣-subst (λ X → FDIC [ X , B ]) (squash-does-nothing A) (≣-subst (λ Y → FDIC [ squash A , Y ]) (squash-does-nothing B) (map₁ f∘g f)))
+    f
+    (λ {x} → lemma A B f x))

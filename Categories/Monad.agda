@@ -7,7 +7,7 @@ open import Categories.Category
 open import Categories.Functor hiding (_≡_; assoc; identityˡ; identityʳ)
 open import Categories.NaturalTransformation renaming (id to idN)
 
-record Monad {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where
+record Monad {o a} (C : Category o a) : Set (o ⊔ a) where
   field
     F : Endofunctor C
     η : NaturalTransformation id F

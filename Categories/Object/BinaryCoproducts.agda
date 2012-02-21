@@ -1,7 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Categories.Category
 
-module Categories.Object.BinaryCoproducts {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.BinaryCoproducts {o a} (C : Category o a) where
 
 open Category C
 open Equiv
@@ -13,7 +13,7 @@ open import Categories.Morphisms
 
 open Coproduct C
 
-record BinaryCoproducts : Set (o ⊔ ℓ ⊔ e) where
+record BinaryCoproducts : Set (o ⊔ a) where
   infix 10 _⧻_
 
   field

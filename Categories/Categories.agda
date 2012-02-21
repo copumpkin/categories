@@ -2,22 +2,27 @@
 module Categories.Categories where
 
 open import Level
+open import Relation.Binary using (module IsEquivalence)
 
 open import Categories.Category
 open import Categories.Functor
 
-Categories : ∀ o ℓ e → Category (suc (o ⊔ ℓ ⊔ e)) (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
-Categories o ℓ e = record 
-  { Obj = Category o ℓ e
+Categories : ∀ o a → Category (suc (o ⊔ a)) (o ⊔ a)
+Categories o a = record 
+  { Obj = Category o a
   ; _⇒_ = Functor
-  ; _≡_ = _≡_
   ; _∘_ = _∘_
   ; id = id
-  ; assoc = λ {_} {_} {_} {_} {F} {G} {H} → assoc {F = F} {G} {H}
-  ; identityˡ = λ {_} {_} {F} → identityˡ {F = F}
-  ; identityʳ = λ {_} {_} {F} → identityʳ {F = F}
-  ; equiv = λ {X} {Y} → equiv {C = X} {D = Y}
-  ; ∘-resp-≡ = λ {_} {_} {_} {f} {h} {g} {i} → ∘-resp-≡ {F = f} {h} {g} {i}
+  ; ASSOC = λ F G H → assoc {F = F} {G} {H}
+  ; IDENTITYˡ = λ F → identityˡ {F = F}
+  ; IDENTITYʳ = λ F → identityʳ {F = F}
+  }
+
+Categoriesᵉ : ∀ o a → EasyCategory (suc (o ⊔ a)) (o ⊔ a) (o ⊔ a)
+Categoriesᵉ o a = UNEASY Categories o a WITH record
+  { _≡_ = _≡_
+  ; promote = promote
+  ; REFL = λ f → Heterogeneous.refl _
   }
 
 {-

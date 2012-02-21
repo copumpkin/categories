@@ -2,7 +2,7 @@
 
 open import Categories.Category
 
-module Categories.Slice {o ℓ e} (C : Category o ℓ e) where
+module Categories.Slice {o a} (C : Category o a) where
 
 open Category C
 open Equiv
@@ -10,13 +10,15 @@ open Equiv
 open import Level
 open import Relation.Binary using (Rel)
 
-record SliceObj (X : Obj) : Set (o ⊔ ℓ) where
+open import Categories.Support.PropositionalEquality
+
+record SliceObj (X : Obj) : Set (o ⊔ a) where
   constructor sliceobj
   field
     {Y} : Obj
     arr : Y ⇒ X
 
-record Slice⇒ {A : Obj} (X Y : SliceObj A) : Set (ℓ ⊔ e) where
+record Slice⇒ {A : Obj} (X Y : SliceObj A) : Set (a) where
   constructor slicearr
   module X = SliceObj X
   module Y = SliceObj Y
@@ -24,8 +26,8 @@ record Slice⇒ {A : Obj} (X Y : SliceObj A) : Set (ℓ ⊔ e) where
     {h} : X.Y ⇒ Y.Y
     .triangle : Y.arr ∘ h ≡ X.arr
 
-slice : Obj → Category _ _ _
-slice x = record 
+sliceᵉ : Obj → EasyCategory _ _ _
+sliceᵉ x = record 
   { Obj = Obj′
   ; _⇒_ = _⇒′_
   ; _≡_ = _≡′_
@@ -34,12 +36,8 @@ slice x = record
   ; assoc = λ {_} {_} {_} {_} {f} {g} {h} → assoc′ {f = f} {g} {h}
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
-  ; equiv = record 
-    { refl = refl
-    ; sym = sym
-    ; trans = trans
-    }
-  ; ∘-resp-≡ = λ {_} {_} {_} {f} {h} {g} {i} → ∘-resp-≡′ {f = f} {h} {g} {i}
+  ; promote = promote
+  ; REFL = ≣-refl
   }
   where
   Obj′ = SliceObj x
@@ -74,8 +72,8 @@ slice x = record
          → (h ∘′ g) ∘′ f ≡′ h ∘′ (g ∘′ f)
   assoc′ = assoc
 
-  .∘-resp-≡′ : ∀ {A B C} {f h : B ⇒′ C} {g i : A ⇒′ B}
-           → f ≡′ h 
-           → g ≡′ i 
-           → f ∘′ g ≡′ h ∘′ i
-  ∘-resp-≡′ f≡h g≡i = ∘-resp-≡ f≡h g≡i
+  .promote : ∀ {A B} (f g : A ⇒′ B) → f ≡′ g → f ≣ g
+  promote (slicearr _) (slicearr _) ≣-refl = ≣-refl
+
+slice : Obj → Category _ _
+slice x = EASY sliceᵉ x

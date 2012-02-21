@@ -5,9 +5,9 @@ open import Categories.Category
 open import Categories.Product
 
 module Categories.Product.Projections 
-    {o ℓ e o′ ℓ′ e′}
-    (C : Category o ℓ e)
-    (D : Category o′ ℓ′ e′)
+    {o a o′ a′}
+    (C : Category o a)
+    (D : Category o′ a′)
     where
 
 open import Categories.Functor
@@ -19,7 +19,6 @@ open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>
     ; F₁            = proj₁
     ; identity      = refl
     ; homomorphism  = refl
-    ; F-resp-≡      = proj₁
     } where
         open Category.Equiv C
 
@@ -30,6 +29,5 @@ open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>
     ; F₁            = proj₂
     ; identity      = refl
     ; homomorphism  = refl
-    ; F-resp-≡      = proj₂
     } where
         open Category.Equiv D

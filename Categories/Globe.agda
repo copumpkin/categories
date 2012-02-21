@@ -9,6 +9,7 @@ open import Data.Nat.Properties using (<-trans)
 
 open import Categories.Support.PropositionalEquality
 open import Categories.Category
+open import Categories.Category.Quotient
 
 -- the stdlib doesn't have this
 private
@@ -29,55 +30,52 @@ x ⊚ I = x
 τ n<m ⊚ σ m<l = σ (<-trans m<l n<m)
 τ n<m ⊚ τ m<l = τ (<-trans m<l n<m)
 
-Globe : Category Level.zero Level.zero Level.zero
+Globe : Category Level.zero Level.zero
 Globe = record 
   { Obj = ℕ
   ; _⇒_ = GlobeHom
-  ; _≡_ = _≣_
   ; id = I
   ; _∘_ = _⊚_
-  ; assoc = λ {_} {_} {_} {_} {f} {g} {h} → assoc {f = f} {g} {h}
-  ; identityˡ = λ {A} {B} {f} → ≣-refl
-  ; identityʳ = identityʳ
-  ; equiv = isEquivalence
-  ; ∘-resp-≡ = ∘-resp-≡
+  ; ASSOC = assoc
+  ; IDENTITYˡ = λ _ → ≣-refl
+  ; IDENTITYʳ = identityʳ
   }
   where
 
-  assoc : ∀ {A B C D} {f : GlobeHom A B} {g : GlobeHom B C} {h : GlobeHom C D} → (h ⊚ g) ⊚ f ≣ h ⊚ (g ⊚ f)
-  assoc {f = I} {I} {I} = ≣-refl
-  assoc {f = I} {I} {σ _} = ≣-refl
-  assoc {f = I} {I} {τ _} = ≣-refl
-  assoc {f = I} {σ _} {I} = ≣-refl
-  assoc {f = I} {σ _} {σ _} = ≣-refl
-  assoc {f = I} {σ _} {τ _} = ≣-refl
-  assoc {f = I} {τ _} {I} = ≣-refl
-  assoc {f = I} {τ _} {σ _} = ≣-refl
-  assoc {f = I} {τ _} {τ _} = ≣-refl
-  assoc {f = σ _} {I} {I} = ≣-refl
-  assoc {f = σ _} {I} {σ _} = ≣-refl
-  assoc {f = σ _} {I} {τ _} = ≣-refl
-  assoc {f = σ _} {σ _} {I} = ≣-refl
-  assoc {f = σ _} {σ _} {σ _} = ≣-cong σ ≤-unique
-  assoc {f = σ _} {σ _} {τ _} = ≣-cong σ ≤-unique
-  assoc {f = σ _} {τ _} {I} = ≣-refl
-  assoc {f = σ _} {τ _} {σ _} = ≣-cong σ ≤-unique
-  assoc {f = σ _} {τ _} {τ _} = ≣-cong σ ≤-unique
-  assoc {f = τ n<m} {I} {I} = ≣-refl
-  assoc {f = τ n<m} {I} {σ _} = ≣-refl
-  assoc {f = τ n<m} {I} {τ _} = ≣-refl
-  assoc {f = τ n<m} {σ _} {I} = ≣-refl
-  assoc {f = τ n<m} {σ _} {σ _} = ≣-cong τ ≤-unique
-  assoc {f = τ n<m} {σ _} {τ _} = ≣-cong τ ≤-unique
-  assoc {f = τ n<m} {τ _} {I} = ≣-refl
-  assoc {f = τ n<m} {τ _} {σ _} = ≣-cong τ ≤-unique
-  assoc {f = τ n<m} {τ _} {τ _} = ≣-cong τ ≤-unique
+  assoc : ∀ {A B C D} (f : GlobeHom A B) (g : GlobeHom B C) (h : GlobeHom C D) → (h ⊚ g) ⊚ f ≣ h ⊚ (g ⊚ f)
+  assoc I     I     I     = ≣-refl
+  assoc I     I     (σ _) = ≣-refl
+  assoc I     I     (τ _) = ≣-refl
+  assoc I     (σ _) I     = ≣-refl
+  assoc I     (σ _) (σ _) = ≣-refl
+  assoc I     (σ _) (τ _) = ≣-refl
+  assoc I     (τ _) I     = ≣-refl
+  assoc I     (τ _) (σ _) = ≣-refl
+  assoc I     (τ _) (τ _) = ≣-refl
+  assoc (σ _) I     I     = ≣-refl
+  assoc (σ _) I     (σ _) = ≣-refl
+  assoc (σ _) I     (τ _) = ≣-refl
+  assoc (σ _) (σ _) I     = ≣-refl
+  assoc (σ _) (σ _) (σ _) = ≣-cong σ ≤-unique
+  assoc (σ _) (σ _) (τ _) = ≣-cong σ ≤-unique
+  assoc (σ _) (τ _) I     = ≣-refl
+  assoc (σ _) (τ _) (σ _) = ≣-cong σ ≤-unique
+  assoc (σ _) (τ _) (τ _) = ≣-cong σ ≤-unique
+  assoc (τ _) I     I     = ≣-refl
+  assoc (τ _) I     (σ _) = ≣-refl
+  assoc (τ _) I     (τ _) = ≣-refl
+  assoc (τ _) (σ _) I     = ≣-refl
+  assoc (τ _) (σ _) (σ _) = ≣-cong τ ≤-unique
+  assoc (τ _) (σ _) (τ _) = ≣-cong τ ≤-unique
+  assoc (τ _) (τ _) I     = ≣-refl
+  assoc (τ _) (τ _) (σ _) = ≣-cong τ ≤-unique
+  assoc (τ _) (τ _) (τ _) = ≣-cong τ ≤-unique
 
   -- this is necessary because Agda lies...
-  identityʳ : ∀ {A B} {f : GlobeHom A B} → f ⊚ I ≣ f
-  identityʳ {f = I} = ≣-refl
-  identityʳ {f = σ _} = ≣-refl
-  identityʳ {f = τ _} = ≣-refl
+  identityʳ : ∀ {A B} (f : GlobeHom A B) → f ⊚ I ≣ f
+  identityʳ I     = ≣-refl
+  identityʳ (σ _) = ≣-refl
+  identityʳ (τ _) = ≣-refl
 
   ∘-resp-≡ : ∀ {A B C} {f h : GlobeHom B C} {g i : GlobeHom A B} → f ≣ h → g ≣ i → f ⊚ g ≣ h ⊚ i
   ∘-resp-≡ ≣-refl ≣-refl = ≣-refl
@@ -116,8 +114,8 @@ x ⊚′ I = x
 x ⊚′ y σ′ = (x ⊚′ y) σ′
 x ⊚′ y τ′ = (x ⊚′ y) τ′
 
-Globe′ : Category Level.zero Level.zero Level.zero
-Globe′ = record 
+Globe′Q : QCategory Level.zero Level.zero Level.zero
+Globe′Q = record 
   { Obj = ℕ
   ; _⇒_ = GlobeHom′
   ; _≡_ = GlobeEq′
@@ -145,6 +143,8 @@ Globe′ = record
   ∘-resp-≡ f∼h both-I = f∼h
   ∘-resp-≡ f∼h both-σ = both-σ
   ∘-resp-≡ f∼h both-τ = both-τ
+
+Globe′ = QCategory.category Globe′Q
 
 -- Fix this
 {-

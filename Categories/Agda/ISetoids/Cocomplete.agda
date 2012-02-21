@@ -22,13 +22,13 @@ open import Categories.Agda.ISetoids.Cocomplete.Helpers
 
 open I→R-Wrapper
 
-ISetoidsCocomplete : ∀ {o ℓ e c ℓ′} → Cocomplete o ℓ e (ISetoids (c ⊔ ding (o ⊔ ℓ ⊔ e)) (c ⊔ ℓ′ ⊔ ding (o ⊔ ℓ ⊔ e)))
+ISetoidsCocomplete : ∀ {o a c ℓ′} → Cocomplete o a (ISetoids (c ⊔ ding (o ⊔ a)) (c ⊔ ℓ′ ⊔ ding (o ⊔ a)))
 ISetoidsCocomplete {o} {ℓ} {e} {c} {cℓ} = record { colimit = colimit }
   where
-  c′ = c ⊔ ding (o ⊔ ℓ ⊔ e)
-  ℓ′ = c ⊔ cℓ ⊔ ding (o ⊔ ℓ ⊔ e)
+  c′ = c ⊔ ding (o ⊔ a)
+  ℓ′ = c ⊔ cℓ ⊔ ding (o ⊔ a)
   C = ISetoids c′ ℓ′
-  colimit : ∀ {J : Category o ℓ e} (F : Functor J C) → Colimit F
+  colimit : ∀ {J : Category o a} (F : Functor J C) → Colimit F
   colimit {J} F = record { initial = my-initial-cocone }
     where
     module J = Category J

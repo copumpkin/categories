@@ -11,7 +11,7 @@ open import Categories.NaturalTransformation using (_∘₁_) renaming (_≡_ to
 
 open import Categories.Monoidal.Helpers
 
-record Monoidal {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where
+record Monoidal {o a} (C : Category o a) : Set (o ⊔ a) where
   private module C = Category C
   open C hiding (id; identityˡ; identityʳ; assoc)
 

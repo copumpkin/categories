@@ -3,8 +3,8 @@ open import Categories.Category
 open import Categories.Object.BinaryProducts
 open import Categories.Object.Exponentiating
 
-module Categories.Object.Exponentiating.Adjunction {o ℓ e}
-    (C : Category o ℓ e)
+module Categories.Object.Exponentiating.Adjunction {o a}
+    (C : Category o a)
     (binary : BinaryProducts C)
     (Σ : Category.Obj C)
     (exponentiating : Exponentiating C binary Σ) where

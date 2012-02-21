@@ -12,9 +12,9 @@ open import Categories.Bifunctor using (Bifunctor)
 open import Categories.NaturalTransformation
 open import Categories.Product using (Product)
 
-Categories : ∀ o ℓ e → 2-Category (suc (o ⊔ ℓ ⊔ e)) (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) (o ⊔ e)
-Categories o ℓ e = record
-  { Obj = Category o ℓ e
+Categories : ∀ o a → 2-Category (suc (o ⊔ a)) (o ⊔ a) (o ⊔ a) (o ⊔ e)
+Categories o a = record
+  { Obj = Category o a
   ; _⇒_ = Functors
   ; id = λ {A} → Constant {D = Functors A A} idF
   ; —∘— = my-∘
@@ -33,7 +33,7 @@ Categories o ℓ e = record
          } {proj₁ {_} {_} {_} {_} η} (Category.Equiv.trans B (Category.∘-resp-≡ˡ B (Functor.identity (proj₁ g))) (Category.identityˡ B))
   } 
   where
-  my-∘ : {A B C : Category o ℓ e} → Bifunctor (Functors B C) (Functors A B) (Functors A C)
+  my-∘ : {A B C : Category o a} → Bifunctor (Functors B C) (Functors A B) (Functors A C)
   my-∘ {A} {B} {C} = record
     { F₀ = uncurry′ _∘F_
     ; F₁ = uncurry′ _∘₀_

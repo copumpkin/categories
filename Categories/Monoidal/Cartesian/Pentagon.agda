@@ -6,7 +6,7 @@ open import Categories.Category using (Category; module Category)
 open import Categories.Object.BinaryProducts
 open import Categories.Square
 
-module Law {o ℓ e} (C : Category o ℓ e) (P : BinaryProducts C) where
+module Law {o a} (C : Category o a) (P : BinaryProducts C) where
   open Category C
   open BinaryProducts C P
 

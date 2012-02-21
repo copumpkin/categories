@@ -25,10 +25,10 @@ open import Data.Vec
 open import Level
 
 record Strength
-  {o ℓ e}(C : Category o ℓ e)
+  {o a}(C : Category o a)
   (monoidal : Monoidal C)
   (M : Monad C)
-  : Set (o ⊔ ℓ ⊔ e) where
+  : Set (o ⊔ a) where
   open Category C
   
   open Monoidal monoidal 

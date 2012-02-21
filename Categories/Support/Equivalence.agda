@@ -7,6 +7,8 @@ open import Data.Product using (_×_; _,_)
 open import Relation.Binary.Product.Pointwise using (_×-isEquivalence_)
 open import Relation.Binary.PropositionalEquality as PropEq using (_≡_)
 
+open import Categories.Support.Irrelevance
+
 ------------------------------------------------------------------------
 -- Setoids
 
@@ -65,6 +67,8 @@ record I→R-Wrapper {c ℓ} {Carrier : Set c} (Base : Rel Carrier ℓ) (x y : C
   constructor squash
   field
     .anonymous-witness : Base x y
+
+open I→R-Wrapper public
 
 setoid-i→r : ∀ {c ℓ} → Setoid c ℓ → RSetoid c ℓ
 setoid-i→r Base = record

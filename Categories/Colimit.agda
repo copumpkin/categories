@@ -9,10 +9,10 @@ open import Categories.Cocones
 open import Categories.Object.Initial
 
 -- Isomorphic to an terminal object, but worth keeping distinct in case we change its definition
-record Colimit {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record Colimit {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   field
     initial : Initial (Cocones F)
 
-record Cocomplete (o ℓ e : Level) {o′ ℓ′ e′} (C : Category o′ ℓ′ e′) : Set (suc o ⊔ suc ℓ ⊔ suc e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record Cocomplete (o a : Level) {o′ a′} (C : Category o′ a′) : Set (suc o ⊔ suc a ⊔ o′ ⊔ a′) where
   field
-    colimit : ∀ {J : Category o ℓ e} (F : Functor J C) → Colimit F
+    colimit : ∀ {J : Category o a} (F : Functor J C) → Colimit F

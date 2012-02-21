@@ -3,8 +3,8 @@ open import Categories.Category
 open import Categories.Object.BinaryProducts
 open import Categories.Object.Exponentiating
 
-module Categories.Object.Exponentiating.Functor {o ℓ e}
-    (C : Category o ℓ e)
+module Categories.Object.Exponentiating.Functor {o a}
+    (C : Category o a)
     (binary : BinaryProducts C)
     (Σ : Category.Obj C)
     (exponentiating : Exponentiating C binary Σ) where
@@ -29,7 +29,6 @@ open import Categories.Functor
     ; F₁            = [Σ↑_]
     ; identity      = identity
     ; homomorphism  = homomorphism
-    ; F-resp-≡      = F-resp-≡
     }
     where
         .identity : ∀ {A} → [Σ↑ id {A} ] ≡ id
@@ -58,15 +57,6 @@ open import Categories.Functor
                 λ-abs X (eval ∘ second f) 
                     ∘
                 λ-abs Y (eval ∘ second g)
-            ∎
-        
-        .F-resp-≡ : ∀ {A B}{f g : A ⇒ B }
-            → f ≡ g → [Σ↑ f ] ≡ [Σ↑ g ]
-        F-resp-≡ {A}{B}{f}{g} f≡g =
-            begin
-                λ-abs A (eval ∘ second f)
-            ↓⟨ λ-cong (refl ⟩∘⟨ ⟨⟩-cong₂ refl (f≡g ⟩∘⟨ refl)) ⟩
-                λ-abs A (eval ∘ second g)
             ∎
 
 Σ²-Functor : Functor C C

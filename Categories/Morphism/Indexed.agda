@@ -2,7 +2,7 @@
 open import Categories.Category
 open import Categories.Support.Equivalence
 
-module Categories.Morphism.Indexed {o ℓ e c q} (C : Category o ℓ e) (B : Setoid c q) where
+module Categories.Morphism.Indexed {o a c q} (C : Category o a) (B : Setoid c q) where
 
 open import Level using (_⊔_)
 open import Data.Product as P using (_,_; _×_)
@@ -47,7 +47,7 @@ ihom-setoid {S} F Xs = record
     ; isEquivalence = record { refl = refl; sym = sym; trans = trans }
     }
 
-  at-≈ : (X : S) → B.Rel ((P.uncurry _⇒_ ⋆′ F) X) (ℓ ⊔ e)
+  at-≈ : (X : S) → B.Rel ((P.uncurry _⇒_ ⋆′ F) X) (a)
   at-≈ X = λ f g → f ∼ g
 
   .resp₁ : ∀ {i j} → (i ≈B j) → my-Carrier i ≣ my-Carrier j

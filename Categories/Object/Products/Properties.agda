@@ -2,8 +2,8 @@
 
 open import Categories.Category
 
-module Categories.Object.Products.Properties {o ℓ e} 
-  (C : Category o ℓ e) where
+module Categories.Object.Products.Properties {o a} 
+  (C : Category o a) where
 
 open Category C
 

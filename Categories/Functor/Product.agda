@@ -7,13 +7,12 @@ import Categories.Object.Product as Product
 import Categories.Object.BinaryProducts as BinaryProducts
 
 -- Ugh, we should start bundling things (categories with binary products, in this case) up consistently
-_[_][_×-] : ∀ {o ℓ e} → (C : Category o ℓ e) → BinaryProducts.BinaryProducts C → Category.Obj C → Functor C C
+_[_][_×-] : ∀ {o a} → (C : Category o a) → BinaryProducts.BinaryProducts C → Category.Obj C → Functor C C
 C [ P ][ O ×-] = record 
   { F₀ = λ x → Product.A×B (product {O} {x})
   ; F₁ = λ f → ⟨ π₁ , f ∘ π₂ ⟩
   ; identity = λ {x} → identity′ {x}
   ; homomorphism = λ {x} {y} {z} {f} {g} → homomorphism′ {x} {y} {z} {f} {g}
-  ; F-resp-≡ = λ f≡g → ⟨⟩-cong₂ refl (∘-resp-≡ˡ f≡g)
   }
   where
   open Category C
@@ -47,13 +46,12 @@ C [ P ][ O ×-] = record
     ∎
     where open HomReasoning
 
-_[_][-×_] : ∀ {o ℓ e} → (C : Category o ℓ e) → BinaryProducts.BinaryProducts C → Category.Obj C → Functor C C
+_[_][-×_] : ∀ {o a} → (C : Category o a) → BinaryProducts.BinaryProducts C → Category.Obj C → Functor C C
 C [ P ][-× O ] = record 
   { F₀ = λ x → Product.A×B (product {x} {O})
   ; F₁ = λ f → ⟨ f ∘ π₁ , π₂ ⟩
   ; identity = λ {x} → identity′ {x}
   ; homomorphism = λ {x} {y} {z} {f} {g} → homomorphism′ {x} {y} {z} {f} {g}
-  ; F-resp-≡ = λ f≡g → ⟨⟩-cong₂ (∘-resp-≡ˡ f≡g) refl
   }
   where
   open Category C

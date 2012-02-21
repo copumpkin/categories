@@ -2,7 +2,7 @@
 
 open import Categories.Category
 
-module Categories.Object.Coproduct {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.Coproduct {o a} (C : Category o a) where
 
 open Category C
 
@@ -13,7 +13,7 @@ import Categories.Object.Product as ProductObject
 module Op× = ProductObject op
 
 -- Borrowed from Dan Doel's definition of coproducts
-record Coproduct (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
+record Coproduct (A B : Obj) : Set (o ⊔ a) where
   field
     A+B : Obj
     i₁ : A ⇒ A+B

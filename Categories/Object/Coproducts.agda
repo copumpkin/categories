@@ -2,7 +2,7 @@
 
 open import Categories.Category
 
-module Categories.Object.Coproducts {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.Coproducts {o a} (C : Category o a) where
 
 open Category C
 
@@ -15,7 +15,7 @@ open Initial C
 open BinaryCoproducts C
 
 -- this should really be 'FiniteCoproducts', no?
-record Coproducts : Set (o ⊔ ℓ ⊔ e) where
+record Coproducts : Set (o ⊔ a) where
   field
     initial : Initial
     binary : BinaryCoproducts

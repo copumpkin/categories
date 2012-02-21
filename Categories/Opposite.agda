@@ -8,7 +8,7 @@ module Categories.Opposite where
 open import Categories.Category
 open import Categories.Morphisms renaming (_≅_ to _[_≅_])
 
-opⁱ : ∀ {o ℓ e} {C : Category o ℓ e} {A B} → C [ A ≅ B ] → Category.op C [ B ≅ A ]
+opⁱ : ∀ {o a} {C : Category o a} {A B} → C [ A ≅ B ] → Category.op C [ B ≅ A ]
 opⁱ {C = C} A≅B = record
   { f = A≅B.f
   ; g = A≅B.g

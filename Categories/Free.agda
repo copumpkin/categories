@@ -26,8 +26,8 @@ open Categories.Free.Functor public
 --    (or whatever other names make sense for the hom-set maps
 --    C [ F _ , _ ] → D [ _ , G _ ] and inverse, respectively)
 --  Let Cata = Adjunction.left Free⊣Underlying
-Cata : ∀{o₁ ℓ₁ e₁}{G : Graph    o₁ ℓ₁ e₁}
-        {o₂ ℓ₂ e₂}{C : Category o₂ ℓ₂ e₂}
+Cata : ∀{o₁ a₁}{G : Graph    o₁ a₁}
+        {o₂ a₂}{C : Category o₂ a₂}
   → (F : GraphMorphism G (Underlying₀ C))
   → Functor (Free₀ G) C
 Cata {G = G} {C = C} F = record
@@ -35,14 +35,12 @@ Cata {G = G} {C = C} F = record
   ; F₁            = F₁*
   ; identity      = refl
   ; homomorphism  = λ{X}{Y}{Z}{f}{g} → homomorphism {X}{Y}{Z}{f}{g}
-  ; F-resp-≡      = F₁*-resp-≡
   }
   where
     open Category C
     open GraphMorphism F
     open Equiv
     open HomReasoning
-    open PathEquality using (ε-cong; _◅-cong_)
     
     F₁* : ∀ {A B} → Free₀ G [ A , B ] → C [ F₀ A , F₀ B ]
     F₁* ε = id
@@ -59,13 +57,3 @@ Cata {G = G} {C = C} F = record
       ↓⟨ assoc ⟩
         F₁* gs ∘ F₁* fs ∘ F₁ f
       ∎
-    
-    .F₁*-resp-≡ : ∀ {A B} {f g : Free₀ G [ A , B ]} → Free₀ G [ f ≡ g ] → C [ F₁* f ≡ F₁* g ]
-    F₁*-resp-≡ {f = ε}{.ε} ε-cong = refl
-    F₁*-resp-≡ {f = f ◅ fs}{g ◅ gs} (f≈g ◅-cong fs≈gs) = 
-      begin
-        F₁* fs ∘ F₁ f
-      ↓⟨ F₁*-resp-≡ fs≈gs ⟩∘⟨ F-resp-≈ f≈g ⟩
-        F₁* gs ∘ F₁ g
-      ∎
-    F₁*-resp-≡ {f = f ◅ fs}{ε} ()

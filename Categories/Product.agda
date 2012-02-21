@@ -3,7 +3,9 @@ module Categories.Product where
 
 open import Level
 open import Function using () renaming (_∘_ to _∙_)
-open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>; swap)
+open import Data.Product using (_×_; Σ; _,_; proj₁; proj₂; zip; map; <_,_>; swap; uncurry′)
+
+open import Categories.Support.PropositionalEquality
 
 open import Categories.Category
 
@@ -18,8 +20,12 @@ private
   zipWith _∙_ _∘_ _*_ (a , p) (b , q) = (a ∙ b) * (p ∘ q)
   syntax zipWith f g h = f -< h >- g
 
-Product : ∀ {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) → Category (o ⊔ o′) (ℓ ⊔ ℓ′) (e ⊔ e′)
-Product C D = record 
+  infixr 4 _,̄̄_
+  _,̄̄_ : ∀ {a b} {A : Set a} {B : Set b} {x y : A} {u v : B} → x ≣ y → u ≣ v → x , u ≣ y , v
+  _,̄̄_ = ≣-cong₂ _,_
+
+Productᵉ : ∀ {o a o′ a′} (C : Category o a) (D : Category o′ a′) → EasyCategory (o ⊔ o′) (a ⊔ a′) (a ⊔ a′)
+Productᵉ C D = record 
   { Obj = C.Obj × D.Obj
   ; _⇒_ = C._⇒_ -< _×_ >- D._⇒_
   ; _≡_ = C._≡_ -< _×_ >- D._≡_
@@ -28,40 +34,37 @@ Product C D = record
   ; assoc = C.assoc , D.assoc
   ; identityˡ = C.identityˡ , D.identityˡ
   ; identityʳ = C.identityʳ , D.identityʳ
-  ; equiv = record 
-    { refl = C.Equiv.refl , D.Equiv.refl
-    ; sym = map C.Equiv.sym D.Equiv.sym
-    ; trans = zip C.Equiv.trans D.Equiv.trans
-    }          
-  ; ∘-resp-≡ = zip C.∘-resp-≡ D.∘-resp-≡
+  ; promote = λ _ _ → uncurry′ _,̄̄_
+  ; REFL = ≣-refl , ≣-refl
   }
   where
   module C = Category C
   module D = Category D
 
+Product : ∀ {o a o′ a′} (C : Category o a) (D : Category o′ a′) → Category _ _
+Product C D = EASY (Productᵉ C D)
+
 open import Categories.Functor using (Functor; module Functor)
 
 infixr 2 _※_
-_※_ : ∀ {o ℓ e o′₁ ℓ′₁ e′₁ o′₂ ℓ′₂ e′₂} {C : Category o ℓ e} {D₁ : Category o′₁ ℓ′₁ e′₁} {D₂ : Category o′₂ ℓ′₂ e′₂} → (F : Functor C D₁) → (G : Functor C D₂) → Functor C (Product D₁ D₂)
+_※_ : ∀ {o a o′₁ a′₁ o′₂ a′₂} {C : Category o a} {D₁ : Category o′₁ a′₁} {D₂ : Category o′₂ a′₂} → (F : Functor C D₁) → (G : Functor C D₂) → Functor C (Product D₁ D₂)
 F ※ G = record
         { F₀ = < F.F₀ , G.F₀ >
         ; F₁ = < F.F₁ , G.F₁ >
-        ; identity = F.identity , G.identity
-        ; homomorphism = F.homomorphism , G.homomorphism
-        ; F-resp-≡ = < F.F-resp-≡ , G.F-resp-≡ >
+        ; identity = F.identity ,̄̄ G.identity
+        ; homomorphism = F.homomorphism ,̄̄ G.homomorphism
         }
         where
         module F = Functor F
         module G = Functor G
 
 infixr 2 _⁂_
-_⁂_ : ∀ {o₁ ℓ₁ e₁ o′₁ ℓ′₁ e′₁ o₂ ℓ₂ e₂ o′₂ ℓ′₂ e′₂} {C₁ : Category o₁ ℓ₁ e₁} {D₁ : Category o′₁ ℓ′₁ e′₁} → {C₂ : Category o₂ ℓ₂ e₂} {D₂ : Category o′₂ ℓ′₂ e′₂} → (F₁ : Functor C₁ D₁) → (F₂ : Functor C₂ D₂) → Functor (Product C₁ C₂) (Product D₁ D₂)
+_⁂_ : ∀ {o₁ a₁ o′₁ a′₁ o₂ a₂ o′₂ a′₂} {C₁ : Category o₁ a₁} {D₁ : Category o′₁ a′₁} → {C₂ : Category o₂ a₂} {D₂ : Category o′₂ a′₂} → (F₁ : Functor C₁ D₁) → (F₂ : Functor C₂ D₂) → Functor (Product C₁ C₂) (Product D₁ D₂)
 F ⁂ G = record
         { F₀ = map F.F₀ G.F₀
         ; F₁ = map F.F₁ G.F₁
-        ; identity = F.identity , G.identity
-        ; homomorphism = F.homomorphism , G.homomorphism
-        ; F-resp-≡ = map F.F-resp-≡ G.F-resp-≡ 
+        ; identity = F.identity ,̄̄ G.identity
+        ; homomorphism = F.homomorphism ,̄̄ G.homomorphism
         }
         where
         module F = Functor F
@@ -70,62 +73,59 @@ F ⁂ G = record
 open import Categories.NaturalTransformation using (NaturalTransformation; module NaturalTransformation)
 
 infixr 2 _⁂ⁿ_
-_⁂ⁿ_ : ∀ {o₁ ℓ₁ e₁ o′₁ ℓ′₁ e′₁ o₂ ℓ₂ e₂ o′₂ ℓ′₂ e′₂} {C₁ : Category o₁ ℓ₁ e₁} {D₁ : Category o′₁ ℓ′₁ e′₁} → {C₂ : Category o₂ ℓ₂ e₂} {D₂ : Category o′₂ ℓ′₂ e′₂} → {F₁ G₁ : Functor C₁ D₁} {F₂ G₂ : Functor C₂ D₂} → (α : NaturalTransformation F₁ G₁) → (β : NaturalTransformation F₂ G₂) → NaturalTransformation (F₁ ⁂ F₂) (G₁ ⁂ G₂)
-α ⁂ⁿ β = record { η = map⁎′ α.η β.η; commute = map⁎′ α.commute β.commute }
+_⁂ⁿ_ : ∀ {o₁ a₁ o′₁ a′₁ o₂ a₂ o′₂ a′₂} {C₁ : Category o₁ a₁} {D₁ : Category o′₁ a′₁} → {C₂ : Category o₂ a₂} {D₂ : Category o′₂ a′₂} → {F₁ G₁ : Functor C₁ D₁} {F₂ G₂ : Functor C₂ D₂} → (α : NaturalTransformation F₁ G₁) → (β : NaturalTransformation F₂ G₂) → NaturalTransformation (F₁ ⁂ F₂) (G₁ ⁂ G₂)
+α ⁂ⁿ β = record { η = map⁎′ α.η β.η; commute = uncurry′ _,̄̄_ ∙ map⁎′ α.commute β.commute }
          where
          module α = NaturalTransformation α
          module β = NaturalTransformation β
 
 infixr 2 _※ⁿ_
-_※ⁿ_ : ∀ {o ℓ e o′₁ ℓ′₁ e′₁} {C : Category o ℓ e} {D₁ : Category o′₁ ℓ′₁ e′₁} {F₁ G₁ : Functor C D₁} (α : NaturalTransformation F₁ G₁) → ∀ {o′₂ ℓ′₂ e′₂} {D₂ : Category o′₂ ℓ′₂ e′₂} {F₂ G₂ : Functor C D₂} (β : NaturalTransformation F₂ G₂) → NaturalTransformation (F₁ ※ F₂) (G₁ ※ G₂)
-α ※ⁿ β = record { η = < α.η , β.η >; commute = < α.commute , β.commute > }
+_※ⁿ_ : ∀ {o a o′₁ a′₁} {C : Category o a} {D₁ : Category o′₁ a′₁} {F₁ G₁ : Functor C D₁} (α : NaturalTransformation F₁ G₁) → ∀ {o′₂ a′₂} {D₂ : Category o′₂ a′₂} {F₂ G₂ : Functor C D₂} (β : NaturalTransformation F₂ G₂) → NaturalTransformation (F₁ ※ F₂) (G₁ ※ G₂)
+α ※ⁿ β = record { η = < α.η , β.η >; commute = uncurry′ _,̄̄_ ∙ < α.commute , β.commute > }
          where
          module α = NaturalTransformation α
          module β = NaturalTransformation β
 
-assocˡ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} → (C₁ : Category o₁ ℓ₁ e₁) (C₂ : Category o₂ ℓ₂ e₂) (C₃ : Category o₃ ℓ₃ e₃) → Functor (Product (Product C₁ C₂) C₃) (Product C₁ (Product C₂ C₃))
+assocˡ : ∀ {o₁ a₁ o₂ a₂ o₃ a₃} → (C₁ : Category o₁ a₁) (C₂ : Category o₂ a₂) (C₃ : Category o₃ a₃) → Functor (Product (Product C₁ C₂) C₃) (Product C₁ (Product C₂ C₃))
 assocˡ C₁ C₂ C₃ = record
   { F₀ = < proj₁ ∙ proj₁ , < proj₂ ∙ proj₁ , proj₂ > >
   ; F₁ = < proj₁ ∙ proj₁ , < proj₂ ∙ proj₁ , proj₂ > >
-  ; identity = C₁.Equiv.refl , C₂.Equiv.refl , C₃.Equiv.refl
-  ; homomorphism = C₁.Equiv.refl , C₂.Equiv.refl , C₃.Equiv.refl
-  ; F-resp-≡ = < proj₁ ∙ proj₁ , < proj₂ ∙ proj₁ , proj₂ > >
+  ; identity = C₁.Equiv.refl ,̄̄ C₂.Equiv.refl ,̄̄ C₃.Equiv.refl
+  ; homomorphism = C₁.Equiv.refl ,̄̄ C₂.Equiv.refl ,̄̄ C₃.Equiv.refl
   }
   where
   module C₁ = Category C₁
   module C₂ = Category C₂
   module C₃ = Category C₃
 
-assocʳ : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} → (C₁ : Category o₁ ℓ₁ e₁) (C₂ : Category o₂ ℓ₂ e₂) (C₃ : Category o₃ ℓ₃ e₃) → Functor (Product C₁ (Product C₂ C₃)) (Product (Product C₁ C₂) C₃)
+assocʳ : ∀ {o₁ a₁ o₂ a₂ o₃ a₃} → (C₁ : Category o₁ a₁) (C₂ : Category o₂ a₂) (C₃ : Category o₃ a₃) → Functor (Product C₁ (Product C₂ C₃)) (Product (Product C₁ C₂) C₃)
 assocʳ C₁ C₂ C₃ = record
   { F₀ = < < proj₁ , proj₁ ∙ proj₂ > , proj₂ ∙ proj₂ >
   ; F₁ = < < proj₁ , proj₁ ∙ proj₂ > , proj₂ ∙ proj₂ >
-  ; identity = (C₁.Equiv.refl , C₂.Equiv.refl) , C₃.Equiv.refl
-  ; homomorphism = (C₁.Equiv.refl , C₂.Equiv.refl) , C₃.Equiv.refl
-  ; F-resp-≡ = < < proj₁ , proj₁ ∙ proj₂ > , proj₂ ∙ proj₂ >
+  ; identity = (C₁.Equiv.refl ,̄̄ C₂.Equiv.refl) ,̄̄ C₃.Equiv.refl
+  ; homomorphism = (C₁.Equiv.refl ,̄̄ C₂.Equiv.refl) ,̄̄ C₃.Equiv.refl
   }
   where
   module C₁ = Category C₁
   module C₂ = Category C₂
   module C₃ = Category C₃
 
-πˡ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product C D) C
+πˡ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → Functor (Product C D) C
 πˡ {C = C} = record { F₀ = proj₁; F₁ = proj₁; identity = refl
-                    ; homomorphism = refl; F-resp-≡ = proj₁ }
+                    ; homomorphism = refl }
   where open Category.Equiv C using (refl)
 
-πʳ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product C D) D
+πʳ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → Functor (Product C D) D
 πʳ {D = D} = record { F₀ = proj₂; F₁ = proj₂; identity = refl
-                    ; homomorphism = refl; F-resp-≡ = proj₂ }
+                    ; homomorphism = refl }
   where open Category.Equiv D using (refl)
 
-Swap : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor (Product D C) (Product C D)
+Swap : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → Functor (Product D C) (Product C D)
 Swap {C = C} {D = D} = (record
   { F₀ = swap
   ; F₁ = swap
-  ; identity = C.Equiv.refl , D.Equiv.refl
-  ; homomorphism = C.Equiv.refl , D.Equiv.refl
-  ; F-resp-≡ = swap
+  ; identity = C.Equiv.refl ,̄̄ D.Equiv.refl
+  ; homomorphism = C.Equiv.refl ,̄̄ D.Equiv.refl
   })
   where
   module C = Category C

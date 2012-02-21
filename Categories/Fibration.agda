@@ -8,8 +8,8 @@ open import Categories.Functor hiding (_∘_; _≡_)
 open import Categories.Morphism.Cartesian
 import Categories.Morphisms as Morphisms
 
-record CartesianLifting {o₀ ℓ₀ e₀} {o₁ ℓ₁ e₁} {E : Category o₀ ℓ₀ e₀} {B : Category o₁ ℓ₁ e₁}
-                        (p : Functor E B) {a e} (f : B [ a , Functor.F₀ p e ]) : Set (o₀ ⊔ ℓ₀ ⊔ e₀ ⊔ o₁ ⊔ ℓ₁ ⊔ e₁) where
+record CartesianLifting {o₀ a₀} {o₁ a₁} {E : Category o₀ a₀} {B : Category o₁ a₁}
+                        (p : Functor E B) {a e} (f : B [ a , Functor.F₀ p e ]) : Set (o₀ ⊔ a₀ ⊔ o₁ ⊔ a₁) where
   private module E = Category E
   private module B = Category B
   open B using (_∘_; _≡_)
@@ -25,7 +25,7 @@ record CartesianLifting {o₀ ℓ₀ e₀} {o₁ ℓ₁ e₁} {E : Category o₀
     φ-cartesian : Cartesian p φ
 
 
-record Fibration {o₀ ℓ₀ e₀} {o₁ ℓ₁ e₁} (E : Category o₀ ℓ₀ e₀) (B : Category o₁ ℓ₁ e₁) : Set (o₀ ⊔ ℓ₀ ⊔ e₀ ⊔ o₁ ⊔ ℓ₁ ⊔ e₁) where
+record Fibration {o₀ a₀} {o₁ a₁} (E : Category o₀ a₀) (B : Category o₁ a₁) : Set (o₀ ⊔ a₀ ⊔ o₁ ⊔ a₁) where
   private module E = Category E
   private module B = Category B
   open B using (_∘_; _≡_)

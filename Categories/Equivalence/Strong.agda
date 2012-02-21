@@ -15,7 +15,7 @@ open import Categories.NaturalIsomorphism as NI hiding (equiv)
 open import Categories.NaturalTransformation as NT hiding (id; equiv)
 open import Categories.Morphisms using (Iso; module Iso)
 
-record WeakInverse {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F : Functor C D) (G : Functor D C) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record WeakInverse {o a o′ a′} {C : Category o a} {D : Category o′ a′} (F : Functor C D) (G : Functor D C) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   field
     F∘G≅id : NaturalIsomorphism (F ∘ G) id
     G∘F≅id : NaturalIsomorphism (G ∘ F) id
@@ -36,7 +36,7 @@ record WeakInverse {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Catego
   .G∘F-isoʳ : _
   G∘F-isoʳ = λ x → Iso.isoʳ C (G∘F-iso x)
 
-record StrongEquivalence {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+record StrongEquivalence {o a o′ a′} (C : Category o a) (D : Category o′ a′) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   field
     F : Functor C D
     G : Functor D C
@@ -44,7 +44,7 @@ record StrongEquivalence {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : 
   open WeakInverse weak-inverse public
 
 module Equiv where
-  refl : ∀ {o ℓ e} {C : Category o ℓ e} → StrongEquivalence C C
+  refl : ∀ {o a} {C : Category o a} → StrongEquivalence C C
   refl = record
     { F = id
     ; G = id
@@ -54,7 +54,7 @@ module Equiv where
       }
     }
 
-  sym : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → StrongEquivalence C D → StrongEquivalence D C
+  sym : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → StrongEquivalence C D → StrongEquivalence D C
   sym Inv = record
     { F = Inv.G
     ; G = Inv.F
@@ -66,7 +66,7 @@ module Equiv where
     where
     module Inv = StrongEquivalence Inv
 
-  trans : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃} → StrongEquivalence C₁ C₂ → StrongEquivalence C₂ C₃ → StrongEquivalence C₁ C₃
+  trans : ∀ {o₁ a₁ o₂ a₂ o₃ a₃} {C₁ : Category o₁ a₁} {C₂ : Category o₂ a₂} {C₃ : Category o₃ a₃} → StrongEquivalence C₁ C₂ → StrongEquivalence C₂ C₃ → StrongEquivalence C₁ C₃
   trans {C₁ = C₁} {C₂} {C₃} A B = record
     { F = B.F ∘ A.F
     ; G = A.G ∘ B.G
@@ -79,5 +79,5 @@ module Equiv where
     module A = StrongEquivalence A
     module B = StrongEquivalence B
 
-equiv : ∀ {o ℓ e} → IsEquivalence (StrongEquivalence {o} {ℓ} {e})
+equiv : ∀ {o a} → IsEquivalence (StrongEquivalence {o} {a})
 equiv = record { refl = Equiv.refl; sym = Equiv.sym; trans = Equiv.trans }

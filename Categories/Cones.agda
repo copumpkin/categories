@@ -8,8 +8,9 @@ open import Categories.Support.PropositionalEquality
 open import Categories.Category
 open import Categories.Functor hiding (_∘_; _≡_; equiv; id; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Categories.Cone
+open import Categories.Square
 
-record ConeMorphism {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} {F : Functor J C} (c₁ c₂ : Cone F) : Set (ℓ ⊔ e ⊔ o′ ⊔ ℓ′) where
+record ConeMorphism {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} {F : Functor J C} (c₁ c₂ : Cone F) : Set (a ⊔ o′ ⊔ a′) where
   module c₁ = Cone c₁
   module c₂ = Cone c₂
   module C = Category C
@@ -19,8 +20,8 @@ record ConeMorphism {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Cat
     f : C [ c₁.N , c₂.N ]
     .commute : ∀ {X} → c₁.ψ X ≡ c₂.ψ X ∘ f
 
-Cones : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) → Category (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) (ℓ ⊔ e ⊔ o′ ⊔ ℓ′) e
-Cones {C = C} F = record 
+Conesᵉ : ∀ {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) → EasyCategory (o ⊔ a ⊔ o′ ⊔ a′) (a ⊔ o′ ⊔ a′) a
+Conesᵉ {C = C} F = record 
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
@@ -29,15 +30,12 @@ Cones {C = C} F = record
   ; assoc = assoc
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
-  ; equiv = record 
-    { refl = Equiv.refl
-    ; sym = Equiv.sym
-    ; trans = Equiv.trans
-    }
-  ; ∘-resp-≡ = ∘-resp-≡
+  ; promote = promote′
+  ; REFL = Equiv.refl
   }
   where
   open Category C
+  open GlueSquares C
   open Cone
   open ConeMorphism
   open Functor F
@@ -53,6 +51,13 @@ Cones {C = C} F = record
   _≡′_ : ∀ {A B} → Hom′ A B → Hom′ A B → Set _
   F ≡′ G = f F ≡ f G
 
+  promote′ : ∀ {A B} (f g : ConeMorphism A B) → f ≡′ g → f ≣ g
+  promote′ {c₁} {c₂} f g f≡g = lemma f≡g
+    where
+    module f = ConeMorphism f
+    lemma : ∀ {f′} (eq : f.f ≣ f′) → f ≣ record { f = f′; commute = ≣-subst (λ f″ → ∀ {X} → f.c₁.ψ X ≡ f.c₂.ψ X ∘ f″) eq f.commute }
+    lemma ≣-refl = ≣-refl
+
   _∘′_ : ∀ {A B C} → Hom′ B C → Hom′ A B → Hom′ A C
   _∘′_ {A} {B} {C} F G = record 
     { f = f F ∘ f G
@@ -65,19 +70,20 @@ Cones {C = C} F = record
           ψ A X
         ↓⟨ ConeMorphism.commute G ⟩
           ψ B X ∘ f G
-        ↓⟨ ∘-resp-≡ˡ (ConeMorphism.commute F) ⟩
-          (ψ C X ∘ f F) ∘ f G
-        ↓⟨ assoc ⟩
+        ↓⟨ pushˡ (ConeMorphism.commute F) ⟩
           ψ C X ∘ (f F ∘ f G)
         ∎
       where
       open HomReasoning
 
+Cones : ∀ {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) → Category (o ⊔ a ⊔ o′ ⊔ a′) (a ⊔ o′ ⊔ a′)
+Cones F = EASY Conesᵉ F
+
 -- Equality of cone morphisms is equality of the underlying arrows in the
 -- base category, but the same is not (directly) true of the heterogeneous
 -- equality.  These functions make the equivalence manifest.
 
-module Heteroconic {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) where
+module Heteroconic {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) where
   open Heterogeneous C
   module ▵ = Heterogeneous (Cones F)
   open ▵ public using () renaming (_∼_ to _▵̃_)
@@ -85,7 +91,7 @@ module Heteroconic {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Cate
 
   demote-∼ : ∀ {K L K′ L′} {f : ConeMorphism K L} {g : ConeMorphism K′ L′}
            → f ▵̃ g → ⌞ f ⌝ ∼ ⌞ g ⌝
-  demote-∼ (≡⇒∼ y) = Heterogeneous.≡⇒∼ y
+  demote-∼ (≡⇒∼ y) = Heterogeneous.≡⇒∼ (≣-cong ⌞_⌝ y)
 
   -- XXX probably need another argument or something to nail things down
   -- promote-∼ : ∀ {K L K′ L′} {f : ConeMorphism {C = C} K L} {g : ConeMorphism {C = C} K′ L′}
@@ -96,7 +102,7 @@ module Heteroconic {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Cate
 -- used to float morphisms from one to another.  Really it should have a
 -- setoid of objects, but we're not equipped for that.
 
-module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) where
+module Float {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) where
 
   module H = Heterogeneous C
   open H hiding (float₂; floatˡ; floatʳ; floatˡ-resp-trans; float₂-breakdown-lr; float₂-breakdown-rl)

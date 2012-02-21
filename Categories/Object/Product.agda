@@ -1,7 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Categories.Category
 
-module Categories.Object.Product {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.Product {o a} (C : Category o a) where
 
 open Category C
 open Equiv
@@ -15,7 +15,7 @@ open import Categories.Square
 open GlueSquares C
 
 -- Borrowed from Dan Doel's definition of products
-record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
+record Product (A B : Obj) : Set (o ⊔ a) where
   field
     A×B : Obj
     π₁ : A×B ⇒ A

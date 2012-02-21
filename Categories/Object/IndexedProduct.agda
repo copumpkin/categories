@@ -1,7 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Categories.Category
 
-module Categories.Object.IndexedProduct {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.IndexedProduct {o a} (C : Category o a) where
 
 -- An indexed product is similar to a limit, but the diagram is from a Set
 --  (irrelevant Setoid here) rather than a category, so there are no subobjects
@@ -17,7 +17,7 @@ import Categories.Object.Indexed as IObj
 import Categories.Morphism.Indexed as IArrow
 
 -- Borrowed from Dan Doel's definition of products
-record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ ℓ ⊔ e ⊔ c ⊔ q) where
+record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a ⊔ c ⊔ q) where
   module B = Setoid B
   open B using (_≈_)
   open Heterogeneous C

@@ -6,18 +6,15 @@ open import Categories.Functor using (Functor; module Functor)
 open import Categories.NaturalTransformation hiding (_≡_; equiv; id)
 open import Categories.Monad
 
-Kleisli : ∀ {o ℓ e} {C : Category o ℓ e} → Monad C → Category o ℓ e
+Kleisli : ∀ {o a} {C : Category o a} → Monad C → Category o a
 Kleisli {C = C} M = record 
   { Obj = Obj
   ; _⇒_ = λ A B → (A ⇒ F₀ B)
-  ; _≡_ = _≡_
   ; _∘_ = λ f g → (μ.η _ ∘ F₁ f) ∘ g
   ; id = η.η _
-  ; assoc = assoc′
-  ; identityˡ = identityˡ′
-  ; identityʳ = identityʳ′
-  ; equiv = equiv
-  ; ∘-resp-≡ = λ f≡h g≡i → ∘-resp-≡ (∘-resp-≡ refl (F-resp-≡ f≡h)) g≡i
+  ; ASSOC = λ _ _ _ → assoc′
+  ; IDENTITYˡ = λ _ → identityˡ′
+  ; IDENTITYʳ = λ _ → identityʳ′
   }
   where
   module M = Monad M

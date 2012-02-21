@@ -4,7 +4,7 @@ module Categories.Square where
 open import Categories.Category
 import Categories.Morphisms as Mor
 
-module GlueSquares {o ℓ e} (C : Category o ℓ e) where
+module GlueSquares {o a} (C : Category o a) where
   private module C = Category C
   open C
   open Mor C
@@ -33,6 +33,31 @@ module GlueSquares {o ℓ e} (C : Category o ℓ e) where
       where open HomReasoning
 
   open Pulls public
+
+  module Pushes {X Y Z} {a : Y ⇒ Z} {b : X ⇒ Y} {c : X ⇒ Z} (c≡ab : c ≡ a ∘ b) where
+    .pushʳ : ∀ {W} {f : Z ⇒ W} → f ∘ c ≡ (f ∘ a) ∘ b
+    pushʳ {f = f} =
+      begin
+        f ∘ c
+      ↓⟨ ∘-resp-≡ʳ c≡ab ⟩
+        f ∘ (a ∘ b)
+      ↑⟨ assoc ⟩
+        (f ∘ a) ∘ b
+      ∎
+      where open HomReasoning
+
+    .pushˡ : ∀ {W} {f : W ⇒ X} → c ∘ f ≡ a ∘ (b ∘ f)
+    pushˡ {f = f} =
+      begin
+        c ∘ f
+      ↓⟨ ∘-resp-≡ˡ c≡ab ⟩
+        (a ∘ b) ∘ f
+      ↓⟨ assoc ⟩
+        a ∘ (b ∘ f)
+      ∎
+      where open HomReasoning
+
+  open Pushes public
 
   module IntroElim {X} {a : X ⇒ X} (a≡id : a ≡ id) where
     .elimʳ : ∀ {W} {f : X ⇒ W} → (f ∘ a) ≡ f

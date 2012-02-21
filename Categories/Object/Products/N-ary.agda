@@ -2,8 +2,8 @@
 open import Categories.Category
 open import Categories.Object.Products
 
-module Categories.Object.Products.N-ary {o ℓ e}
-  (C : Category o ℓ e) 
+module Categories.Object.Products.N-ary {o a}
+  (C : Category o a) 
   (P : Products C)
   where
 

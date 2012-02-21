@@ -4,8 +4,8 @@ open import Categories.Category
 open import Categories.Object.Terminal
 open import Level
 
-module Categories.Object.Terminal.Exponentials {o ℓ e : Level}
-    (C : Category o ℓ e)
+module Categories.Object.Terminal.Exponentials {o a : Level}
+    (C : Category o a)
     (T : Terminal C) where
 
 open Category C

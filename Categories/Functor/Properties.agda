@@ -7,7 +7,7 @@ open import Categories.Category
 open import Categories.Functor
 import Categories.Morphisms as Morphisms
 
-module FunctorsAlways {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F : Functor C D) where
+module FunctorsAlways {o a o′ a′} {C : Category o a} {D : Category o′ a′} (F : Functor C D) where
   open Functor F
   module C = Category C
   module D = Category D

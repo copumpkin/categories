@@ -10,7 +10,7 @@ open import Categories.Category
   renaming (_[_∼_] to _[_~C_])
 open import Categories.Free.Core
 open import Categories.Functor
-  using (Functor)
+  using (Functor; EasyFunctor)
   renaming (_≡_ to _≡F_; _∘_ to _∘F_)
 open import Categories.Graphs
 open import Data.Product
@@ -21,11 +21,11 @@ open import Graphs.GraphMorphism
 open import Data.Star
 open import Data.Star.Properties
   using (gmap-◅◅; gmap-id)
-open import Categories.Support.StarEquality
+-- open import Categories.Support.StarEquality
 open import Level using (_⊔_)
 
-ε∼ε : ∀{o₁ ℓ₁ e₁}{X : Graph o₁ ℓ₁ e₁}
-       {o₂ ℓ₂ e₂}{Y : Graph o₂ ℓ₂ e₂}
+ε∼ε : ∀{o₁ a₁}{X : Graph o₁ a₁}
+       {o₂ a₂}{Y : Graph o₂ a₂}
   → (F G : GraphMorphism X Y)
   → F ≈ G
   → {x : Graph.Obj X}
@@ -39,7 +39,7 @@ open import Level using (_⊔_)
 -}
 
 _◅~◅_ : 
-  ∀ {o ℓ e}{G : Graph o ℓ e}
+  ∀ {o a}{G : Graph o a}
     {a₀ a₁ b₀ b₁ c₀ c₁ : Graph.Obj G}
     {f  :       G [ a₀ ↝ b₀ ]}
     {g  :       G [ a₁ ↝ b₁ ]}
@@ -49,22 +49,20 @@ _◅~◅_ :
   → Free₀ G [ fs ~C gs ]
   → Free₀ G [ (f ◅ fs) ~C (g ◅ gs) ]
 _◅~◅_ {G = G} (HeterogeneousG.≈⇒~ hd) (Heterogeneous.≡⇒∼ tl)
-  = ≡⇒∼ (hd ◅-cong tl)
+  = ≡⇒∼ (≣-cong₂ _◅_ hd tl)
   where
     open Heterogeneous (Free₀ G)
-    open PathEquality G
 
-Free : ∀ {o ℓ e} → Functor (Graphs o ℓ e) (Categories o (o ⊔ ℓ) (o ⊔ ℓ ⊔ e))
-Free {o}{ℓ}{e} = record
+Freeᵉ : ∀ {o a} → EasyFunctor (Graphs o a) (Categoriesᵉ o (o ⊔ a))
+Freeᵉ {o}{a} = record
   { F₀            = Free₀
   ; F₁            = Free₁
   ; identity      = λ {A} f → Heterogeneous.reflexive (Free₀ A) (gmap-id f)
   ; homomorphism  = λ {X}{Y}{Z}{f}{g} → homomorphism {X}{Y}{Z}{f}{g}
-  ; F-resp-≡      = λ {X}{Y}{F G : GraphMorphism X Y} → Free₁-resp-≡ {X}{Y}{F}{G}
   }
   where
-    module Graphs     = Category (Graphs o ℓ e)
-    module Categories = Category (Categories o (o ⊔ ℓ) (o ⊔ ℓ ⊔ e))
+    module Graphs     = Category (Graphs o a)
+    module Categories = Category (Categories o (o ⊔ a))
     
     .homomorphism : ∀ {X Y Z} {f : GraphMorphism X Y} {g : GraphMorphism Y Z}
                   → Free₁ (g ∘G f) ≡F (Free₁ g ∘F Free₁ f)
@@ -72,9 +70,5 @@ Free {o}{ℓ}{e} = record
     homomorphism {X}{Y}{Z}{f}{g}{S}{U} (_◅_ {.S}{T}{.U} h hs) = 
       HeterogeneousG.refl Z ◅~◅ homomorphism {X}{Y}{Z}{f}{g}{T}{U} hs
     
-    .Free₁-resp-≡ : ∀ {X Y} {F G : GraphMorphism X Y} 
-      → F ≈ G
-      → Free₁ F ≡F Free₁ G
-    Free₁-resp-≡ {X}{Y}{F}{G} F≈G {S}{.S} ε = ε∼ε F G F≈G
-    Free₁-resp-≡ {X}{Y}{F}{G} F≈G {S}{U} (_◅_ {.S}{T}{.U} h hs) 
-      = proj₂ F≈G h ◅~◅ Free₁-resp-≡ {X}{Y}{F}{G} F≈G {T}{U} hs
+Free : ∀ {o a} → Functor (Graphs o a) (Categories o (o ⊔ a))
+Free = EasyFunctor.functor Freeᵉ

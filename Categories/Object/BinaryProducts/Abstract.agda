@@ -6,7 +6,7 @@ open import Categories.Category
 open import Categories.Object.BinaryProducts
 open import Categories.Morphisms
 
-module AbstractBinaryProducts {o ℓ e} (C : Category o ℓ e) (BP : BinaryProducts C) where
+module AbstractBinaryProducts {o a} (C : Category o a) (BP : BinaryProducts C) where
   private module P = BinaryProducts C BP
   open P public using (_×_; π₁; π₂)
   private open Category C

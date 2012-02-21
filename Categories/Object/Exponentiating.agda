@@ -2,8 +2,8 @@
 open import Categories.Category
 open import Categories.Object.BinaryProducts
 
-module Categories.Object.Exponentiating {o ℓ e}
-    (C : Category o ℓ e)
+module Categories.Object.Exponentiating {o a}
+    (C : Category o a)
     (binary : BinaryProducts C)  where
 
 open Category C
@@ -25,7 +25,7 @@ open   Categories.Object.Exponential C
 
 open import Level
 
-record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
+record Exponentiating Σ : Set (o ⊔ a) where
     field 
         exponential : ∀{A} → Exponential A Σ
     module Σ↑ (X : Obj) = Exponential (exponential {X})

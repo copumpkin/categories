@@ -1,12 +1,14 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Level
 open import Categories.Category
-module Categories.Power.NaturalTransformation {o ℓ e : Level} (C : Category o ℓ e) where
+module Categories.Power.NaturalTransformation {o a : Level} (C : Category o a) where
 
 open import Function using () renaming (_∘_ to _∙_)
 open import Data.Fin using (Fin; inject+; raise)
 open import Data.Sum using (_⊎_; [_,_]′; inj₁; inj₂)
 open import Data.Product using (_,_)
+
+open import Categories.Support.PropositionalEquality
 
 import Categories.Power
 module Pow = Categories.Power C
@@ -15,7 +17,7 @@ open import Categories.Bifunctor using (Bifunctor)
 open import Categories.Bifunctor.NaturalTransformation renaming (id to idⁿ; _≡_ to _≡ⁿ_)
 open import Categories.Functor using (module Functor)
 
-flattenPⁿ : ∀ {D : Category o ℓ e} {n m} {F G : Powerfunctor′ D (Fin n ⊎ Fin m)} (η : NaturalTransformation F G) → NaturalTransformation (flattenP F) (flattenP G)
+flattenPⁿ : ∀ {D : Category o a} {n m} {F G : Powerfunctor′ D (Fin n ⊎ Fin m)} (η : NaturalTransformation F G) → NaturalTransformation (flattenP F) (flattenP G)
 flattenPⁿ {n = n} {m} η = record
   { η = λ Xs → η.η (Xs ∙ pack)
   ; commute = λ fs → η.commute (fs ∙ pack)
@@ -46,7 +48,7 @@ reduceN′ H {I} {F} {F′} φ {J} {G} {G′} γ = record
       my-η Ys ∘ L.F₁ fs
     ↑⟨ H.homomorphism ⟩
       H.F₁ ((φ.η (Ys ∙ inj₁) ∘ F.F₁ (fs ∙ inj₁)) , (γ.η (Ys ∙ inj₂) ∘ G.F₁ (fs ∙ inj₂)))
-    ↓⟨ H.F-resp-≡ ((φ.commute (fs ∙ inj₁)) , (γ.commute (fs ∙ inj₂))) ⟩
+    ↓⟨ H.F-resp-≡ (≣-cong₂ _,_ (φ.commute (fs ∙ inj₁))  (γ.commute (fs ∙ inj₂))) ⟩
       H.F₁ ((F′.F₁ (fs ∙ inj₁) ∘ φ.η (Xs ∙ inj₁)) , (G′.F₁ (fs ∙ inj₂) ∘ γ.η (Xs ∙ inj₂)))
     ↓⟨ H.homomorphism ⟩
       R.F₁ fs ∘ my-η Xs

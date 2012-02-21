@@ -2,7 +2,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 open import Categories.Category
 
-module Categories.Object.Product.Morphisms {o ℓ e} (C : Category o ℓ e) where
+module Categories.Object.Product.Morphisms {o a} (C : Category o a) where
 
 import Categories.Object.Product
 open Categories.Object.Product C

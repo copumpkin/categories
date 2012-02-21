@@ -1,12 +1,39 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.NaturalTransformation where
 
+open import Level
+
 open import Categories.Category
-open import Categories.Functor hiding (equiv) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
+open import Categories.Functor hiding (equiv; promote) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Categories.NaturalTransformation.Core public
 
-_∘ˡ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
-     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+record EasyNaturalTransformation {o a o′ a′ e′}
+                                 {C : Category o a}
+                                 {D : EasyCategory o′ a′ e′}
+                                 (F G : EasyFunctor C D)
+                               : Set (o ⊔ a ⊔ o′ ⊔ a′ ⊔ e′) where
+  private module C = Category C
+  private module D = EasyCategory D
+  private module F = EasyFunctor F
+  private module G = EasyFunctor G
+  open F using (F₀; F₁)
+  open G using () renaming (F₀ to G₀; F₁ to G₁)
+
+  field
+    η : ∀ X → D ⟦ F₀ X , G₀ X ⟧
+    .commute : ∀ {X Y} (f : C [ X , Y ]) → D.CommutativeSquare (F₁ f) (η X) (η Y) (G₁ f)
+
+  std : NaturalTransformation (EasyFunctor.functor F) (EasyFunctor.functor G)
+  std = record
+    { η = η
+    ; commute = λ f → D.promote _ _ (commute f)
+    }
+
+EASED-NT_⇒_VIA_AS_ : ∀ {o a o′ a′ e′} {C : Category o a} {D : Category o′ a′} (F G : Functor C D) (rel : EasyRel D e′) (ent : EasyNaturalTransformation (UNEASYF F WITH rel) (UNEASYF G WITH rel)) → NaturalTransformation F G
+EASED-NT F ⇒ G VIA rel AS ent = EasyNaturalTransformation.std ent
+
+_∘ˡ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
+     → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D} 
      → (H : Functor D E) → (η : NaturalTransformation F G) → NaturalTransformation (H ∘F F) (H ∘F G)
 _∘ˡ_ {C = C} {D} {E} {F} {G} H η′ = record 
@@ -38,8 +65,8 @@ _∘ˡ_ {C = C} {D} {E} {F} {G} H η′ = record
     open E.HomReasoning
 
 
-_∘ʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
-     → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+_∘ʳ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
+     → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D} 
      → (η : NaturalTransformation F G) → (K : Functor E C) → NaturalTransformation (F ∘F K) (G ∘F K)
 _∘ʳ_ η K = record
@@ -50,29 +77,29 @@ _∘ʳ_ η K = record
 
 
 -- The vertical versions
-.identity₁ˡ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} {X : NaturalTransformation F G} 
+.identity₁ˡ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} {X : NaturalTransformation F G} 
            → id ∘₁ X ≡ X
 identity₁ˡ {D = D} = Category.identityˡ D
 
-.identity₁ʳ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} {X : NaturalTransformation F G} 
+.identity₁ʳ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} {X : NaturalTransformation F G} 
            → X ∘₁ id ≡ X
 identity₁ʳ {D = D} = Category.identityʳ D
 
 
 
-.assoc₁ : ∀ {o ℓ e o′ ℓ′ e′} 
-           {P : Category o ℓ e} {Q : Category o′ ℓ′ e′} {A B C D : Functor P Q} 
+.assoc₁ : ∀ {o a o′ a′} 
+           {P : Category o a} {Q : Category o′ a′} {A B C D : Functor P Q} 
            {X : NaturalTransformation A B} {Y : NaturalTransformation B C} {Z : NaturalTransformation C D} 
        → (Z ∘₁ Y) ∘₁ X ≡ Z ∘₁ (Y ∘₁ X)
 assoc₁ {Q = Q} = Category.assoc Q
 
 
 -- The horizontal ones
-.identity₀ˡ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} {X : NaturalTransformation F G} 
+.identity₀ˡ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} {X : NaturalTransformation F G} 
            → id {F = idF} ∘₀ X ≡ X
 identity₀ˡ {D = D} = Category.identityʳ D
 
-.identity₀ʳ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} {X : NaturalTransformation F G} 
+.identity₀ʳ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D} {X : NaturalTransformation F G} 
            → X ∘₀ id {F = idF} ≡ X
 identity₀ʳ {C = C} {D} {F} {G} {X} = 
     begin
@@ -93,8 +120,8 @@ identity₀ʳ {C = C} {D} {F} {G} {X} =
   open G
   open D
 
-.assoc₀ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} 
-            {C₀ : Category o₀ ℓ₀ e₀} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃} 
+.assoc₀ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂ o₃ a₃} 
+            {C₀ : Category o₀ a₀} {C₁ : Category o₁ a₁} {C₂ : Category o₂ a₂} {C₃ : Category o₃ a₃} 
             {F G : Functor C₀ C₁} {H I : Functor C₁ C₂} {J K : Functor C₂ C₃}
         → {X : NaturalTransformation F G} → {Y : NaturalTransformation H I} → {Z : NaturalTransformation J K}
         → (Z ∘₀ Y) ∘₀ X ≡ Z ∘₀ (Y ∘₀ X) 
@@ -127,8 +154,8 @@ assoc₀ {C₀ = C₀} {C₁} {C₂} {C₃} {F} {G} {H} {I} {J} {K} {X} {Y} {Z} 
   open K
 
 
-.interchange : ∀ {o₀ ℓ₀ e₀} {o₁ ℓ₁ e₁} {o₂ ℓ₂ e₂}
-                 {C₀ : Category o₀ ℓ₀ e₀} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂}
+.interchange : ∀ {o₀ a₀} {o₁ a₁} {o₂ a₂}
+                 {C₀ : Category o₀ a₀} {C₁ : Category o₁ a₁} {C₂ : Category o₂ a₂}
                  {F₀ F₁ F₅ : Functor C₀ C₁} {F₂ F₃ F₄ : Functor C₁ C₂} 
                  {α : NaturalTransformation F₃ F₄} 
                  {β : NaturalTransformation F₁ F₅} 
@@ -169,15 +196,15 @@ interchange {C₀ = C₀} {C₁} {C₂} {F₀} {F₁} {F₅} {F₂} {F₃} {F₄
   open C₂.HomReasoning
 
 
-.∘₁-resp-≡ : ∀ {o ℓ e} {o′ ℓ′ e′}
-               {D : Category o ℓ e} {E : Category o′ ℓ′ e′}
+.∘₁-resp-≡ : ∀ {o a} {o′ a′}
+               {D : Category o a} {E : Category o′ a′}
                {A B C : Functor D E} 
                {f h : NaturalTransformation B C} {g i : NaturalTransformation A B} 
           → f ≡ h → g ≡ i → f ∘₁ g ≡ h ∘₁ i
 ∘₁-resp-≡ {E = E} f≡h g≡i = Category.∘-resp-≡ E f≡h g≡i
 
-.∘₀-resp-≡ : ∀ {o ℓ e} {o′ ℓ′ e′} {o″ ℓ″ e″}
-               {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {E : Category o″ ℓ″ e″}
+.∘₀-resp-≡ : ∀ {o a} {o′ a′} {o″ a″}
+               {C : Category o a} {D : Category o′ a′} {E : Category o″ a″}
                {F F′ : Functor C D} {G G′ : Functor D E}
                {f h : NaturalTransformation G G′} {g i : NaturalTransformation F F′}
            → f ≡ h → g ≡ i → f ∘₀ g ≡ h ∘₀ i

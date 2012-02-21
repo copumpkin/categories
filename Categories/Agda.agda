@@ -10,9 +10,10 @@ import Categories.Support.SetoidFunctions
 
 open import Categories.Support.PropositionalEquality
 open import Categories.Category
+open import Categories.Category.Quotient
 
-Sets : ∀ o → Category _ _ _
-Sets o = record
+Setsᵉ : ∀ o → EasyCategory _ _ _
+Setsᵉ o = record
   { Obj = Set o
   ; _⇒_ = λ d c → d → c
   ; _≡_ = λ f g → ∀ {x} → f x ≣ g x
@@ -23,25 +24,16 @@ Sets o = record
   ; assoc = ≣-refl
   ; identityˡ = ≣-refl
   ; identityʳ = ≣-refl
-  ; equiv = record { refl = ≣-refl; sym = s; trans = t }
-  ; ∘-resp-≡ = ∘-resp-≡′
+  ; promote = λ f g f≗g → ≣-ext (λ x → f≗g)
+  ; REFL = ≣-refl
   }
-  where
-  s : {A B : Set o} → {i j : A → B} → ({x : A} → i x ≣ j x) → {x : A} → j x ≣ i x
-  s f {x} rewrite f {x} = ≣-refl
 
-  t : {A B : Set o} {i j k : A → B} → ({x : A} → i x ≣ j x) → ({x : A} → j x ≣ k x) → {x : A} → i x ≣ k x
-  t f g {x} rewrite f {x} | g {x} = ≣-refl
-
-  ∘-resp-≡′ : {A B C : Set o} {f h : B → C} {g i : A → B} →
-             (∀ {x} → f x ≣ h x) →
-             (∀ {x} → g x ≣ i x) → 
-             (∀ {x} → f (g x) ≣ h (i x))
-  ∘-resp-≡′ {g = g} f≡h g≡i {x} rewrite f≡h {g x} | g≡i {x} = ≣-refl
+Sets : ∀ o → Category _ _
+Sets o = EASY Setsᵉ o
 
 -- use standard library setoids here, not our special irrelevant ones
-Setoids : ∀ c ℓ → Category (suc (ℓ ⊔ c)) (ℓ ⊔ c) (ℓ ⊔ c)
-Setoids c ℓ = record
+SetoidsQ : ∀ c ℓ → QCategory (suc (ℓ ⊔ c)) (ℓ ⊔ c) (ℓ ⊔ c)
+SetoidsQ c ℓ = record
   { Obj = Setoid c ℓ
   ; _⇒_ = _⟶_
   ; _≡_ = λ {X} {Y} → _≡′_ {X} {Y}
@@ -68,22 +60,28 @@ Setoids c ℓ = record
   .∘-resp-≡′ : ∀ {A B C} {f h : B ⟶ C} {g i : A ⟶ B} → f ≡′ h → g ≡′ i → f ∘′ g ≡′ h ∘′ i
   ∘-resp-≡′ {C = C} {h = h} f≡h g≡i {x} = Setoid.trans C f≡h (cong h g≡i)
 
+Setoids : ∀ c ℓ → Category (suc (ℓ ⊔ c)) (ℓ ⊔ c)
+Setoids c ℓ = QCategory.category (SetoidsQ c ℓ)
+
 -- setoids with irrelevant equality
-ISetoids : ∀ c ℓ → Category (suc (ℓ ⊔ c)) (ℓ ⊔ c) (ℓ ⊔ c)
-ISetoids c ℓ = record
+ISetoidsQ : ∀ c ℓ → QCategory (suc (ℓ ⊔ c)) (ℓ ⊔ c) (ℓ ⊔ c)
+ISetoidsQ c ℓ = record
   { Obj = Setoid c ℓ
   ; _⇒_ = _⟶_
-  ; _≡_ = λ {A B} → Setoid._≈_ (A ⇨ B)
+  ; _≡_ = λ {A B} → Relation.Binary.Setoid._≈_ (setoid-i→r (A ⇨ B))
   ; _∘_ = _∙_
   ; id = id′
   ; assoc = λ {A B C D} {f g h} →
-                cong (h ∙ g ∙ f)
-  ; identityˡ = λ {A B f} → cong f
-  ; identityʳ = λ {A B f} → cong f
-  ; equiv = λ {A B} → Setoid.isEquivalence (A ⇨ B)
-  ; ∘-resp-≡ = λ f≡h g≡i x≡y → f≡h (g≡i x≡y)
+                squash (cong (h ∙ g ∙ f))
+  ; identityˡ = λ {A B f} → squash (cong f)
+  ; identityʳ = λ {A B f} → squash (cong f)
+  ; equiv = λ {A B} → Relation.Binary.Setoid.isEquivalence (setoid-i→r (A ⇨ B))
+  ; ∘-resp-≡ = λ f≡h g≡i → squash (λ x≡y → anonymous-witness f≡h (anonymous-witness g≡i x≡y))
   }
   where
   open Relation.Binary using (Rel)
   open Categories.Support.Equivalence
   open Categories.Support.SetoidFunctions renaming (id to id′)
+
+ISetoids : ∀ c ℓ → Category (suc (ℓ ⊔ c)) (ℓ ⊔ c)
+ISetoids c ℓ = QCategory.category (ISetoidsQ c ℓ)

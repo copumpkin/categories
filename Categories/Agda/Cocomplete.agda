@@ -5,10 +5,11 @@ open import Level
 open import Relation.Binary using (Setoid; module Setoid; Preorder; module Preorder; Rel; _=[_]⇒_)
 open import Data.Product using (Σ; _,_)
 open import Function.Equality using (module Π)
-open import Relation.Binary.PropositionalEquality.TrustMe using (trustMe)
 -- import Relation.Binary.EqReasoning as EqReasoning
 
+open import Categories.Support.Irrelevance
 open import Categories.Support.PropositionalEquality
+open import Categories.Support.IProduct using (Σ′; _,_)
 import Categories.Support.ZigZag as ZigZag
 open import Categories.Support.Quotients
 
@@ -39,7 +40,7 @@ SetsCocomplete {o} {a} {o′} = record { colimit = colimit }
     -- objects of vertex-carrier to be equal.  completing this to an
     -- equivalence relation gives us the setoid we need
     _↝_ : (i j : vertex-carrier) → Set ℓ′
-    (j₁ , x₁) ↝ (j₂ , x₂) = Σ[ f ∶ J [ j₁ , j₂ ] ] (F₁ f x₁ ≣ x₂)
+    (j₁ , x₁) ↝ (j₂ , x₂) = Σ′[ f ∶ J [ j₁ , j₂ ] ] (F₁ f x₁ ≣ x₂)
 
     ↝-preorder : Preorder ℓ′ ℓ′ ℓ′
     ↝-preorder = record
@@ -80,12 +81,9 @@ SetsCocomplete {o} {a} {o′} = record { colimit = colimit }
       -- the ugly proof that loads before the sun burns out.
       ↝-trans : ∀ {i j k} → (i ↝ j) → (j ↝ k) → (i ↝ k)
       ↝-trans {i = i₁ , i₂} (f , fi≈j) (g , gj≈k) =
-        J [ g ∘ f ] , ≣-trans (≣-trans (≣-app homomorphism-relevant i₂) (≣-cong (F₁ g) fi≈j)) gj≈k
+        J [ g ∘ f ] , ≣-trans (≣-trans (≣-app homomorphism i₂) (≣-cong (F₁ g) fi≈j)) gj≈k
  
     module ZZ = ZigZag ↝-preorder
-
-    relevant-≣ : ∀ {a} {A : Set a} {x y : A} → .(x ≣ y) → x ≣ y
-    relevant-≣ eq = trustMe
 
     vertex = Quotient vertex-carrier ZZ.Alternating ZZ.is-equivalence
 
@@ -100,13 +98,13 @@ SetsCocomplete {o} {a} {o′} = record { colimit = colimit }
     my-!-f A (X , x) = A.ψ X x
       where module A = Cocone A
 
-    my-!-cong : (A : Cocone F) → ZZ.Alternating =[ my-!-f A ]⇒ _≣_
+    .my-!-cong : (A : Cocone F) → ZZ.Alternating =[ my-!-f A ]⇒ _≣_
     my-!-cong A = ZZ.minimal (≣-setoid A.N) (my-!-f A) my-precong
       where
       module A = Cocone A
 
-      my-precong : _↝_ =[ my-!-f A ]⇒ _≣_
-      my-precong {X , x} {Y , y} (f , fx≈y) = (≣-trans (≣-app (relevant-≣ (A.commute f)) x) (≣-cong (A.ψ Y) fx≈y))
+      .my-precong : _↝_ =[ my-!-f A ]⇒ _≣_
+      my-precong {X , x} {Y , y} (f , fx≈y) = (≣-trans (≣-app (A.commute f) x) (≣-cong (A.ψ Y) (irr fx≈y)))
 
     my-! : {A : Cocone F} → CoconeMorphism {F = F} my-initial-cocone-object A
     my-! {A} = record

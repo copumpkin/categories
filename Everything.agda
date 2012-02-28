@@ -22,7 +22,7 @@ import Categories.Agda
 
 -- XXX port this to Sets and fix it up
 -- The fact that one version of it is cocomplete
--- import Categories.Agda.ISetoids.Cocomplete
+import Categories.Agda.Cocomplete
 
 -- The arrow category construction on any category
 import Categories.Arrow
@@ -141,6 +141,9 @@ import Categories.Functor.Representable
 
 -- Functor categories (of functors between two categories and natural transformations between them)
 import Categories.FunctorCategory
+
+-- Isos in functor categories are the same as natural isomorphisms
+import Categories.FunctorCategory.Morphisms
 
 -- The category of graphs and graph homomorphisms (Gph)
 import Categories.Graphs

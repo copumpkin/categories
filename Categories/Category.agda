@@ -49,6 +49,9 @@ record Category (o a : Level) : Set (suc (o ⊔ a)) where
     id  : ∀ {A} → (A ⇒ A)
     _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
 
+  id2 : ∀ {A B} → A ≣ B → A ⇒ B
+  id2 {A} eq = ≣-subst (_⇒_ A) eq id
+
   open Laws _⇒_ _∘_ id
 
   field

@@ -28,6 +28,11 @@ record Functor {o a o′ a′} (C : Category o a) (D : Category o′ a′) : Set
   identity-relevant : ∀ {A} → F₁ (C.id {A}) ≣ D.id
   identity-relevant {A} = trustMe
 
+  abstract
+    homomorphism-relevant : ∀ {X Y Z} {f : C [ X , Y ]} {g : C [ Y , Z ]}
+                          → F₁ (C [ g ∘ f ]) ≣ D [ F₁ g ∘ F₁ f ]
+    homomorphism-relevant = trustMe
+
   op : Functor C.op D.op
   op = record 
     { F₀ = F₀

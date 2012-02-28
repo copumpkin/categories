@@ -299,8 +299,7 @@ import Categories.Object.Zero
 import Categories.Power
 
 -- Demonstrations that Power categories are the same as functors from discrete categories
--- XXX metas waiting on Agda Issue 574
--- import Categories.Power.Functorial
+import Categories.Power.Functorial
 
 -- Natural transformations for functors to/from power categories
 import Categories.Power.NaturalTransformation

@@ -29,6 +29,7 @@ import Categories.Arrow
 
 -- Bifunctors (functors from a product category)
 import Categories.Bifunctor
+import Categories.Bifunctor.Properties
 
 -- Natural transformations between bifunctors
 import Categories.Bifunctor.NaturalTransformation

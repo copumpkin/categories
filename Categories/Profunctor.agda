@@ -193,11 +193,22 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
                      → action f g ⌞ z ⌝ ≣ ⌞ action′ f g z ⌝
     action-compute f g z = qelim-compute′ (λ pf → qdiv (action′-resp-≡′ pf))
 
-    .identity : ∀ {e c} → action (idᴱ {e}) (idᶜ {c}) ≣ Function.id
-    identity = ≣-ext (qequate′ λ z → ≣-trans (action-compute _ _ z)
-                                             (≣-cong ⌊_⌉ identity′))
+    ⇒-ext : ∀ {e c a} {A : Set a} {f g : (e ⇒ c) → A} (eq : (x : e ⇒′ c) → f ⌞ x ⌝ ≣ g ⌞ x ⌝) → f ≣ g
+    ⇒-ext = ≣-ext ∙ qequate′
 
-    .homomorphism : ∀ {e e′ e″ c c′ c″} {f : e′ ⇒ᴱ e} {f′ : e″ ⇒ᴱ e′}
-                                        {g : c ⇒ᶜ c′} {g′ : c′ ⇒ᶜ c″}
-                  → action (f ᴱ∘ᴱ f′) (g′ ᶜ∘ᶜ g) ≣ action f′ g′ ∙ action f g
-    homomorphism = ≣-ext (qequate′ λ z → ≣-trans (action-compute _ _ z) (≣-trans (≣-cong ⌊_⌉ homomorphism′) (≣-sym (≣-trans (≣-cong (action _ _) (action-compute _ _ z)) (action-compute _ _ (action′ _ _ z))))))
+  .identity : ∀ {e c} → action (idᴱ {e}) (idᶜ {c}) ≣ Function.id
+  identity = ⇒-ext λ z → ≣-trans (action-compute _ _ z)
+                                 (≣-cong ⌞_⌝ identity′)
+
+  .homomorphism : ∀ {e e′ e″ c c′ c″} {f : e′ ⇒ᴱ e} {f′ : e″ ⇒ᴱ e′}
+                                      {g : c ⇒ᶜ c′} {g′ : c′ ⇒ᶜ c″}
+                → action (f ᴱ∘ᴱ f′) (g′ ᶜ∘ᶜ g) ≣ action f′ g′ ∙ action f g
+  homomorphism = ⇒-ext λ z →
+            (action-compute _ _ z)
+    >trans> (≣-cong ⌞_⌝ homomorphism′)
+    >trans> (≣-sym (        (≣-cong (action _ _) (action-compute _ _ z))
+                    >trans> (action-compute _ _ (action′ _ _ z))))
+    where
+    infixr 4 _>trans>_
+    _>trans>_ : ∀ {a} {A : Set a} {x y z : A} → x ≣ y → y ≣ z → x ≣ z
+    _>trans>_ = ≣-trans

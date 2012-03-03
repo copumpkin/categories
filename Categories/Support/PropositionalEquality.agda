@@ -9,6 +9,9 @@ module ≣-reasoning = Relation.Binary.PropositionalEquality.≡-Reasoning renam
 ≣-app : ∀ {a} {A : Set a} {b} {B : A → Set b} {f g : (x : A) → B x} → f ≣ g → (x : A) → f x ≣ g x
 ≣-app {f = f} {g} = flip (λ x → ≣-cong (flip id x))
 
+≣-appʰ : ∀ {a} {A : Set a} {b} {B : A → Set b} {f g : ∀ {x} → B x} → (λ {x} → f) ≣ g → ∀ {x} → f {x} ≣ g {x}
+≣-appʰ {f = f} {g} = λ pf {x} → ≣-cong (λ h → h {x}) pf
+
 ≣-subst₂-breakdown-lr : ∀ {a} {A : Set a} {b} {B : Set b} {ℓ} (f : A → B → Set ℓ) {a₁ a₂ : A} (a₁≣a₂ : a₁ ≣ a₂) {b₁ b₂ : B} (b₁≣b₂ : b₁ ≣ b₂) (x : f a₁ b₁) → ≣-subst₂ f a₁≣a₂ b₁≣b₂ x ≣ ≣-subst (f a₂) b₁≣b₂ (≣-subst (λ y → f y b₁) a₁≣a₂ x)
 ≣-subst₂-breakdown-lr f ≣-refl ≣-refl x = ≣-refl
 
@@ -22,3 +25,6 @@ module ≣-reasoning = Relation.Binary.PropositionalEquality.≡-Reasoning renam
 ≣-cong₂₊ f z ≣-refl ≣-refl = ≣-refl
 
 postulate ≣-ext : ∀ {a b} → ≣-Extensionality a b
+
+≣-extʰ : ∀ {a b} {A : Set a} {B : A → Set b} {f g : ∀ {x} → B x} → (∀ {x} → f {x} ≣ g {x}) → (λ {x} → f {x}) ≣ g
+≣-extʰ pf = ≣-cong (λ f {x} → f x) (≣-ext λ x → pf {x})

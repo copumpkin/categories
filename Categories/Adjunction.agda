@@ -18,13 +18,13 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
 
   private module C = Category C renaming (_∘_ to _∘C_; _≡_ to _≡C_)
   private module D = Category D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
-  open C
-  open D
+  open C hiding (op)
+  open D hiding (op)
 
   private module F = Functor F
   private module G = Functor G renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
-  open F
-  open G
+  open F hiding (op)
+  open G hiding (op)
 
   private module unit   = NaturalTransformation unit
   private module counit = NaturalTransformation counit
@@ -71,6 +71,9 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
 
     .identityʳ′ : ∀ {x} → G₁ (counit.η (F₀ x)) ∘D unit.η (G₀ (F₀ x)) ≡D D.id
     identityʳ′ = D.Equiv.sym zag
+
+  op : Adjunction {C = D.op} {D = C.op} G.op F.op
+  op = record { unit = counit.op; counit = unit.op; zig = zag; zag = zig }
 
 
 {-

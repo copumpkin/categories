@@ -28,8 +28,8 @@ record End (F : Bifunctor C.op C V) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ �
   field
     universal : (Q : End-data F) → End-data.E Q V.⇒ E
 
-    π[c]∘universal≡δ[c] : {Q : End-data F} → IsUni Q (universal Q)
+    .π[c]∘universal≡δ[c] : {Q : End-data F} → IsUni Q (universal Q)
 
-    universal-unique : {Q : End-data F} → ∀ u → IsUni Q u → u V.≡ universal Q
+    .universal-unique : {Q : End-data F} → ∀ u → IsUni Q u → u V.≡ universal Q
 
   open End-data Data public

@@ -49,7 +49,7 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
     .reflexive : _≣_ ⊆ _≡_
     reflexive = e.reflexive q
 
-  private open Equiv
+  open Equiv
 
   domain : ∀ {A B} → (A ⇒ B) → Obj
   domain {A} _ = A

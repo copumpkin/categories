@@ -16,13 +16,17 @@ record DinaturalTransformation {o ℓ e o′ ℓ′ e′}
   private
     module C = Category C
     module D = Category D
-  open Functor F
-  open Functor G renaming (F₀ to G₀; F₁ to G₁)
-  open D
+  open Functor F renaming (op to Fop)
+  open Functor G renaming (F₀ to G₀; F₁ to G₁; op to Gop)
+  open D hiding (op)
   field
     α : (c : C.Obj) → D [ F₀ (c , c) , G₀ (c , c) ]
 
     .commute : ∀ {c c′} (f : C [ c , c′ ]) → G₁ (f , C.id) ∘ α c′ ∘ F₁ ( C.id , f ) ≡ G₁ ( C.id , f ) ∘ α c ∘ F₁ ( f , C.id )
+
+  op : DinaturalTransformation {C = C.op} {D = D.op} Gop Fop
+  op = record { α = α; commute = λ f → D.Equiv.trans assoc (D.Equiv.trans (D.Equiv.sym (commute f)) (D.Equiv.sym assoc)) }
+
 
 
 _<∘_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G H : Bifunctor (Category.op C) C D} 

@@ -6,15 +6,36 @@ module C = Category C
 module V = Category V
 open import Categories.Bifunctor using (Bifunctor; Functor; module Functor)
 open import Categories.DinaturalTransformation
-open DinaturalTransformation using (α)
 open import Categories.Functor.Constant
 open import Level
+open import Categories.Morphisms V
 
 record End-data (F : Bifunctor C.op C V) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
   field
     E : V.Obj
     π : DinaturalTransformation {C = C} (Constant E) F
-    
+  
+  open DinaturalTransformation π using (α; commute)
+  π∘_ : ∀ {Q} → Q V.⇒ E → End-data F
+  π∘ g = record { π = record { α = λ c → α c ∘ g; commute = λ {c c′} f → 
+          begin
+            F.F₁ (f , C.id) ∘ (α c′ ∘ g) ∘ id ↓⟨ Equiv.refl ⟩∘⟨ identityʳ ⟩
+            F.F₁ (f , C.id) ∘ α c′ ∘ g ↑⟨ assoc ⟩
+            (F.F₁ (f , C.id) ∘ α c′) ∘ g ↑⟨ (Equiv.refl ⟩∘⟨ identityʳ) ⟩∘⟨ Equiv.refl ⟩ 
+            (F.F₁ (f , C.id) ∘ α c′ ∘ id) ∘ g ↓⟨ commute f ⟩∘⟨ Equiv.refl ⟩ 
+            (F.F₁ (C.id , f) ∘ α c ∘ id) ∘ g ↓⟨ (Equiv.refl ⟩∘⟨ identityʳ) ⟩∘⟨ Equiv.refl ⟩ 
+            (F.F₁ (C.id , f) ∘ α c) ∘ g ↓⟨ assoc ⟩ 
+            F.F₁ (C.id , f) ∘ α c ∘ g ↑⟨ Equiv.refl ⟩∘⟨ identityʳ ⟩ 
+            F.F₁ (C.id , f) ∘ (α c ∘ g) ∘ id ∎ } }
+   where
+     open V.HomReasoning
+     module F = Functor F
+     open import Data.Product
+     open V
+
+
+open DinaturalTransformation using (α)
+
 
 record End (F : Bifunctor C.op C V) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
   field
@@ -31,6 +52,21 @@ record End (F : Bifunctor C.op C V) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ �
     .π[c]∘universal≡δ[c] : {Q : End-data F} → IsUni Q (universal Q)
 
     .universal-unique : {Q : End-data F} → ∀ u → IsUni Q u → u V.≡ universal Q
+
+
+  .eta-rule : universal Data V.≡ V.id
+  eta-rule = begin universal Data ↑⟨ universal-unique {Data} V.id (λ c → V.identityʳ) ⟩ 
+                   V.id           ∎
+   where
+    open V.HomReasoning
+
+  .π-mono : ∀ {Q} (g₁ g₂ : Q V.⇒ E) → (∀ c → α π c V.∘ g₁ V.≡ α π c V.∘ g₂) → g₁ V.≡ g₂
+  π-mono {Q} g₁ g₂ π∘g₁≡π∘g₂ = begin 
+     g₁                ↓⟨ universal-unique {π∘ g₁} g₁ (λ c → V.Equiv.refl) ⟩ 
+     universal (π∘ g₁) ↑⟨ universal-unique {π∘ g₁} g₂ (λ c → V.Equiv.sym (π∘g₁≡π∘g₂ c)) ⟩ 
+     g₂                ∎
+    where
+     open V.HomReasoning
 
   open End-data Data public
 

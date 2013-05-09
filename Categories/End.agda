@@ -1,9 +1,9 @@
 open import Categories.Category
 
 module Categories.End {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {V : Category o′ ℓ′ e′} where
-
-module C = Category C
-module V = Category V
+private
+  module C = Category C
+  module V = Category V
 open import Categories.Bifunctor using (Bifunctor; Functor; module Functor)
 open import Categories.DinaturalTransformation
 open import Categories.Functor.Constant

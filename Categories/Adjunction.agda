@@ -5,7 +5,7 @@ open import Level
 
 open import Categories.Category
 open import Categories.Functor renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
-open import Categories.NaturalTransformation
+open import Categories.NaturalTransformation renaming (id to idT)
 open import Categories.Monad
 
 record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} (F : Functor D C) (G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o₁ ⊔ ℓ₁ ⊔ e₁) where
@@ -13,8 +13,8 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
     unit   : NaturalTransformation idF (G ∘F F)
     counit : NaturalTransformation (F ∘F G) idF
 
-    .zig : id ≡ (counit ∘ʳ F) ∘₁ (F ∘ˡ unit)
-    .zag : id ≡ (G ∘ˡ counit) ∘₁ (unit ∘ʳ G)
+    .zig : idT ≡ (counit ∘ʳ F) ∘₁ (F ∘ˡ unit)
+    .zag : idT ≡ (G ∘ˡ counit) ∘₁ (unit ∘ʳ G)
 
   private module C = Category C
   private module D = Category D
@@ -28,7 +28,7 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
   private module counit = NaturalTransformation counit
 
   monad : Monad D
-  monad = record 
+  monad = record
     { F = G ∘F F
     ; η = unit
     ; μ = G ∘ˡ (counit ∘ʳ F)
@@ -38,9 +38,9 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
     }
     where
 
-    .assoc′ : ∀ {x} 
+    .assoc′ : ∀ {x}
            → G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (G₁ (counit.η (F₀ x)))) D.≡ G₁ (counit.η (F₀ x)) D.∘ G₁ (counit.η (F₀ (G₀ (F₀ x))))
-    assoc′ {x} = 
+    assoc′ {x} =
         begin
           G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (G₁ (counit.η (F₀ x))))
         ↑⟨ G.homomorphism ⟩
@@ -54,7 +54,7 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
       open D.HomReasoning
 
     .identityˡ′ : ∀ {x} → G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (unit.η x)) D.≡ D.id
-    identityˡ′ {x} = 
+    identityˡ′ {x} =
         begin
           G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (unit.η x))
         ↑⟨ G.homomorphism ⟩
@@ -73,12 +73,22 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
   op : Adjunction {C = D.op} {D = C.op} G.op F.op
   op = record { unit = counit.op; counit = unit.op; zig = zag; zag = zig }
 
+id : ∀ {o ℓ e} {C : Category o ℓ e} → Adjunction (idF {C = C}) (idF {C = C})
+id {C = C} = record
+   { unit = idT
+   ; counit = idT
+   ; zig = Equiv.sym C.identityˡ
+   ; zag = Equiv.sym C.identityˡ
+   }
+  where
+    module C = Category C
+    open C
 
 {-
-_∘_ : ∀ {o ℓ e} {o₁ ℓ₁ e₁} {o₂ ℓ₂ e₂} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂} 
-      {F : Functor D C} {G : Functor C D} {H : Functor E D} {I : Functor D E} → 
+_∘_ : ∀ {o ℓ e} {o₁ ℓ₁ e₁} {o₂ ℓ₂ e₂} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
+      {F : Functor D C} {G : Functor C D} {H : Functor E D} {I : Functor D E} →
       Adjunction F G → Adjunction H I → Adjunction (F ∘F H) (I ∘F G)
-_∘_ X Y = record 
+_∘_ X Y = record
   { unit = {!!} ∘₀ {!!}
   ; counit = {!!}
   ; zig = {!!}

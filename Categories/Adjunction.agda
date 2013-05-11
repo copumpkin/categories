@@ -16,10 +16,8 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
     .zig : id ≡ (counit ∘ʳ F) ∘₁ (F ∘ˡ unit)
     .zag : id ≡ (G ∘ˡ counit) ∘₁ (unit ∘ʳ G)
 
-  private module C = Category C renaming (_∘_ to _∘C_; _≡_ to _≡C_)
-  private module D = Category D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
-  open C hiding (op)
-  open D hiding (op)
+  private module C = Category C
+  private module D = Category D
 
   private module F = Functor F
   private module G = Functor G renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
@@ -41,26 +39,26 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
     where
 
     .assoc′ : ∀ {x} 
-           → G₁ (counit.η (F₀ x)) ∘D G₁ (F₁ (G₁ (counit.η (F₀ x)))) ≡D G₁ (counit.η (F₀ x)) ∘D G₁ (counit.η (F₀ (G₀ (F₀ x))))
+           → G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (G₁ (counit.η (F₀ x)))) D.≡ G₁ (counit.η (F₀ x)) D.∘ G₁ (counit.η (F₀ (G₀ (F₀ x))))
     assoc′ {x} = 
         begin
-          G₁ (counit.η (F₀ x)) ∘D G₁ (F₁ (G₁ (counit.η (F₀ x))))
+          G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (G₁ (counit.η (F₀ x))))
         ↑⟨ G.homomorphism ⟩
-          G₁ ((counit.η (F₀ x)) ∘C (F₁ (G₁ (counit.η (F₀ x)))))
+          G₁ ((counit.η (F₀ x)) C.∘ (F₁ (G₁ (counit.η (F₀ x)))))
         ↓⟨ G-resp-≡ (NaturalTransformation.commute counit (counit.η (F₀ x))) ⟩
-          G₁ (counit.η (F₀ x) ∘C counit.η (F₀ (G₀ (F₀ x))))
+          G₁ (counit.η (F₀ x) C.∘ counit.η (F₀ (G₀ (F₀ x))))
         ↓⟨ G.homomorphism ⟩
-          G₁ (counit.η (F₀ x)) ∘D G₁ (counit.η (F₀ (G₀ (F₀ x))))
+          G₁ (counit.η (F₀ x)) D.∘ G₁ (counit.η (F₀ (G₀ (F₀ x))))
         ∎
       where
       open D.HomReasoning
 
-    .identityˡ′ : ∀ {x} → G₁ (counit.η (F₀ x)) ∘D G₁ (F₁ (unit.η x)) ≡D D.id
+    .identityˡ′ : ∀ {x} → G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (unit.η x)) D.≡ D.id
     identityˡ′ {x} = 
         begin
-          G₁ (counit.η (F₀ x)) ∘D G₁ (F₁ (unit.η x))
+          G₁ (counit.η (F₀ x)) D.∘ G₁ (F₁ (unit.η x))
         ↑⟨ G.homomorphism ⟩
-          G₁ ((counit.η (F₀ x)) ∘C (F₁ (unit.η x)))
+          G₁ ((counit.η (F₀ x)) C.∘ (F₁ (unit.η x)))
         ↑⟨ G-resp-≡ zig ⟩
           G₁ C.id
         ↓⟨ G.identity ⟩
@@ -69,7 +67,7 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
       where
       open D.HomReasoning
 
-    .identityʳ′ : ∀ {x} → G₁ (counit.η (F₀ x)) ∘D unit.η (G₀ (F₀ x)) ≡D D.id
+    .identityʳ′ : ∀ {x} → G₁ (counit.η (F₀ x)) D.∘ unit.η (G₀ (F₀ x)) D.≡ D.id
     identityʳ′ = D.Equiv.sym zag
 
   op : Adjunction {C = D.op} {D = C.op} G.op F.op

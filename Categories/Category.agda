@@ -390,5 +390,5 @@ module Heterogeneous {o a} (C : Category o a) where
   floatʳ-resp-∼ : ∀ {A A′ B} (A≣A′ : A ≣ A′) {f : C [ A , B ]} → f ∼ floatʳ A≣A′ f
   floatʳ-resp-∼ ≣-refl = refl
   
-_[_∼_] : ∀ {o a} (C : Category o a) {A B} (f : C [ A , B ]) {X Y} (g : C [ X , Y ]) → Set (a)
+_[_∼_] : ∀ {o a} (C : Category o a) {A B} (f : C [ A , B ]) {X Y} (g : C [ X , Y ]) → Set a
 C [ f ∼ g ] = Heterogeneous._∼_ C f g

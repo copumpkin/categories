@@ -76,6 +76,9 @@ import Categories.Cones
 -- A coherent equivalence relation over the objects of a category
 import Categories.Congruence
 
+-- Dinatural transformations
+import Categories.DinaturalTransformation
+
 -- Discrete categories (they only have objects and identity morphisms)
 import Categories.Discrete
 

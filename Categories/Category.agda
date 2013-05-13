@@ -91,7 +91,7 @@ record Category (o a : Level) : Set (suc (o ⊔ a)) where
     .reflexive : _≣_ ⊆ _≣_
     reflexive = e.reflexive q
 
-  private open Equiv
+  open Equiv
 
   domain : ∀ {A B} → (A ⇒ B) → Obj
   domain {A} _ = A
@@ -226,7 +226,7 @@ record EasyCategory (o a e : Level) : Set (suc (o ⊔ a ⊔ e)) where
     .reflexive : _≣_ ⊆ _≡_
     reflexive = e.reflexive q
 
-  private open Equiv
+  open Equiv
 
   domain : ∀ {A B} → (A ⇒ B) → Obj
   domain {A} _ = A

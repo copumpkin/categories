@@ -149,12 +149,6 @@ import Categories.FunctorCategory
 -- Isos in functor categories are the same as natural isomorphisms
 import Categories.FunctorCategory.Morphisms
 
--- The category of graphs and graph homomorphisms (Gph)
-import Categories.Graphs
-
--- The underlying graph of a category (forgetful functor Cat ⇒ Gph)
-import Categories.Graphs.Underlying
-
 -- The Grothendieck construction on categories (taking a Sets-valued functor and building a category containing all values)
 import Categories.Grothendieck
 
@@ -335,6 +329,12 @@ import Categories.Pullback
 
 -- Pushouts in a category
 import Categories.Pushout
+
+-- The category of quivers and quiver homomorphisms (Gph)
+import Categories.Quivers
+
+-- The underlying quiver of a category (forgetful functor Cat ⇒ Gph)
+import Categories.Quivers.Underlying
 
 -- All categories can have a slice category defined on them
 import Categories.Slice

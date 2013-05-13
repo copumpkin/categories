@@ -7,16 +7,17 @@ open import Categories.Support.PropositionalEquality
 
 open import Categories.Categories
 open import Categories.Category
-  renaming (_[_∼_] to _[_~C_])
+  renaming (_[_∼_] to _[_~C_]; _[_,_] to _[_⇒C_])
 open import Categories.Free.Core
 open import Categories.Functor
   using (Functor; EasyFunctor)
   renaming (_≡_ to _≡F_; _∘_ to _∘F_)
-open import Categories.Graphs
+open import Categories.Quivers
 open import Data.Product
-open import Graphs.Graph
-  renaming (_[_~_] to _[_~G_]; module Heterogeneous to HeterogeneousG)
-open import Graphs.GraphMorphism
+open import Graphs.Quiver
+  renaming (_[_~_] to _[_~G_]; _[_,_] to _[_⇒G_]
+           ; module Heterogeneous to HeterogeneousG)
+open import Graphs.Quiver.Morphism
   renaming (_∘_ to _∘G_)
 open import Data.Star
 open import Data.Star.Properties
@@ -24,13 +25,13 @@ open import Data.Star.Properties
 -- open import Categories.Support.StarEquality
 open import Level using (_⊔_)
 
-ε∼ε : ∀{o₁ a₁}{X : Graph o₁ a₁}
-       {o₂ a₂}{Y : Graph o₂ a₂}
-  → (F G : GraphMorphism X Y)
+ε∼ε : ∀{o₁ a₁}{X : Quiver o₁ a₁}
+       {o₂ a₂}{Y : Quiver o₂ a₂}
+  → (F G : QuiverMorphism X Y)
   → F ≈ G
-  → {x : Graph.Obj X}
-  → Free₀ Y [ ε {x = GraphMorphism.F₀ F x} ~C ε {x = GraphMorphism.F₀ G x} ]
-ε∼ε {Y = Y} F G (F≈G₀ , F≈G₁) {x} = ≣-subst (λ z → Free₀ Y [ ε {x = GraphMorphism.F₀ F x} ~C ε {x = z} ]) (F≈G₀ x) (Heterogeneous.refl (Free₀ Y))
+  → {x : Quiver.Obj X}
+  → Free₀ Y [ ε {x = QuiverMorphism.F₀ F x} ~C ε {x = QuiverMorphism.F₀ G x} ]
+ε∼ε {Y = Y} F G (F≈G₀ , F≈G₁) {x} = ≣-subst (λ z → Free₀ Y [ ε {x = QuiverMorphism.F₀ F x} ~C ε {x = z} ]) (F≈G₀ x) (Heterogeneous.refl (Free₀ Y))
 -- the below should probably work, but there's an agda bug
 -- XXX bug id?  mokus?  anybody?  bueller?
 {-
@@ -39,12 +40,12 @@ open import Level using (_⊔_)
 -}
 
 _◅~◅_ : 
-  ∀ {o a}{G : Graph o a}
-    {a₀ a₁ b₀ b₁ c₀ c₁ : Graph.Obj G}
-    {f  :       G [ a₀ ↝ b₀ ]}
-    {g  :       G [ a₁ ↝ b₁ ]}
-    {fs : Free₀ G [ b₀ , c₀ ]}
-    {gs : Free₀ G [ b₁ , c₁ ]}
+  ∀ {o a}{G : Quiver o a}
+    {a₀ a₁ b₀ b₁ c₀ c₁ : Quiver.Obj G}
+    {f  :       G [ a₀ ⇒G b₀ ]}
+    {g  :       G [ a₁ ⇒G b₁ ]}
+    {fs : Free₀ G [ b₀ ⇒C c₀ ]}
+    {gs : Free₀ G [ b₁ ⇒C c₁ ]}
   →       G [ f  ~G g  ]
   → Free₀ G [ fs ~C gs ]
   → Free₀ G [ (f ◅ fs) ~C (g ◅ gs) ]
@@ -53,7 +54,7 @@ _◅~◅_ {G = G} (HeterogeneousG.≈⇒~ hd) (Heterogeneous.≡⇒∼ tl)
   where
     open Heterogeneous (Free₀ G)
 
-Freeᵉ : ∀ {o a} → EasyFunctor (Graphs o a) (Categoriesᵉ o (o ⊔ a))
+Freeᵉ : ∀ {o a} → EasyFunctor (Quivers o a) (Categoriesᵉ o (o ⊔ a))
 Freeᵉ {o}{a} = record
   { F₀            = Free₀
   ; F₁            = Free₁
@@ -61,14 +62,14 @@ Freeᵉ {o}{a} = record
   ; homomorphism  = λ {X}{Y}{Z}{f}{g} → homomorphism {X}{Y}{Z}{f}{g}
   }
   where
-    module Graphs     = Category (Graphs o a)
+    module Graphs     = Category (Quivers o a)
     module Categories = Category (Categories o (o ⊔ a))
     
-    .homomorphism : ∀ {X Y Z} {f : GraphMorphism X Y} {g : GraphMorphism Y Z}
+    .homomorphism : ∀ {X Y Z} {f : QuiverMorphism X Y} {g : QuiverMorphism Y Z}
                   → Free₁ (g ∘G f) ≡F (Free₁ g ∘F Free₁ f)
     homomorphism ε = Heterogeneous.refl _
     homomorphism {X}{Y}{Z}{f}{g}{S}{U} (_◅_ {.S}{T}{.U} h hs) = 
       HeterogeneousG.refl Z ◅~◅ homomorphism {X}{Y}{Z}{f}{g}{T}{U} hs
     
-Free : ∀ {o a} → Functor (Graphs o a) (Categories o (o ⊔ a))
+Free : ∀ {o a} → Functor (Quivers o a) (Categories o (o ⊔ a))
 Free = EasyFunctor.functor Freeᵉ

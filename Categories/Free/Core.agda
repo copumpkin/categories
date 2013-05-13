@@ -13,8 +13,8 @@ open import Categories.Functor
   using (Functor)
 open import Categories.Support.Equivalence
 open import Categories.Support.PropositionalEquality
-open import Graphs.Graph
-open import Graphs.GraphMorphism
+open import Graphs.Quiver hiding (_[_,_])
+open import Graphs.Quiver.Morphism
 open import Relation.Binary
   using (module IsEquivalence)
 open import Relation.Binary.PropositionalEquality
@@ -25,10 +25,10 @@ open import Data.Star.Properties
   using (gmap-◅◅; ◅◅-assoc)
 open import Level using (_⊔_)
 
-Free₀ : ∀ {o a} → Graph o a → Category o (o ⊔ a)
+Free₀ : ∀ {o a} → Quiver o a → Category o (o ⊔ a)
 Free₀ {o}{a} G = record
   { Obj       = Obj
-  ; _⇒_       = Star _↝_
+  ; _⇒_       = Star _⇒_
   ; id        = ε
   ; _∘_       = _▻▻_
   ; ASSOC     = λ f g h → ≣-sym (◅◅-assoc f g h)
@@ -36,16 +36,16 @@ Free₀ {o}{a} G = record
   ; IDENTITYʳ = λ _ → ≣-refl
   }
   where
-    open Graph G
+    open Quiver G
     
-    f◅◅ε≣f : ∀ {A B}{f : Star _↝_ A B} -> (f ◅◅ ε) ≣ f
+    f◅◅ε≣f : ∀ {A B}{f : Star _⇒_ A B} -> (f ◅◅ ε) ≣ f
     f◅◅ε≣f {f = ε} = ≣-refl
     f◅◅ε≣f {f = x ◅ xs} rewrite f◅◅ε≣f {f = xs}  = ≣-refl
 
 Free₁ : ∀ {o₁ a₁ o₂ a₂}
-  {A : Graph o₁ a₁}
-  {B : Graph o₂ a₂}
-  → GraphMorphism A B → Functor (Free₀ A) (Free₀ B)
+  {A : Quiver o₁ a₁}
+  {B : Quiver o₂ a₂}
+  → QuiverMorphism A B → Functor (Free₀ A) (Free₀ B)
 Free₁ {o₁}{a₁}{o₂}{a₂}{A}{B} G = record
   { F₀            = G₀
   ; F₁            = gmap G₀ G₁
@@ -53,7 +53,7 @@ Free₁ {o₁}{a₁}{o₂}{a₂}{A}{B} G = record
   ; homomorphism  = λ {X}{Y}{Z}{f}{g} → homomorphism {X}{Y}{Z}{f}{g}
   }
   where
-    open GraphMorphism G
+    open QuiverMorphism G
       renaming (F₀ to G₀; F₁ to G₁; F-resp-≈ to G-resp-≈)
     open Category.Equiv (Free₀ B)
     

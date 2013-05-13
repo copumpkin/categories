@@ -1,5 +1,5 @@
 {-# OPTIONS --universe-polymorphism #-}
-module Categories.Graphs where
+module Categories.Quivers where
 
 open import Categories.Category
   hiding (module Heterogeneous)
@@ -11,13 +11,13 @@ open import Relation.Binary.PropositionalEquality
   using ()
   renaming (_≡_ to _≣_; refl to ≣-refl)
 
-open import Graphs.Graph
-open import Graphs.GraphMorphism
+open import Graphs.Quiver
+open import Graphs.Quiver.Morphism
 
-Graphs : ∀ o a → Category (suc (o ⊔ a)) (o ⊔ a)
-Graphs o a = record
-  { Obj = Graph o a
-  ; _⇒_ = GraphMorphism
+Quivers : ∀ o a → Category (suc (o ⊔ a)) (o ⊔ a)
+Quivers o a = record
+  { Obj = Quiver o a
+  ; _⇒_ = QuiverMorphism
   ; id = id
   ; _∘_ = _∘_
   ; ASSOC = λ f g h → ≣-refl
@@ -25,8 +25,8 @@ Graphs o a = record
   ; IDENTITYʳ = λ f → ≣-refl
   }
 
-Graphsᵉ : ∀ o a → EasyCategory (suc (o ⊔ a)) (o ⊔ a) (o ⊔ a)
-Graphsᵉ o a = UNEASY Graphs o a WITH record
+Quiversᵉ : ∀ o a → EasyCategory (suc (o ⊔ a)) (o ⊔ a) (o ⊔ a)
+Quiversᵉ o a = UNEASY Quivers o a WITH record
   { _≡_     = _≈_
   ; promote = promote
   ; REFL    = λ {_ _ f} → IsEquivalence.refl isEquivalence {f}

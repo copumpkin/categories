@@ -5,12 +5,12 @@ module Categories.Free where
 open import Categories.Category
 open import Categories.Free.Core
 open import Categories.Free.Functor
-open import Categories.Graphs.Underlying
+open import Categories.Quivers.Underlying
 open import Categories.Functor
   using (Functor)
-open import Graphs.Graph
-open import Graphs.GraphMorphism
-  using (GraphMorphism; module GraphMorphism)
+open import Graphs.Quiver hiding (_[_,_])
+open import Graphs.Quiver.Morphism
+  using (QuiverMorphism; module QuiverMorphism)
 open import Data.Star
 
 -- Exports from other modules:
@@ -26,9 +26,9 @@ open Categories.Free.Functor public
 --    (or whatever other names make sense for the hom-set maps
 --    C [ F _ , _ ] → D [ _ , G _ ] and inverse, respectively)
 --  Let Cata = Adjunction.left Free⊣Underlying
-Cata : ∀{o₁ a₁}{G : Graph    o₁ a₁}
+Cata : ∀{o₁ a₁}{G : Quiver   o₁ a₁}
         {o₂ a₂}{C : Category o₂ a₂}
-  → (F : GraphMorphism G (Underlying₀ C))
+  → (F : QuiverMorphism G (Underlying₀ C))
   → Functor (Free₀ G) C
 Cata {G = G} {C = C} F = record
   { F₀            = F₀
@@ -38,7 +38,7 @@ Cata {G = G} {C = C} F = record
   }
   where
     open Category C
-    open GraphMorphism F
+    open QuiverMorphism F
     open Equiv
     open HomReasoning
     

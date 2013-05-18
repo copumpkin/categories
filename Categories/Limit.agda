@@ -2,7 +2,7 @@
 module Categories.Limit where
 
 open import Level
-open import Data.Product using (Σ; _,_; uncurry; proj₂)
+open import Data.Product using (Σ; _,_; Σ-syntax; uncurry; proj₂)
 
 open import Categories.Support.PropositionalEquality
 
@@ -143,7 +143,7 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
 
   -- do these lemmas belong in Cones?
 
-  isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → Σ[ κ′ ∶ Cone ] κ ⇿ κ′
+  isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → Σ[ κ′ ∈ Cone ] κ ⇿ κ′
   isos-lift-to-cones κ {v} κ≅v =
       record
       { N = v

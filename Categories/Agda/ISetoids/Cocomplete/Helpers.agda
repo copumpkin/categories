@@ -3,7 +3,7 @@ module Categories.Agda.ISetoids.Cocomplete.Helpers where
 
 open import Level
 open import Relation.Binary using (Setoid; module Setoid; Preorder; module Preorder; Rel; _=[_]⇒_)
-open import Data.Product using (Σ; _,_)
+open import Data.Product using (Σ; _,_; Σ-syntax)
 -- import Relation.Binary.EqReasoning as EqReasoning
 
 open import Categories.Support.Equivalence using (module I→R-Wrapper; setoid-i→r; squash) renaming (Setoid to ISetoid; module Setoid to ISetoid)
@@ -34,7 +34,7 @@ module ColimitCocone {o ℓ e c ℓ′} {J : Category o ℓ e} (F : Functor J (I
   open ISetoid
   open _⟶_
 
-  vertex-carrier = Σ[ x ∶ J.Obj ] Carrier (F₀ x)
+  vertex-carrier = Σ[ x ∈ J.Obj ] Carrier (F₀ x)
 
   -- this lets us build a preorder out of an irrelevant setoid, since there
   -- are no irrelevant preorders
@@ -47,7 +47,7 @@ module ColimitCocone {o ℓ e c ℓ′} {J : Category o ℓ e} (F : Functor J (I
   -- objects of vertex-carrier to be equal.  completing this to an
   -- equivalence relation gives us the setoid we need
   _↝_ : (x y : vertex-carrier) → Set ℓ″
-  (X , x) ↝ (Y , y) = Σ[ f ∶ J [ X , Y ] ] (Y [ (F₁ f ⟨$⟩ x) ≈ y ])
+  (X , x) ↝ (Y , y) = Σ[ f ∈ J [ X , Y ] ] (Y [ (F₁ f ⟨$⟩ x) ≈ y ])
 
   ↝-preorder : Preorder c′ c′ ℓ″
   ↝-preorder = record

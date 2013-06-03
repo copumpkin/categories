@@ -4,22 +4,21 @@ open import Categories.Category
 module Categories.Object.IndexedProduct {o a} (C : Category o a) where
 
 -- An indexed product is similar to a limit, but the diagram is from a Set
---  (irrelevant Setoid here) rather than a category, so there are no subobjects
---  involved.
+--  rather than a category, so there are no subobjects involved.
  
 open Category C
 open Equiv
 
 open import Level
 open import Relation.Binary as Bi using ()
-open import Categories.Support.Equivalence
+
+open import Categories.Support.PropositionalEquality
+
 import Categories.Object.Indexed as IObj
 import Categories.Morphism.Indexed as IArrow
 
 -- Borrowed from Dan Doel's definition of products
-record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a ⊔ c ⊔ q) where
-  module B = Setoid B
-  open B using (_≈_)
+record IndexedProduct {c} (B : Set c) (As : IObj.Dust C B) : Set (o ⊔ a ⊔ c) where
   open Heterogeneous C
   open IObj C B
   open IArrow C B
@@ -27,22 +26,19 @@ record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a
   Cone : Obj → _
   Cone apex = apex ⇒∗ As
 
-  cone-setoid : Obj → Setoid _ _
-  cone-setoid apex = fan-setoid apex As
-
   _≜_ : ∀ {apex} → Bi.Rel (Cone apex) _
-  _≜_ {apex} = Setoid._≈_ (cone-setoid apex)
+  _≜_ {apex} = _≣_
 
   field
     ∏ : Obj
     π : Cone ∏
 
   -- convenience!
-  π[_] : (x : B.Carrier) → (∏ ⇒ (As ! x))
-  π[_] x = π ‼ x
-  -- ↑ XXX for some reason it won't parse as π[ x ]
-  .π-cong : ∀ {x y} → x ≈ y → (π[ x ] ∼ π[ y ])
-  π-cong x≈y = cong₁ π x≈y
+  π[_] : (x : B) → (∏ ⇒ (As ! x))
+  π[_] = π
+
+  -- .π-cong : ∀ {x y} → x ≣ y → (π[ x ] ∼ π[ y ])
+  -- π-cong = Heterogeneous.cong C
 
   π▹_ : ∀ {X} (f : X ⇒ ∏) → Cone X
   π▹_ f = _▹_ {Zs = As} π f 
@@ -53,15 +49,15 @@ record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a
     --   because of eta-driven irrelevant-field dropping
     .commute∗ : ∀ {V} (fs : Cone V) → (π▹ uncurry fs) ≜ fs
     .universal : ∀ {V} (fs : Cone V) {i : V ⇒ ∏}
-               → (∀ {x} → π[ x ] ∘ i ≡ fs ‼ x) → uncurry fs ≡ i
+               → (∀ {x} → π[ x ] ∘ i ≡ fs x) → uncurry fs ≡ i
 
   -- convenience?
-  .commute : ∀ {V} (fs : Cone V) {x} → (π[ x ] ∘ uncurry fs) ≡ fs ‼ x
-  commute fs {x} = ∼⇒≡ (commute∗ fs B.refl)
+  .commute : ∀ {V} (fs : Cone V) {x} → (π[ x ] ∘ uncurry fs) ≡ fs x
+  commute fs {x} = ≣-app (commute∗ fs) x
 
   .universal∗ : ∀ {V} (fs : Cone V) {i : V ⇒ ∏}
               → ((π▹ i) ≜ fs) → uncurry fs ≡ i
-  universal∗ fs pf = universal fs (∼⇒≡ (pf B.refl))
+  universal∗ fs pf = universal fs (≣-app pf _)
 
   .g-η : ∀ {C} {f : C ⇒ ∏} → (uncurry (π▹ f) ≡ f)
   g-η {f = f} = universal (π▹ f) Equiv.refl
@@ -69,17 +65,13 @@ record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a
   .η : uncurry π ≡ Category.id C
   η = universal π identityʳ
 
-  .uncurry-cong : ∀ {V} {fs gs : Cone V} → (∀ {x} → fs ‼ x ≡ gs ‼ x) → uncurry fs ≡ uncurry gs
+  .uncurry-cong : ∀ {V} {fs gs : Cone V} → (∀ {x} → fs x ≡ gs x) → uncurry fs ≡ uncurry gs
   uncurry-cong {fs = fs} {gs} eq = 
     universal fs (Equiv.trans (commute gs) (Equiv.sym eq))
 
   .uncurry-cong∗ : ∀ {V} {fs gs : Cone V} → fs ≜ gs → uncurry fs ≡ uncurry gs
   uncurry-cong∗ {V} {fs} {gs} eq = universal∗ fs 
-      (≜-trans {π▹ uncurry gs} {gs} {fs} (commute∗ gs) (≜-sym {fs} {gs} eq))
-    where
-    open Setoid (cone-setoid V) using ()
-                                renaming (trans to ≜-trans; sym to ≜-sym)
-
+      (≣-trans (commute∗ gs) (≣-sym eq))
 
   .uncurry∘ : ∀ {V W} (fs : Cone V) {q : W ⇒ V} → (uncurry fs) ∘ q ≡ uncurry (_▹_ {Zs = As} fs q)
   uncurry∘ fs {q} = Equiv.sym (universal (_▹_ {Zs = As} fs q) (Equiv.trans (Equiv.sym assoc) (∘-resp-≡ˡ (commute fs))))

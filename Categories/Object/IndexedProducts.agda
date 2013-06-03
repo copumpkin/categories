@@ -10,19 +10,17 @@ open Category C
 
 open import Level
 
-open import Categories.Support.Equivalence using (Setoid; module Setoid)
+open import Categories.Support.PropositionalEquality
 
 import Categories.Object.Indexed as IObj
 import Categories.Object.IndexedProduct as IProduct
 import Categories.Morphism.Indexed as IArrow
 import Categories.Morphisms as Morphisms
 
-record IndexedProducts {c q} {Shape : Setoid c q} : Set (o ⊔ a ⊔ c ⊔ q) where
+record IndexedProducts {c} {Shape : Set c} : Set (o ⊔ a ⊔ c) where
   open IObj C Shape
   open IArrow C Shape
   open IProduct C
-  module Fan-Setoid {V} (xs : Dust) = Setoid (fan-setoid V xs)
-  open Fan-Setoid using () renaming (_≈_ to _[_≜_])
 
   field
     product : ∀ {As} → IndexedProduct Shape As
@@ -38,7 +36,7 @@ record IndexedProducts {c q} {Shape : Setoid c q} : Set (o ⊔ a ⊔ c ⊔ q) wh
 
   -- Convenience!  well, sort of.
   module Product {As} = IndexedProduct {As = As} (product {As = As})
-  open Product using (π; π[_]; π-cong; π▹_; uncurry; commute; commute∗; universal; universal∗; g-η; η; uncurry-cong; uncurry-cong∗; uncurry∘)
+  open Product using (π; π[_]; π▹_; uncurry; commute; commute∗; universal; universal∗; g-η; η; uncurry-cong; uncurry-cong∗; uncurry∘)
 
   -- assocˡ : ∀ {A B C} → (((A × B) × C) ⇒ (A × (B × C)))
   -- assocˡ = _≅_.g C ×-assoc
@@ -61,27 +59,27 @@ record IndexedProducts {c q} {Shape : Setoid c q} : Set (o ⊔ a ⊔ c ⊔ q) wh
   -- second g = id ⁂ g
 
   -- Just to make this more obvious
-  .π▹bundle : ∀ {As Bs} {fs : As ∗⇒∗ Bs} → Bs [ π▹ bundle {As} {Bs} fs ≜ _⋉π {As} {Bs} fs ]
+  .π▹bundle : ∀ {As Bs} {fs : As ∗⇒∗ Bs} → π▹ bundle {As} {Bs} fs ≣ _⋉π {As} {Bs} fs
   π▹bundle {As} {Bs} {fs = fs} = commute∗ {Bs} (_⋉π {As} {Bs} fs)
 
-  .π∘bundle : ∀ {As Bs} {fs : As ∗⇒∗ Bs} {x} → π[_] {Bs} x ∘ bundle {As} {Bs} fs ≡ (fs ‼ x) ∘ π[_] {As} x
+  .π∘bundle : ∀ {As Bs} {fs : As ∗⇒∗ Bs} {x} → π[_] {Bs} x ∘ bundle {As} {Bs} fs ≡ (fs x) ∘ π[_] {As} x
   π∘bundle {As} {Bs} {fs = fs} = commute {Bs} (_⋉π {As} {Bs} fs)
 
   .bundle∘uncurry : ∀ {A Bs Cs} {fs : Bs ∗⇒∗ Cs} {gs : A ⇒∗ Bs} → bundle {Bs} {Cs} fs ∘ uncurry {Bs} gs ≡ uncurry {Cs} (_⋉_ {Ys = Bs} {Cs} fs gs)
   bundle∘uncurry {Bs = Bs} {Cs} {fs = fs} {gs} = Equiv.sym (universal {Cs} (_⋉_ {Ys = Bs} {Cs} fs gs) helper)
     where
-    helper : ∀ {x} → π[_] {Cs} x ∘ (bundle {Bs} {Cs} fs ∘ uncurry {Bs} gs) ≡ (fs ‼ x) ∘ (gs ‼ x)
+    helper : ∀ {x} → π[_] {Cs} x ∘ (bundle {Bs} {Cs} fs ∘ uncurry {Bs} gs) ≡ (fs x) ∘ (gs x)
     helper {x} = 
       begin
         π[_] {Cs} x ∘ (bundle {Bs} {Cs} fs ∘ uncurry {Bs} gs)
       ↑⟨ assoc ⟩
         (π[_] {Cs} x ∘ bundle {Bs} {Cs} fs) ∘ uncurry {Bs} gs
       ↓⟨ ∘-resp-≡ˡ (π∘bundle {Bs} {Cs} {fs = fs}) ⟩
-        ((fs ‼ x) ∘ π[_] {Bs} x) ∘ uncurry {Bs} gs
+        ((fs x) ∘ π[_] {Bs} x) ∘ uncurry {Bs} gs
       ↓⟨ assoc ⟩
-        (fs ‼ x) ∘ (π[_] {Bs} x ∘ uncurry {Bs} gs)
+        (fs x) ∘ (π[_] {Bs} x ∘ uncurry {Bs} gs)
       ↓⟨ ∘-resp-≡ʳ (commute {Bs} gs) ⟩
-        (fs ‼ x) ∘ (gs ‼ x)
+        (fs x) ∘ (gs x)
       ∎
       where
       open HomReasoning

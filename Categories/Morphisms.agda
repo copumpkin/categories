@@ -5,7 +5,6 @@ module Categories.Morphisms {o a} (C : Category o a) where
 
 open import Level
 open import Relation.Binary using (IsEquivalence; Setoid)
-open import Function using (type-signature)
 
 open import Categories.Support.PropositionalEquality
 

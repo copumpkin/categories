@@ -143,7 +143,7 @@ module LimitsOf {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F
 
   -- do these lemmas belong in Cones?
 
-  isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → Σ[ κ′ ∶ Cone ] κ ⇿ κ′
+  isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → Σ Cone (λ κ′ → κ ⇿ κ′)
   isos-lift-to-cones κ {v} κ≅v =
     κ′ , record
       { f = f′

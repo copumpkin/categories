@@ -2,7 +2,7 @@
 module Categories.Limit where
 
 open import Level
-open import Data.Product using (Σ; _,_; uncurry; proj₂)
+open import Data.Product using (Σ; _,_; Σ-syntax; uncurry; proj₂)
 
 open import Categories.Support.PropositionalEquality
 

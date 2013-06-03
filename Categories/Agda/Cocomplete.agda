@@ -34,7 +34,7 @@ SetsCocomplete {o} {a} {o′} = record { colimit = colimit }
     module J = Category J
     open Functor F
     open EasyCategory (Coconesᵉ F) using (promote)
-    vertex-carrier = Σ[ x ∶ J.Obj ] (F₀ x)
+    vertex-carrier = Σ J.Obj (λ x → F₀ x)
 
     -- _↝_ means that an arrow in the diagram directly constrains the two
     -- objects of vertex-carrier to be equal.  completing this to an

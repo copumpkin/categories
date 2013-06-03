@@ -11,7 +11,7 @@ open import Categories.Support.Equivalence
 open import Categories.Category
 open import Categories.Functor hiding (id; equiv) renaming (_∘_ to _∘F_; _≡_ to _≡F_)
 open import Categories.NaturalTransformation.Core hiding (_≡_; equiv; setoid)
-open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_)
+open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_) renaming (promote to promoteNT)
 import Categories.Morphisms as Morphisms
 open import Categories.Functor.Properties using (module FunctorsAlways)
 open import Categories.Square
@@ -202,3 +202,20 @@ _ⓘʳ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
     module F = Functor F
     module G = Functor G
   my-iso F G F≡G G≡F x | _ | ._ | _ | _ | ≡⇒∼ _ | ≡⇒∼ _ = D.identityʳ
+
+promoteⁱ : let open NaturalIsomorphism using (ηⁱ) in
+           ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D}
+             (i j : NaturalIsomorphism F G) → (∀ X → ηⁱ i X ≣ ηⁱ j X) → i ≣ j
+promoteⁱ {D = D} i j eqs = helper (promoteNT i.F⇒G j.F⇒G (≣-cong fwd (eqs _)))
+                                  (promoteNT i.F⇐G j.F⇐G (≣-cong rev (eqs _)))
+  where
+  module i = NaturalIsomorphism i
+  module j = NaturalIsomorphism j
+  open NaturalTransformation using () renaming (η to _©_)
+  open Morphisms D using (Iso; module _≅_)
+  open _≅_ using () renaming (f to fwd; g to rev)
+  helper : ∀ {F⇒G} {F⇐G} (eq⇒ : i.F⇒G ≣ F⇒G) (eq⇐ : i.F⇐G ≣ F⇐G)
+         → (i ≣ record { F⇒G = F⇒G; F⇐G = F⇐G
+                       ; iso = ≣-subst₂ (λ η⇒ η⇐ → ∀ X → Iso (η⇒ © X) (η⇐ © X))
+                                        eq⇒ eq⇐ i.iso })
+  helper ≣-refl ≣-refl = ≣-refl

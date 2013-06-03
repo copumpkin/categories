@@ -8,6 +8,7 @@ open import Categories.Category
 import Categories.NaturalTransformation 
 module NT = Categories.NaturalTransformation
 open import Categories.Bifunctor using (Bifunctor; module Functor)
+open import Categories.Square
 
 record DinaturalTransformation {o a o′ a′}
                                {C : Category o a}
@@ -33,17 +34,46 @@ _<∘_ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G H 
       → NT.NaturalTransformation G H → DinaturalTransformation {C = C} F G → DinaturalTransformation {C = C} F H
 _<∘_ {C = C} {D} {F} {G} {H} eta alpha = record { α = λ c → η (c , c) ∘ α c; commute = λ {c} {c′} f → 
      begin 
-       H.F₁ (f , C.id) ∘ ((η (c′ , c′) ∘ α c′) ∘ F.F₁ (C.id , f)) ↑⟨ assoc ⟩ 
-       (H.F₁ (f , C.id) ∘ η (c′ , c′) ∘ α c′) ∘ F.F₁ (C.id , f)   ↑⟨ assoc ⟩∘⟨ refl ⟩ 
-       ((H.F₁ (f , C.id) ∘ η (c′ , c′)) ∘ α c′) ∘ F.F₁ (C.id , f) ↑⟨ (eta.commute (f , C.id) ⟩∘⟨ refl) ⟩∘⟨ refl ⟩ 
-       ((η (c , c′) ∘ G.F₁ (f , C.id)) ∘ α c′) ∘ F.F₁ (C.id , f)  ↓⟨ assoc ⟩ 
-       (η (c , c′) ∘ G.F₁ (f , C.id)) ∘ α c′ ∘ F.F₁ (C.id , f)    ↓⟨ assoc ⟩ 
-       η (c , c′) ∘ G.F₁ (f , C.id) ∘ α c′ ∘ F.F₁ (C.id , f)      ↓⟨ refl ⟩∘⟨ commute f ⟩ 
-       η (c , c′) ∘ G.F₁ (C.id , f) ∘ α c ∘ F.F₁ (f , C.id)       ↑⟨ assoc ⟩ 
-       (η (c , c′) ∘ G.F₁ (C.id , f)) ∘ α c ∘ F.F₁ (f , C.id)     ↓⟨ eta.commute (C.id , f) ⟩∘⟨ refl ⟩ 
-       (H.F₁ (C.id , f) ∘ η (c , c)) ∘ α c ∘ F.F₁ (f , C.id)      ↓⟨ assoc ⟩ 
-       H.F₁ (C.id , f) ∘ η (c , c) ∘ α c ∘ F.F₁ (f , C.id)        ↑⟨ refl ⟩∘⟨ assoc ⟩ 
-       H.F₁ (C.id , f) ∘ (η (c , c) ∘ α c) ∘ F.F₁ (f , C.id)      ∎ }
+       H.F₁ (f , C.id) ∙ ((η (c′ , c′) ∙ α c′) ∙ F.F₁ (C.id , f))
+     ↑⟨ refl ⟩ 
+       (H.F₁ (f , C.id) ∙ η (c′ , c′)) ∙ (α c′ ∙ F.F₁ (C.id , f))
+     ↑≡⟨ ∘-resp-≡ˡ (eta.commute (f , C.id)) ⟩
+       (η (c , c′) ∙ G.F₁ (f , C.id)) ∙ (α c′ ∙ F.F₁ (C.id , f))
+     ↓≡⟨ pullʳ (commute f) ⟩
+       η (c , c′) ∙ G.F₁ (C.id , f) ∙ α c ∙ F.F₁ (f , C.id)
+     ↓≡⟨ pullˡ (eta.commute (C.id , f)) ⟩ 
+       (H.F₁ (C.id , f) ∙ η (c , c)) ∙ α c ∙ F.F₁ (f , C.id)
+     ↓⟨ refl ⟩
+       H.F₁ (C.id , f) ∙ (η (c , c) ∙ α c) ∙ F.F₁ (f , C.id)
+     ∎ }
+  where
+    module C = Category C
+    module D = Category D
+    open D 
+    open D.Equiv
+    module F = Functor F
+    module G = Functor G
+    module H = Functor H
+    module eta = NT.NaturalTransformation eta
+    open eta using (η)
+    open DinaturalTransformation alpha
+    open AUReasoning D
+    open GlueSquares D
+
+
+
+_∘>_ : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G H : Bifunctor (Category.op C) C D} 
+      → DinaturalTransformation {C = C} G H → NT.NaturalTransformation F G → DinaturalTransformation {C = C} F H
+_∘>_ {C = C} {D} {F} {G} {H} alpha eta = record { α = λ c → α c ∘ η (c , c); commute = λ {c} {c′} f → 
+     begin 
+       H.F₁ (f , C.id) ∘ ((α c′ ∘ η (c′ , c′)) ∘ F.F₁ (C.id , f))
+     ↓⟨ pushʳ (extendˡ (eta.commute (C.id , f))) ⟩
+       (H.F₁ (f , C.id) ∘ α c′ ∘ G.F₁ (C.id , f)) ∘ η (c′ , c)
+     ↓⟨ pushˡ (commute f) ⟩
+       H.F₁ (C.id , f) ∘ ((α c ∘ G.F₁ (f , C.id)) ∘ η (c′ , c))
+     ↑⟨ ∘-resp-≡ʳ (extendˡ (eta.commute (f , C.id))) ⟩ 
+       H.F₁ (C.id , f) ∘ (α c ∘ η (c , c)) ∘ F.F₁ (f , C.id)
+     ∎ }
   where
     module C = Category C
     module D = Category D
@@ -56,3 +86,4 @@ _<∘_ {C = C} {D} {F} {G} {H} eta alpha = record { α = λ c → η (c , c) ∘
     open eta using (η)
     open DinaturalTransformation alpha
     open D.HomReasoning
+    open GlueSquares D

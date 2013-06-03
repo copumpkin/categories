@@ -14,6 +14,7 @@ open import Categories.NaturalTransformation.Core hiding (_≡_; equiv; setoid)
 open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_)
 import Categories.Morphisms as Morphisms
 open import Categories.Functor.Properties using (module FunctorsAlways)
+open import Categories.Square
 
 record NaturalIsomorphism {o a o′ a′}
                           {C : Category o a}
@@ -85,36 +86,26 @@ equiv {C = C} {D} = record
       isoˡ′ : (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ≡ D.id
       isoˡ′ = begin
                 (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z)
-              ↓⟨ D.assoc ⟩
-                η (F⇐G X) Z ∘ (η (F⇐G Y) Z ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z))
-              ↑⟨ D.∘-resp-≡ʳ D.assoc ⟩
-                η (F⇐G X) Z ∘ ((η (F⇐G Y) Z ∘ η (F⇒G Y) Z) ∘ η (F⇒G X) Z)
-              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (Morphisms.Iso.isoˡ D (iso Y Z))) ⟩
-                η (F⇐G X) Z ∘ (D.id ∘ η (F⇒G X) Z)
-              ↓⟨ D.∘-resp-≡ʳ D.identityˡ ⟩
+              ↓⟨ cancelInner (Morphisms.Iso.isoˡ D (iso Y Z)) ⟩
                 η (F⇐G X) Z ∘ η (F⇒G X) Z
               ↓⟨ Morphisms.Iso.isoˡ D (iso X Z) ⟩
                 D.id
               ∎
         where
         open D.HomReasoning
+        open GlueSquares D
 
       isoʳ′ : (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ∘ (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ≡ D.id
       isoʳ′ = begin
                 (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ∘ (η (F⇐G X) Z ∘ η (F⇐G Y) Z)
-              ↓⟨ D.assoc ⟩
-                η (F⇒G Y) Z ∘ (η (F⇒G X) Z ∘ (η (F⇐G X) Z ∘ η (F⇐G Y) Z))
-              ↑⟨ D.∘-resp-≡ʳ D.assoc ⟩
-                η (F⇒G Y) Z ∘ ((η (F⇒G X) Z ∘ η (F⇐G X) Z) ∘ η (F⇐G Y) Z)
-              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (Morphisms.Iso.isoʳ D (iso X Z))) ⟩
-                η (F⇒G Y) Z ∘ (D.id ∘ η (F⇐G Y) Z)
-              ↓⟨ D.∘-resp-≡ʳ D.identityˡ ⟩
+              ↓⟨ cancelInner (Morphisms.Iso.isoʳ D (iso X Z)) ⟩
                 η (F⇒G Y) Z ∘ η (F⇐G Y) Z
               ↓⟨ Morphisms.Iso.isoʳ D (iso Y Z) ⟩
                 D.id
               ∎
         where
         open D.HomReasoning
+        open GlueSquares D
 
 setoid : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → Setoid _ _
 setoid {C = C} {D} = record 

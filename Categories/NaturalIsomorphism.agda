@@ -39,6 +39,9 @@ record NaturalIsomorphism {o a o′ a′}
   field
     .iso : ∀ X → Iso (⇒.η X) (⇐.η X)
 
+  ηⁱ : ∀ X → F₀ X ≅ G₀ X
+  ηⁱ X = record { f = ⇒.η X; g = ⇐.η X; iso = iso X }
+
 equiv : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → IsEquivalence (NaturalIsomorphism {C = C} {D})
 equiv {C = C} {D} = record 
   { refl = record

@@ -67,6 +67,45 @@ module GlueSquares {o ℓ e} (C : Category o ℓ e) where
 
   open IntroElim public
 
+  module Extends {X Y Z W} {f : X ⇒ Y} {g : X ⇒ Z} {h : Y ⇒ W} {i : Z ⇒ W} (s : CommutativeSquare f g h i) where
+    .extendˡ : ∀ {A} {a : W ⇒ A} → CommutativeSquare f g (a ∘ h) (a ∘ i)
+    extendˡ {a = a} =
+      begin
+        (a ∘ h) ∘ f
+      ↓⟨ pullʳ s ⟩
+        a ∘ i ∘ g
+      ↑⟨ assoc ⟩
+        (a ∘ i) ∘ g
+      ∎
+      where
+      open HomReasoning
+
+    .extendʳ : ∀ {A} {a : A ⇒ X} → CommutativeSquare (f ∘ a) (g ∘ a) h i
+    extendʳ {a = a} =
+      begin
+        h ∘ (f ∘ a)
+      ↓⟨ pullˡ s ⟩
+        (i ∘ g) ∘ a
+      ↓⟨ assoc ⟩
+        i ∘ (g ∘ a)
+      ∎
+      where
+      open HomReasoning
+
+    .extend² : ∀ {A B} {a : W ⇒ A} {b : B ⇒ X} → CommutativeSquare (f ∘ b) (g ∘ b) (a ∘ h) (a ∘ i)
+    extend² {a = a} {b} =
+      begin
+        (a ∘ h) ∘ (f ∘ b)
+      ↓⟨ pullʳ extendʳ ⟩
+        a ∘ (i ∘ (g ∘ b))
+      ↑⟨ assoc ⟩
+        (a ∘ i) ∘ (g ∘ b)
+      ∎
+      where
+      open HomReasoning
+
+  open Extends public
+
   -- essentially composition in the arrow category
   .glue : {X Y Y′ Z Z′ W : Obj} {a : Z ⇒ W} {a′ : Y′ ⇒ Z′} {b : Y ⇒ Z} {b′ : X ⇒ Y′} {c : X ⇒ Y} {c′ : Y′ ⇒ Z} {c″ : Z′ ⇒ W} → CommutativeSquare c′ a′ a c″ → CommutativeSquare c b′ b c′ → CommutativeSquare c (a′ ∘ b′) (a ∘ b) c″
   glue {a = a} {a′} {b} {b′} {c} {c′} {c″} sq-a sq-b = 

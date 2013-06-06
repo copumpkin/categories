@@ -28,47 +28,47 @@ Comma {o₁}{ℓ₁}{e₁}
   ; assoc       = A.assoc , B.assoc
   ; identityˡ   = A.identityˡ , B.identityˡ
   ; identityʳ   = A.identityʳ , B.identityʳ
-  ; equiv = record 
+  ; equiv = record
     { refl  = A.Equiv.refl , B.Equiv.refl
     ; sym   = map A.Equiv.sym B.Equiv.sym
     ; trans = zip A.Equiv.trans B.Equiv.trans
-    }          
+    }
   ; ∘-resp-≡    = zip A.∘-resp-≡ B.∘-resp-≡
-  } where
+  } module Comma where
     module A = Category A
     module B = Category B
     module C = Category C
     module T = Functor T
     module S = Functor S
-    
+
     open T using () renaming (F₀ to T₀; F₁ to T₁)
     open S using () renaming (F₀ to S₀; F₁ to S₁)
-    
+
     infixr 9 _∘′_
     infix  4 _≡′_
-    
+
     record Obj′ : Set (o₁ ⊔ o₂ ⊔ ℓ₃) where
         constructor _,_,_
         field
             α : A.Obj
             β : B.Obj
             f : C [ T₀ α , S₀ β ]
-    
+
     record Hom′ (X₁ X₂ : Obj′) : Set (ℓ₁ ⊔ ℓ₂ ⊔ e₃) where
         constructor _,_[_]
         open Obj′ X₁ renaming (α to α₁; β to β₁; f to f₁)
         open Obj′ X₂ renaming (α to α₂; β to β₂; f to f₂)
-        
+
         field
             g         : A [ α₁ , α₂ ]
             h         : B [ β₁ , β₂ ]
             .commutes : C.CommutativeSquare f₁ (T₁ g) (S₁ h) f₂
-    
+
     _≡′_ : ∀ {X₁ X₂} → Rel (Hom′ X₁ X₂) _
-    (g₁ , h₁ [ _ ]) ≡′ (g₂ , h₂ [ _ ]) 
+    (g₁ , h₁ [ _ ]) ≡′ (g₂ , h₂ [ _ ])
         = A [ g₁ ≡ g₂ ]
         × B [ h₁ ≡ h₂ ]
-    
+
     id′ : {A : Obj′} → Hom′ A A
     id′ { A } = A.id , B.id
         [ begin
@@ -86,7 +86,7 @@ Comma {o₁}{ℓ₁}{e₁}
             open Obj′ A
             open C.HomReasoning
             open C.Equiv
-    
+
     _∘′_ : ∀ {X₁ X₂ X₃} → Hom′ X₂ X₃ → Hom′ X₁ X₂ → Hom′ X₁ X₃
     _∘′_ {X₁}{X₂}{X₃} (g₁ , h₁ [ commutes₁ ]) (g₂ , h₂ [ commutes₂ ])
         = A [ g₁ ∘ g₂ ] , B [ h₁ ∘ h₂ ]

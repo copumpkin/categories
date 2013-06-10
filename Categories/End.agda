@@ -9,6 +9,7 @@ open import Categories.DinaturalTransformation
 open import Categories.Functor.Constant
 open import Level
 open import Categories.Morphisms V
+open import Categories.Square
 
 record End-data (F : Bifunctor C.op C V) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
   field
@@ -19,16 +20,12 @@ record End-data (F : Bifunctor C.op C V) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ
   π∘_ : ∀ {Q} → Q V.⇒ E → End-data F
   π∘ g = record { π = record { α = λ c → α c ∘ g; commute = λ {c c′} f → 
           begin
-            F.F₁ (f , C.id) ∘ (α c′ ∘ g) ∘ id ↓⟨ Equiv.refl ⟩∘⟨ identityʳ ⟩
-            F.F₁ (f , C.id) ∘ α c′ ∘ g ↑⟨ assoc ⟩
-            (F.F₁ (f , C.id) ∘ α c′) ∘ g ↑⟨ (Equiv.refl ⟩∘⟨ identityʳ) ⟩∘⟨ Equiv.refl ⟩ 
-            (F.F₁ (f , C.id) ∘ α c′ ∘ id) ∘ g ↓⟨ commute f ⟩∘⟨ Equiv.refl ⟩ 
-            (F.F₁ (C.id , f) ∘ α c ∘ id) ∘ g ↓⟨ (Equiv.refl ⟩∘⟨ identityʳ) ⟩∘⟨ Equiv.refl ⟩ 
-            (F.F₁ (C.id , f) ∘ α c) ∘ g ↓⟨ assoc ⟩ 
-            F.F₁ (C.id , f) ∘ α c ∘ g ↑⟨ Equiv.refl ⟩∘⟨ identityʳ ⟩ 
-            F.F₁ (C.id , f) ∘ (α c ∘ g) ∘ id ∎ } }
+            F.F₁ (f , C.id) ∙ (α c′ ∙ g) ∙ ID ↓⟨ Equiv.refl ⟩
+            (F.F₁ (f , C.id) ∙ α c′ ∙ ID) ∙ g ↓≡⟨ ∘-resp-≡ˡ (commute f) ⟩ 
+            (F.F₁ (C.id , f) ∙ α c ∙ ID) ∙ g  ↓⟨ Equiv.refl ⟩ 
+            F.F₁ (C.id , f) ∙ (α c ∙ g) ∙ ID  ∎ } }
    where
-     open V.HomReasoning
+     open AUReasoning V
      module F = Functor F
      open import Data.Product
      open V
@@ -82,32 +79,31 @@ endF {A = A} F mke = record {
                    F₀ = λ a → End.E (mke a);
                    F₁ = λ {a b} → F₁ {a} {b} ;
                    identity = λ {a} → V.Equiv.sym (End.universal-unique (mke a) V.id (λ c → 
-                     begin α (End.π (mke a)) c ∘ id                    ↓⟨ identityʳ ⟩ 
-                           α (End.π (mke a)) c                         ↑⟨ identityˡ ⟩ 
-                           id ∘ α (End.π (mke a)) c                    ↑⟨ F.identity ⟩∘⟨ Equiv.refl ⟩ 
-                           η (F.F₁ A.id) (c , c) ∘ α (End.π (mke a)) c ∎)) ;
+                     begin α (End.π (mke a)) c ∙ ID                    ↓⟨ Equiv.refl ⟩ 
+                           ID ∙ α (End.π (mke a)) c                    ↑≡⟨ ∘-resp-≡ˡ F.identity ⟩ 
+                           η (F.F₁ A.id) (c , c) ∙ α (End.π (mke a)) c ∎)) ;
                    homomorphism = λ {X Y Z f g} → V.Equiv.sym (End.universal-unique (mke Z) _ (λ c → 
-                       begin α (End.π (mke Z)) c ∘ F₁ g ∘ F₁ f 
-                                   ↑⟨ assoc ⟩ 
-                             (α (End.π (mke Z)) c ∘ F₁ g) ∘ F₁ f
-                                   ↓⟨ End.π[c]∘universal≡δ[c] (mke Z) {record {π = F.F₁ g <∘ End.π (mke Y)}} c ⟩∘⟨ Equiv.refl ⟩ 
-                             (η (F.F₁ g) (c , c) ∘ α (End.π (mke Y)) c) ∘ F₁ f 
-                                   ↓⟨ assoc ⟩ 
-                             η (F.F₁ g) (c , c) ∘ α (End.π (mke Y)) c ∘ F₁ f
-                                   ↓⟨ Equiv.refl ⟩∘⟨ End.π[c]∘universal≡δ[c] (mke Y) {record {π = F.F₁ f <∘ End.π (mke X)}} c ⟩ 
-                             η (F.F₁ g) (c , c) ∘ η (F.F₁ f) (c , c) ∘ α (End.π (mke X)) c 
-                                   ↑⟨ assoc ⟩ 
-                             η (Functors (Product C.op C) V [ F.F₁ g ∘ F.F₁ f ]) (c , c) ∘ α (End.π (mke X)) c 
-                                   ↑⟨ F.homomorphism ⟩∘⟨ Equiv.refl ⟩ 
-                             η (F.F₁ (A [ g ∘ f ])) (c , c) ∘ α (End.π (mke X)) c 
+                       begin α (End.π (mke Z)) c ∙ F₁ g ∙ F₁ f 
+                                   ↑⟨ Equiv.refl ⟩ 
+                             (α (End.π (mke Z)) c ∙ F₁ g) ∙ F₁ f
+                                   ↓≡⟨ ∘-resp-≡ˡ (End.π[c]∘universal≡δ[c] (mke Z) {record {π = F.F₁ g <∘ End.π (mke Y)}} c) ⟩ 
+                             (η (F.F₁ g) (c , c) ∙ α (End.π (mke Y)) c) ∙ F₁ f 
+                                   ↓⟨ Equiv.refl ⟩ 
+                             η (F.F₁ g) (c , c) ∙ α (End.π (mke Y)) c ∙ F₁ f
+                                   ↓≡⟨ ∘-resp-≡ʳ (End.π[c]∘universal≡δ[c] (mke Y) {record {π = F.F₁ f <∘ End.π (mke X)}} c) ⟩ 
+                             η (F.F₁ g) (c , c) ∙ η (F.F₁ f) (c , c) ∙ α (End.π (mke X)) c 
+                                   ↑⟨ Equiv.refl ⟩ 
+                             (η (F.F₁ g) (c , c) ∙ η (F.F₁ f) (c , c)) ∙ α (End.π (mke X)) c 
+                                   ↑≡⟨ ∘-resp-≡ˡ F.homomorphism  ⟩
+                             η (F.F₁ (A [ g ∘ f ])) (c , c) ∙ α (End.π (mke X)) c 
                                                                                    ∎));
                    F-resp-≡ = λ {a b f g} f≡g → End.universal-unique (mke b) _ (λ c → 
-                       begin α (End.π (mke b)) c ∘ F₁ f               ↓⟨ End.π[c]∘universal≡δ[c] (mke b) c ⟩ 
-                             η (F.F₁ f) (c , c) ∘ α (End.π (mke a)) c ↓⟨ F.F-resp-≡ f≡g ⟩∘⟨ Equiv.refl ⟩ 
-                             η (F.F₁ g) (c , c) ∘ α (End.π (mke a)) c ∎)} 
+                       begin α (End.π (mke b)) c ∙ F₁ f               ↓≡⟨ End.π[c]∘universal≡δ[c] (mke b) c ⟩ 
+                             η (F.F₁ f) (c , c) ∙ α (End.π (mke a)) c ↓≡⟨ ∘-resp-≡ˡ (F.F-resp-≡ f≡g) ⟩ 
+                             η (F.F₁ g) (c , c) ∙ α (End.π (mke a)) c ∎)} 
  where
   module A = Category A
   module F = Functor F
   open V
-  open V.HomReasoning
+  open AUReasoning V
   F₁ = λ {a b} f → End.universal (mke b) (record { E = _; π = (F.F₁ f) <∘ (End.π (mke a)) })

@@ -4,6 +4,7 @@ module Categories.Functor.Hom where
 open import Data.Product using (_×_; uncurry; proj₁; proj₂; _,_)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category
 open import Categories.Bifunctor using (Bifunctor; Functor; module Functor)

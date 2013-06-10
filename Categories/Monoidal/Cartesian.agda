@@ -4,6 +4,7 @@ module Categories.Monoidal.Cartesian where
 open import Data.Product using (proj₁; proj₂) renaming (_×_ to _×₀_)
 open import Data.Fin using (zero)
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Monoidal
 open import Categories.Object.BinaryProducts

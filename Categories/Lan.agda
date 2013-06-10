@@ -2,6 +2,7 @@
 module Categories.Lan where
 
 open import Level
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor hiding (_≡_)
 open import Categories.NaturalTransformation

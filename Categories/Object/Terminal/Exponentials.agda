@@ -11,6 +11,8 @@ module Categories.Object.Terminal.Exponentials {o a : Level}
 open Category C
 open Terminal C T
 
+open import Categories.Operations
+
 import Categories.Object.Exponential
 import Categories.Object.Product
 import Categories.Object.Product.Morphisms

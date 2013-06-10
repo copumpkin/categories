@@ -9,6 +9,7 @@ open import Data.Product using (Σ; _×_; ∃; proj₁)
 open import Categories.Support.PropositionalEquality
 open import Categories.Category
 open import Categories.Functor.Core public
+open import Categories.Operations
 import Categories.Morphisms as Morphisms
 
 infix  4 _≡_

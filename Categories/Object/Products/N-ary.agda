@@ -11,6 +11,8 @@ open Category C
 open Products C P
 open Equiv
 
+open import Categories.Operations
+
 import Categories.Object.Product
 open Categories.Object.Product C
 

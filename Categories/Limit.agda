@@ -2,9 +2,10 @@
 module Categories.Limit where
 
 open import Level
-open import Data.Product using (Σ; _,_; uncurry; proj₂)
+open import Data.Product using (Σ; _,_; uncurry; proj₂; ∃)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category
 open import Categories.Functor using (Functor; module Functor)
@@ -22,7 +23,7 @@ module LimitsOf {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F
   open Functor F
   open Mor C using (_≅_; _≡ⁱ_)
   open Mor (Cones F) using () renaming (_≅_ to _⇿_; _≡ⁱ_ to _≜ⁱ_)
-  open Category (Cones F) using () renaming (Obj to Cone; _≡_ to _≜₁_; _∘_ to _▵_; _⇒_ to _⇾_; id to id▵)
+  open Category (Cones F) using (Category-composes) renaming (Obj to Cone; _≡_ to _≜₁_; _⇒_ to _⇾_; id to id▵)
   open ConeOver F using (_≜_; ≜-refl; ≜-sym; ≜-trans; heterogenize; homogenize; ConeUnder; tether; untether; _≜′_) renaming (module _≜_ to ≜; module _≜′_ to ≜′)
   open Heterogeneous C
 
@@ -119,7 +120,7 @@ module LimitsOf {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F
       ≡⇒∼ʳ (≜.N-≣ K₁≜K₂) (≣-cong ConeMorphism.f (rep-cone-cong K₁≜K₂))
 
     .rep-cone∘ : ∀ {K K′} {q : K′ ⇾ K} → Cones F [ Cones F [ rep-cone K ∘ q ] ≡ rep-cone K′ ]
-    rep-cone∘ {K} {q = q} = ≣-sym (terminal.!-unique (rep-cone K ▵ q))
+    rep-cone∘ {K} {q = q} = ≣-sym (terminal.!-unique (rep-cone K ∘ q))
 
     .rep∘ : ∀ {K K′} {q : K′ ⇾ K} → rep K ∘ ConeMorphism.f q ≡ rep K′
     rep∘ {K} {K′} {q} = ≣-cong ConeMorphism.f (rep-cone∘ {K} {K′} {q})
@@ -143,12 +144,12 @@ module LimitsOf {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F
 
   -- do these lemmas belong in Cones?
 
-  isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → Σ[ κ′ ∶ Cone ] κ ⇿ κ′
+  isos-lift-to-cones : ∀ (κ : Cone) {v : Obj} → Cone.N κ ≅ v → ∃ λ κ′ → κ ⇿ κ′
   isos-lift-to-cones κ {v} κ≅v =
     κ′ , record
       { f = f′
       ; g = g′
-      ; iso = record { isoˡ = promote (g′ ▵ f′) id▵ isoˡ; isoʳ = promote (f′ ▵ g′) id▵ isoʳ }
+      ; iso = record { isoˡ = promote (g′ ∘ f′) id▵ isoˡ; isoʳ = promote (f′ ∘ g′) id▵ isoʳ }
       }
     where
     open Mor._≅_ C κ≅v

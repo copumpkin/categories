@@ -10,6 +10,7 @@ open import Categories.Support.Irrelevance
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
 open import Categories.Support.EqReasoning
+open import Categories.Operations hiding (_∘_)
 open import Data.Product
 
 module EasyLaws {o a e} {Obj : Set o} (_⇒_ : Rel Obj a)
@@ -18,8 +19,6 @@ module EasyLaws {o a e} {Obj : Set o} (_⇒_ : Rel Obj a)
                 (_≡_ : ∀ {A B} → Rel (A ⇒ B) e) where
   Ob = Obj
   Hom = _⇒_
-  compose : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
-  compose = _∘_
   _eq_ : ∀ {A B} → Rel (A ⇒ B) e
   _eq_ = _≡_
   ident : ∀ {A} → (A ⇒ A)
@@ -47,7 +46,14 @@ record Category (o a : Level) : Set (suc (o ⊔ a)) where
     _⇒_ : Rel Obj a
 
     id  : ∀ {A} → (A ⇒ A)
+    compose : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
+
+  Category-composes : ∀ {A B C} → ∘Spec (B ⇒ C) (A ⇒ B) (A ⇒ C)
+  Category-composes = COMPOSES compose
+
+  private
     _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
+    _∘_ = compose
 
   id2 : ∀ {A B} → A ≣ B → A ⇒ B
   id2 {A} eq = ≣-subst (_⇒_ A) eq id
@@ -126,7 +132,7 @@ record Category (o a : Level) : Set (suc (o ⊔ a)) where
   op = record 
     { Obj = Obj
     ; _⇒_ = flip _⇒_
-    ; _∘_ = flip _∘_
+    ; compose = flip compose
     ; id = id
     ; ASSOC = λ _ _ _ → sym assoc
     ; IDENTITYˡ = λ _ → identityʳ
@@ -149,7 +155,7 @@ record EasyRel {o a} (C : Category o a) e : Set (o ⊔ a ⊔ suc e) where
   field
     _≡_ : ∀ {A B} → Rel (A ⇒ B) e
 
-  open EasyLaws _⇒_ _∘_ id _≡_
+  open EasyLaws _⇒_ compose id _≡_
 
   field
     promote : Promote
@@ -175,9 +181,16 @@ record EasyCategory (o a e : Level) : Set (suc (o ⊔ a ⊔ e)) where
     _≡_ : ∀ {A B} → Rel (A ⇒ B) e
 
     id  : ∀ {A} → (A ⇒ A)
-    _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
+    compose : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
 
-  open EasyLaws _⇒_ _∘_ id _≡_
+  EC-composes : ∀ {A B C} → ∘Spec (B ⇒ C) (A ⇒ B) (A ⇒ C)
+  EC-composes = COMPOSES compose
+
+  private
+    _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
+    _∘_ = compose
+
+  open EasyLaws _⇒_ compose id _≡_
 
   field
     .assoc     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
@@ -191,7 +204,7 @@ record EasyCategory (o a e : Level) : Set (suc (o ⊔ a ⊔ e)) where
     { Obj = Obj
     ; _⇒_ = _⇒_
     ; id = id
-    ; _∘_ = _∘_
+    ; compose = compose
     ; ASSOC = λ f g h → promote _ _ assoc
     ; IDENTITYˡ = λ f → promote _ _ identityˡ
     ; IDENTITYʳ = λ f → promote _ _ identityʳ
@@ -272,7 +285,7 @@ UNEASY C WITH rel = record
   ; _⇒_ = _⇒_
   ; _≡_ = _≡_
   ; id = id
-  ; _∘_ = _∘_
+  ; compose = compose
   ; assoc = demote _ _ assoc
   ; identityˡ = demote _ _ identityˡ
   ; identityʳ = demote _ _ identityʳ
@@ -290,8 +303,7 @@ _[_,_] = Category._⇒_
 _[_≡_] : ∀ {o a} → (C : Category o a) → ∀ {X Y} (f g : C [ X , Y ]) → Set a
 _[_≡_] = Category._≡_
 
-_[_∘_] : ∀ {o a} → (C : Category o a) → ∀ {X Y Z} (f : C [ Y , Z ]) → (g : C [ X , Y ]) → C [ X , Z ]
-_[_∘_] = Category._∘_
+open Category public using () renaming (compose to _[_∘_])
 
 _⟦_,_⟧ : ∀ {o a e} → (C : EasyCategory o a e) → (X : EasyCategory.Obj C) → (Y : EasyCategory.Obj C) → Set a
 _⟦_,_⟧ = EasyCategory._⇒_
@@ -299,12 +311,11 @@ _⟦_,_⟧ = EasyCategory._⇒_
 _⟦_≡_⟧ : ∀ {o a e} → (C : EasyCategory o a e) → ∀ {X Y} (f g : C ⟦ X , Y ⟧) → Set e
 _⟦_≡_⟧ = EasyCategory._≡_
 
-_⟦_∘_⟧ : ∀ {o a e} → (C : EasyCategory o a e) → ∀ {X Y Z} (f : C ⟦ Y , Z ⟧) → (g : C ⟦ X , Y ⟧) → C ⟦ X , Z ⟧
-_⟦_∘_⟧ = EasyCategory._∘_
+open EasyCategory public using () renaming (compose to _⟦_∘_⟧)
 
 -- Should this live in the Category record itself? It doesn't seem terribly useful for most situations
 module Heterogeneous {o a} (C : Category o a) where
-  open Category C
+  open Category C renaming (compose to _∘_)
   open Equiv renaming (refl to refl′; sym to sym′; trans to trans′; reflexive to reflexive′)
 
   data _∼_ {A B} (f : A ⇒ B) : ∀ {X Y} → (X ⇒ Y) → Set (a) where

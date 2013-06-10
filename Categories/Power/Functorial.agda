@@ -11,15 +11,17 @@ open import Relation.Binary.HeterogeneousEquality as H using () renaming (_≅_ 
 
 open import Categories.Support.Irrelevance
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
+
 import Categories.Power as Power
 open Power C
-open import Categories.Functor hiding (identityˡ) renaming (_≡_ to _≡F_; _∘_ to _∘F_; id to idF; promote to promoteF)
+open import Categories.Functor hiding (identityˡ) renaming (_≡_ to _≡F_; id to idF; promote to promoteF)
 open import Categories.NaturalTransformation using (NaturalTransformation; module NaturalTransformation) renaming (promote to promoteNT)
 open import Categories.Discrete
 open import Categories.Equivalence.Strong hiding (module Equiv)
 
 open Category using (Obj) renaming (_⇒_ to Hom)
-open Category C using (_⇒_; _∘_; _≡_; module Equiv)
+open Category C using (_⇒_; Category-composes; _≡_; module Equiv)
 open import Categories.FunctorCategory
 open import Categories.Lift
 open import Categories.NaturalIsomorphism as NI using (NaturalIsomorphism; module NaturalIsomorphism)
@@ -93,11 +95,11 @@ exp≋functor {I} = record
   ; G = functor→exp
   ; weak-inverse = record
     { F∘G≅id = IsEquivalence.reflexive NI.equiv
-                 (promoteF (exp→functor ∘F functor→exp) idF 
+                 (promoteF (exp→functor ∘ functor→exp) idF 
                    (λ {A B} f → sym (trans
                      (float₂-resp-∼ (canonical A) (canonical B))
                      (≡⇒∼ (promoteNT (float₂ (canonical A) (canonical B) f)
-                                     (map₁ (exp→functor ∘F functor→exp) f)
+                                     (map₁ (exp→functor ∘ functor→exp) f)
                             (λ {x} → unhet
                               (≣-subst₂-gone (Hom FDIC) _ (λ g → η g x) (canonical A) (canonical B))))))))
     ; G∘F≅id = IsEquivalence.refl NI.equiv
@@ -120,7 +122,7 @@ exp≅functor {I} =
   }
   where
   FDIC = Functors (Discrete I) C
-  f∘g = LiftFˡ exp→functor ∘F LiftFʳ functor→exp
+  f∘g = LiftFˡ exp→functor ∘ LiftFʳ functor→exp
 
   squash : ∀ (A : Obj FDIC) → Obj FDIC
   squash A = exp→functor₀ (map₀ A)

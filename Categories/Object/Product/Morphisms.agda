@@ -4,6 +4,8 @@ open import Categories.Category
 
 module Categories.Object.Product.Morphisms {o a} (C : Category o a) where
 
+open import Categories.Operations
+
 import Categories.Object.Product
 open Categories.Object.Product C
 

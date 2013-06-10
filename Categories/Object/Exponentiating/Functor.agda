@@ -19,9 +19,9 @@ open HomReasoning
 import Categories.Object.Product.Morphisms
 open Categories.Object.Product.Morphisms C
 
+open import Categories.Operations
 open import Categories.Functor
-  using (Functor; Contravariant)
-  renaming (_∘_ to _∘F_)
+  using (Functor-composes; Functor; Contravariant)
 
 Σ↑-Functor : Contravariant C C
 Σ↑-Functor = record
@@ -60,4 +60,4 @@ open import Categories.Functor
             ∎
 
 Σ²-Functor : Functor C C
-Σ²-Functor = Σ↑-Functor ∘F Functor.op Σ↑-Functor
+Σ²-Functor = Σ↑-Functor ∘ Functor.op Σ↑-Functor

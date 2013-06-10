@@ -3,8 +3,9 @@ module Categories.Fibration where
 
 open import Level hiding (lift)
 
+open import Categories.Operations
 open import Categories.Category
-open import Categories.Functor hiding (_∘_; _≡_)
+open import Categories.Functor hiding (_≡_)
 open import Categories.Morphism.Cartesian
 import Categories.Morphisms as Morphisms
 
@@ -12,7 +13,7 @@ record CartesianLifting {o₀ a₀} {o₁ a₁} {E : Category o₀ a₀} {B : Ca
                         (p : Functor E B) {a e} (f : B [ a , Functor.F₀ p e ]) : Set (o₀ ⊔ a₀ ⊔ o₁ ⊔ a₁) where
   private module E = Category E
   private module B = Category B
-  open B using (_∘_; _≡_)
+  open B using (Category-composes; _≡_)
 
   open Functor p renaming (F₀ to p₀; F₁ to p₁)
   open Morphisms B
@@ -28,7 +29,7 @@ record CartesianLifting {o₀ a₀} {o₁ a₁} {E : Category o₀ a₀} {B : Ca
 record Fibration {o₀ a₀} {o₁ a₁} (E : Category o₀ a₀) (B : Category o₁ a₁) : Set (o₀ ⊔ a₀ ⊔ o₁ ⊔ a₁) where
   private module E = Category E
   private module B = Category B
-  open B using (_∘_; _≡_)
+  open B using (Category-composes; _≡_)
 
   field
     p : Functor E B

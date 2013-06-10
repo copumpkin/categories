@@ -15,6 +15,7 @@ open Categories.Object.Product C
 import Categories.Object.Product.Morphisms
 open Categories.Object.Product.Morphisms C
 
+open import Categories.Operations
 open import Categories.Square
 open GlueSquares C
 

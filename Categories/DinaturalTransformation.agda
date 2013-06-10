@@ -4,6 +4,7 @@ module Categories.DinaturalTransformation where
 open import Level
 open import Data.Product
 
+open import Categories.Operations
 open import Categories.Category
 import Categories.NaturalTransformation 
 module NT = Categories.NaturalTransformation

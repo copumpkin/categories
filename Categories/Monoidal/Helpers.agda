@@ -7,7 +7,7 @@ open import Function using (flip)
 open import Categories.Category
 import Categories.Functor
 
-open import Categories.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
+open import Categories.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming (id to idF; _≡_ to _≡F_)
 open import Categories.NaturalIsomorphism
 open import Categories.NaturalTransformation using (_∘₀_; _∘₁_; _∘ˡ_; _∘ʳ_; NaturalTransformation) renaming (_≡_ to _≡ⁿ_; id to idⁿ)
 

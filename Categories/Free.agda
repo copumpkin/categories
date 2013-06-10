@@ -2,6 +2,7 @@
 
 module Categories.Free where
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Free.Core
 open import Categories.Free.Functor

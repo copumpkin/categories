@@ -13,6 +13,7 @@ open import Relation.Binary.HeterogeneousEquality as HE using (_≅_)
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.SetoidFunctions as SF using (_⟶_; ⟪_,_⟫′)
 open import Categories.Support.SetoidPi as SΠ public using (Π; IndexedSetoid) renaming (_⟨$⟩_ to _‼_; cong to cong₁)
+open import Categories.Operations
 
 import Categories.Object.Indexed as IxOb
 open IxOb C B

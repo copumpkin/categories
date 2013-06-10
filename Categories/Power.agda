@@ -13,6 +13,7 @@ open import Relation.Nullary.Decidable using (True)
 open import Data.Vec.N-ary using (N-ary)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Bifunctor using (Bifunctor)
 open import Categories.Functor using (Functor; module Functor; EasyFunctor; module EasyFunctor)
@@ -24,7 +25,7 @@ Expᵉ I = record
   { Obj = I → C.Obj
   ; _⇒_ = λ x y → (i : I) → C [ x i , y i ]
   ; _≡_ = λ f g → (i : I) → C [ f i ≡ g i ]
-  ; _∘_ = λ f g i → C [ f i ∘ g i ]
+  ; compose = λ f g i → C [ f i ∘ g i ]
   ; id = λ {x} i → C.id
   ; assoc = λ {A} {B} {C'} {D} {f} {g} {h} i → C.assoc
   ; identityˡ = λ {A} {B} {f} i → C.identityˡ
@@ -143,8 +144,8 @@ reduce′ H {I} {J} F G = record
   private module F = Functor F
   private module G = Functor G
   private module H = Functor H
-  open L using () renaming (_≡_ to _≡≡_; _∘_ to _∘∘_)
-  open C using (_≡_; _∘_)
+  open L using (Category-composes) renaming (_≡_ to _≡≡_)
+  open C using (_≡_; Category-composes)
   my-F₀ = λ As → H.F₀ ((F.F₀ (As ∙ inj₁)) , (G.F₀ (As ∙ inj₂)))
   my-F₁ : ∀ {As Bs} → L._⇒_ As Bs → C [ my-F₀ As , my-F₀ Bs ]
   my-F₁ {As} {Bs} fs = H.F₁ (F.F₁ (fs ∙ inj₁) , G.F₁ (fs ∙ inj₂))
@@ -158,10 +159,10 @@ reduce′ H {I} {J} F G = record
                       ∎
     where
     open C.HomReasoning
-  .my-homomorphism : ∀ {As Bs Cs} {fs : L._⇒_ As Bs} {gs : L._⇒_ Bs Cs} → my-F₁ (gs ∘∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
+  .my-homomorphism : ∀ {As Bs Cs} {fs : L._⇒_ As Bs} {gs : L._⇒_ Bs Cs} → my-F₁ (gs ∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
   my-homomorphism {fs = fs} {gs} = 
     begin
-      my-F₁ (gs ∘∘ fs)
+      my-F₁ (gs ∘ fs)
     ↓⟨ H.F-resp-≡ (≣-cong₂ _,_ F.homomorphism G.homomorphism) ⟩
       H.F₁ ((F.F₁ (gs ∙ inj₁) ∘ F.F₁ (fs ∙ inj₁)) , (G.F₁ (gs ∙ inj₂) ∘ G.F₁ (fs ∙ inj₂)))
     ↓⟨ H.homomorphism ⟩
@@ -203,9 +204,9 @@ overlap {D} {E} H {I} F G = record
   private module H = Functor H
   private module D = Category D
   private module E = Category E
-  open L using () renaming (_≡_ to _≡≡_; _∘_ to _∘∘_)
-  open E using (_≡_; _∘_)
-  open D using () renaming (_∘_ to _∘D_)
+  open L using (Category-composes) renaming (_≡_ to _≡≡_)
+  open E using (_≡_; Category-composes)
+  open D using (Category-composes)
   my-F₀ = λ As → H.F₀ (F.F₀ As , G.F₀ As)
   my-F₁ : ∀ {As Bs} → (Exp I) [ As , Bs ] → E [ my-F₀ As , my-F₀ Bs ]
   my-F₁ {As} {Bs} fs = H.F₁ (F.F₁ fs , G.F₁ fs)
@@ -219,12 +220,12 @@ overlap {D} {E} H {I} F G = record
                       ∎
     where
     open E.HomReasoning
-  .my-homomorphism : ∀ {As Bs Cs} {fs : (Exp I) [ As , Bs ]} {gs : (Exp I) [ Bs , Cs ]} → my-F₁ (gs ∘∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
+  .my-homomorphism : ∀ {As Bs Cs} {fs : (Exp I) [ As , Bs ]} {gs : (Exp I) [ Bs , Cs ]} → my-F₁ (gs ∘ fs) ≡ (my-F₁ gs ∘ my-F₁ fs)
   my-homomorphism {fs = fs} {gs} = 
     begin
-      my-F₁ (gs ∘∘ fs)
+      my-F₁ (gs ∘ fs)
     ↓⟨ H.F-resp-≡ (≣-cong₂ _,_ F.homomorphism G.homomorphism) ⟩
-      H.F₁ ((F.F₁ gs ∘D F.F₁ fs) , (G.F₁ gs ∘D G.F₁ fs))
+      H.F₁ ((F.F₁ gs ∘ F.F₁ fs) , (G.F₁ gs ∘ G.F₁ fs))
     ↓⟨ H.homomorphism ⟩
       my-F₁ gs ∘ my-F₁ fs
     ∎
@@ -355,8 +356,8 @@ plex′ Fs = record
   -- ; F-resp-≡ = flip (λ j → Functor.F-resp-≡ (Fs j))
   }
 
-plex : ∀ {n} {I} → N-ary n (Powerendo′ I) (Hyperendo′ I (Fin n))
-plex {n} = curryⁿ n plex′
+plex : ∀ {n} {I} → N-ary (suc n) (Powerendo′ I) (Hyperendo′ I (Fin (suc n)))
+plex {n} = curryⁿ (suc n) plex′
 
 widenˡ : ∀ (l : ℕ) {n} (F : Powerendo n) → Powerendo (l + n)
 widenˡ l F = record

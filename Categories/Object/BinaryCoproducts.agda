@@ -8,6 +8,8 @@ open Equiv
 
 open import Level
 
+open import Categories.Operations
+
 import Categories.Object.Coproduct as Coproduct
 open import Categories.Morphisms
 

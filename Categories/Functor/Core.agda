@@ -8,6 +8,7 @@ open import Level
 open import Relation.Binary.PropositionalEquality.TrustMe
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.EqReasoning
+open import Categories.Operations
 
 record Functor {o a o′ a′} (C : Category o a) (D : Category o′ a′) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   private module C = Category C
@@ -91,11 +92,9 @@ id {C = C} = record
   }
   where open Category.Equiv C
 
-infixr 9 _∘_
-
-_∘_ : ∀ {o a} {o′ a′} {o′′ a′′} {C : Category o a} {D : Category o′ a′} {E : Category o′′ a′′} 
+compose : ∀ {o a} {o′ a′} {o′′ a′′} {C : Category o a} {D : Category o′ a′} {E : Category o′′ a′′} 
     → Functor D E → Functor C D → Functor C E
-_∘_ {C = C} {D = D} {E = E} F G = record 
+compose {C = C} {D = D} {E = E} F G = record 
   { F₀ = λ x → F₀ (G₀ x)
   ; F₁ = λ f → F₁ (G₁ f)
   ; identity = identity′
@@ -136,3 +135,7 @@ _∘_ {C = C} {D = D} {E = E} F G = record
   .∘-resp-≡′ : ∀ {A B} {F G : C [ A , B ]} 
             → C [ F ≡ G ] → E [ F₁ (G₁ F) ≡ F₁ (G₁ G) ]
   ∘-resp-≡′ = λ x → F-resp-≡ (G-resp-≡ x)
+
+Functor-composes : ∀ {o a o′ a′ o″ a″} {C : Category o a} {D : Category o′ a′} {E : Category o″ a″} → ∘Spec (Functor D E) (Functor C D) (Functor C E)
+Functor-composes = COMPOSES compose
+

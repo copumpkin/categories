@@ -4,9 +4,10 @@ module Categories.Functor.Algebras where
 open import Level hiding (lift)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category
-open import Categories.Functor hiding (_≡_; id; _∘_; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡)
+open import Categories.Functor hiding (_≡_; id; equiv; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Categories.Functor.Algebra
 open import Function using (_on_)
 
@@ -25,7 +26,7 @@ F-Algebrasᵉ {C = C} F = record
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
-  ; _∘_ = _∘′_
+  ; compose = _∘′_
   ; id = id′
   ; assoc = assoc
   ; identityˡ = identityˡ
@@ -101,7 +102,7 @@ open import Categories.Object.Initial
 module Lambek {o a} {C : Category o a} {F : Endofunctor C} (I : Initial (F-Algebras F)) where
   open Category C
   open Equiv
-  module FA = EasyCategory (F-Algebrasᵉ F) renaming (_∘_ to _∘FA_; _≡_ to _≡FA_)
+  module FA = EasyCategory (F-Algebrasᵉ F) renaming (_≡_ to _≡FA_)
   open Functor F
   import Categories.Morphisms as Morphisms
   open Morphisms C
@@ -140,6 +141,6 @@ module Lambek {o a} {C : Category o a} {F : Endofunctor C} (I : Initial (F-Algeb
       open FA hiding (id; module HomReasoning)
       open HomReasoning
 
-      isoˡ′ = FA.demote _ _ (⊥-id ((_,_ {C = C} {F} g′ refl) ∘FA !))
+      isoˡ′ = FA.demote _ _ (⊥-id ((_,_ {C = C} {F} g′ refl) ∘ !))
 
 open Lambek public

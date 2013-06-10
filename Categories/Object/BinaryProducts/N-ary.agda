@@ -11,6 +11,8 @@ open Category C
 open BinaryProducts C BP
 open Equiv
 
+open import Categories.Operations
+
 import Categories.Object.Product
 open Categories.Object.Product C
 

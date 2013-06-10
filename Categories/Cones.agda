@@ -5,8 +5,9 @@ open import Level
 
 open import Categories.Support.PropositionalEquality
 
+open import Categories.Operations
 open import Categories.Category
-open import Categories.Functor hiding (_∘_; _≡_; equiv; id; assoc; identityˡ; identityʳ; ∘-resp-≡)
+open import Categories.Functor hiding (_≡_; equiv; id; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Categories.Cone
 open import Categories.Square
 
@@ -25,7 +26,7 @@ Conesᵉ {C = C} F = record
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
-  ; _∘_ = _∘′_
+  ; compose = _∘′_
   ; id = record { f = id; commute = Equiv.sym identityʳ }
   ; assoc = assoc
   ; identityˡ = identityˡ

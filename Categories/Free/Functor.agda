@@ -4,21 +4,21 @@
 module Categories.Free.Functor where
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Categories
 open import Categories.Category
   renaming (_[_∼_] to _[_~C_]; _[_,_] to _[_⇒C_])
 open import Categories.Free.Core
 open import Categories.Functor
-  using (Functor; EasyFunctor)
-  renaming (_≡_ to _≡F_; _∘_ to _∘F_)
+  using (Functor; EasyFunctor; Functor-composes)
+  renaming (_≡_ to _≡F_)
 open import Categories.Quivers
 open import Data.Product
 open import Graphs.Quiver
   renaming (_[_~_] to _[_~G_]; _[_,_] to _[_⇒G_]
            ; module Heterogeneous to HeterogeneousG)
 open import Graphs.Quiver.Morphism
-  renaming (_∘_ to _∘G_)
 open import Data.Star
 open import Data.Star.Properties
   using (gmap-◅◅; gmap-id)
@@ -66,7 +66,7 @@ Freeᵉ {o}{a} = record
     module Categories = Category (Categories o (o ⊔ a))
     
     .homomorphism : ∀ {X Y Z} {f : QuiverMorphism X Y} {g : QuiverMorphism Y Z}
-                  → Free₁ (g ∘G f) ≡F (Free₁ g ∘F Free₁ f)
+                  → Free₁ (g ∘ f) ≡F (Free₁ g ∘ Free₁ f)
     homomorphism ε = Heterogeneous.refl _
     homomorphism {X}{Y}{Z}{f}{g}{S}{U} (_◅_ {.S}{T}{.U} h hs) = 
       HeterogeneousG.refl Z ◅~◅ homomorphism {X}{Y}{Z}{f}{g}{T}{U} hs

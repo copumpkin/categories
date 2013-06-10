@@ -18,7 +18,7 @@ Setsᵉ o = record
   ; _⇒_ = λ d c → d → c
   ; _≡_ = λ f g → ∀ {x} → f x ≣ g x
 
-  ; _∘_ = λ f g x → f (g x)
+  ; compose = λ f g x → f (g x)
   ; id = λ x → x
 
   ; assoc = ≣-refl
@@ -37,7 +37,7 @@ SetoidsQ c ℓ = record
   { Obj = Setoid c ℓ
   ; _⇒_ = _⟶_
   ; _≡_ = λ {X} {Y} → _≡′_ {X} {Y}
-  ; _∘_ = _∘′_
+  ; compose = _∘′_
   ; id = id′
   ; assoc = λ {_} {_} {_} {D} → Setoid.refl D
   ; identityˡ = λ {_} {B} → Setoid.refl B
@@ -69,7 +69,7 @@ ISetoidsQ c ℓ = record
   { Obj = Setoid c ℓ
   ; _⇒_ = _⟶_
   ; _≡_ = λ {A B} → Relation.Binary.Setoid._≈_ (setoid-i→r (A ⇨ B))
-  ; _∘_ = _∙_
+  ; compose = _∙_
   ; id = id′
   ; assoc = λ {A B C D} {f g h} →
                 squash (cong (h ∙ g ∙ f))

@@ -1,6 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Monad.Kleisli where
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor using (Functor; module Functor)
 open import Categories.NaturalTransformation hiding (_≡_; equiv; id)
@@ -10,7 +11,7 @@ Kleisli : ∀ {o a} {C : Category o a} → Monad C → Category o a
 Kleisli {C = C} M = record 
   { Obj = Obj
   ; _⇒_ = λ A B → (A ⇒ F₀ B)
-  ; _∘_ = λ f g → (μ.η _ ∘ F₁ f) ∘ g
+  ; compose = λ f g → (μ.η _ ∘ F₁ f) ∘ g
   ; id = η.η _
   ; ASSOC = λ _ _ _ → assoc′
   ; IDENTITYˡ = λ _ → identityˡ′

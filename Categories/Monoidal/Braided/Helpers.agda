@@ -6,10 +6,11 @@ open import Categories.Monoidal.Helpers
 open import Data.Nat using (_+_)
 open import Function using (flip)
 
+open import Categories.Operations
 open import Categories.Category
 import Categories.Functor
 
-open import Categories.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
+open import Categories.Bifunctor hiding (identityˡ; identityʳ; assoc) renaming (id to idF; _≡_ to _≡F_)
 open import Categories.NaturalIsomorphism
 open import Categories.NaturalTransformation using (_∘₀_; _∘₁_; _∘ˡ_; _∘ʳ_; NaturalTransformation) renaming (_≡_ to _≡ⁿ_; id to idⁿ)
 
@@ -38,13 +39,13 @@ module BraidedHelperFunctors {o a} (C : Category o a) (—⊗— : Bifunctor C C
 
     
     α-over : ∀ {n} (F₁ F₂ F₃ : Powerendo n) → NaturalTransformation ((F₁ ⊗₂ F₂) ⊗₂ F₃) (overlap2ʳ —⊗— F₁ F₂ F₃)
-    α-over F₁ F₂ F₃ = α ∘ʳ plex {3} F₁ F₂ F₃ -- ((hyp F₁ ∥ hyp F₂) ∥ hyp F₃)
+    α-over F₁ F₂ F₃ = α ∘ʳ plex {2} F₁ F₂ F₃ -- ((hyp F₁ ∥ hyp F₂) ∥ hyp F₃)
 
     α₂-over : ∀ {n} (F₁ F₂ F₃ : Powerendo n) → NaturalTransformation (overlap2ʳ —⊗— F₁ F₂ F₃) ((F₁ ⊗₂ F₂) ⊗₂ F₃)
-    α₂-over F₁ F₂ F₃ = α₂ ∘ʳ plex {3} F₁ F₂ F₃
+    α₂-over F₁ F₂ F₃ = α₂ ∘ʳ plex {2} F₁ F₂ F₃
 
     B-over : ∀ {n} (F₁ F₂ : Powerendo n) → NaturalTransformation (F₁ ⊗₂ F₂) (F₂ ⊗₂ F₁)
-    B-over F₁ F₂ = B ∘ʳ plex {2} F₁ F₂
+    B-over F₁ F₂ = B ∘ʳ plex {1} F₁ F₂
 
     BTriangleTop   : NaturalTransformation id⊗x x⊗id
     BTriangleTop   = B-over (widenˡ 1 id↑) x

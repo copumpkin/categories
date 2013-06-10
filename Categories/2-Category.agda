@@ -6,12 +6,13 @@ open import Data.Product using (curry; _,_)
 open import Function using () renaming (_∘_ to _·_)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category
 open import Categories.Categories
 open import Categories.Object.Terminal
 open import Categories.Terminal
-open import Categories.Functor using (Functor) renaming (_∘_ to _∘F_; _≡_ to _≡F_; id to idF)
+open import Categories.Functor using (Functor; Functor-composes) renaming (_≡_ to _≡F_; id to idF)
 open import Categories.Bifunctor using (Bifunctor; reduce-×)
 open import Categories.Product using (assocʳ; πˡ; πʳ)
 
@@ -22,19 +23,19 @@ record 2-Category (o a t : Level) : Set (suc (o ⊔ a ⊔ t)) where
     _⇒_ : (A B : Obj) → Category a t
     id : {A : Obj} → Functor ⊤ (A ⇒ A)
     —∘— : {A B C : Obj} → Bifunctor (B ⇒ C) (A ⇒ B) (A ⇒ C)
-  _∘_ : {A B C : Obj} {L R : Category a t} → Functor L (B ⇒ C) → Functor R (A ⇒ B) → Bifunctor L R (A ⇒ C)
-  _∘_ {A} {B} {C} F G = reduce-× {D₁ = B ⇒ C} {D₂ = A ⇒ B} —∘— F G
+  _∘′_ : {A B C : Obj} {L R : Category a t} → Functor L (B ⇒ C) → Functor R (A ⇒ B) → Bifunctor L R (A ⇒ C)
+  _∘′_ {A} {B} {C} F G = reduce-× {D₁ = B ⇒ C} {D₂ = A ⇒ B} —∘— F G
   field
-    .assoc : ∀ {A B C D : Obj} → ((—∘— ∘ idF) ∘F assocʳ (C ⇒ D) (B ⇒ C) (A ⇒ B)) ≡F idF ∘ —∘—
-    .identityˡ : {A B : Obj} → (id {B} ∘ idF {C = A ⇒ B}) ≡F πʳ {C = ⊤} {A ⇒ B}
-    .identityʳ : {A B : Obj} → (idF {C = A ⇒ B} ∘ id {A}) ≡F πˡ {C = A ⇒ B} {⊤}
+    .assoc : ∀ {A B C D : Obj} → ((—∘— ∘′ idF) ∘ assocʳ (C ⇒ D) (B ⇒ C) (A ⇒ B)) ≡F idF ∘′ —∘—
+    .identityˡ : {A B : Obj} → (id {B} ∘′ idF {C = A ⇒ B}) ≡F πʳ {C = ⊤} {A ⇒ B}
+    .identityʳ : {A B : Obj} → (idF {C = A ⇒ B} ∘′ id {A}) ≡F πˡ {C = A ⇒ B} {⊤}
 
   -- convenience?
   module _⇒_ (A B : Obj) = Category (A ⇒ B)
   open _⇒_ public using () renaming (Obj to _⇒₁_)
 
   private module imp⇒ {X Y : Obj} = Category (X ⇒ Y)
-  open imp⇒ public using () renaming (_⇒_ to _⇒₂_; id to id₂; _∘_ to _•_; assoc to vassoc′; identityˡ to videntityˡ′; identityʳ to videntityʳ′; ∘-resp-≡ to •-resp-≡′; ∘-resp-≡ˡ to •-resp-≡′ˡ; ∘-resp-≡ʳ to •-resp-≡′ʳ; hom-setoid to hom₂′-setoid; _≡_ to _≡′_; equiv to equiv′; module Equiv to Equiv′)
+  open imp⇒ public using () renaming (Category-composes to imp⇒-composes; _⇒_ to _⇒₂_; id to id₂; assoc to vassoc′; identityˡ to videntityˡ′; identityʳ to videntityʳ′; ∘-resp-≡ to •-resp-≡′; ∘-resp-≡ˡ to •-resp-≡′ˡ; ∘-resp-≡ʳ to •-resp-≡′ʳ; hom-setoid to hom₂′-setoid; _≡_ to _≡′_; equiv to equiv′; module Equiv to Equiv′)
 
   module Equiv {X Y : Obj} = Heterogeneous (X ⇒ Y)
   open Equiv public using () renaming (_∼_ to _≡_; ≡⇒∼ to loosely)
@@ -78,16 +79,16 @@ record 2-Category (o a t : Level) : Set (suc (o ⊔ a ⊔ t)) where
   private
     module Laws1A {A B} {f : A ⇒₁ B} where
       .assoc₁ : ∀ {C D} {g : B ⇒₁ C} {h : C ⇒₁ D} → ((h ∘₁ g) ∘₁ f) ≣ (h ∘₁ (g ∘₁ f))
-      assoc₁ {C} {D} {g} {h} = ≡F-on-objects ((—∘— ∘ idF) ∘F assocʳ (C ⇒ D) (B ⇒ C) (A ⇒ B)) (idF ∘ —∘—) assoc (h , g , f)
+      assoc₁ {C} {D} {g} {h} = ≡F-on-objects ((—∘— ∘′ idF) ∘ assocʳ (C ⇒ D) (B ⇒ C) (A ⇒ B)) (idF ∘′ —∘—) assoc (h , g , f)
 
       .identity₁ˡ : {- ∀ {A B} {f : A ⇒₁ B} → -} id₁ ∘₁ f ≣ f
-      identity₁ˡ = ≡F-on-objects (id {B} ∘ idF {C = A ⇒ B}) (πʳ {C = ⊤} {A ⇒ B}) identityˡ (unit , f)
+      identity₁ˡ = ≡F-on-objects (id {B} ∘′ idF {C = A ⇒ B}) (πʳ {C = ⊤} {A ⇒ B}) identityˡ (unit , f)
 
   .identity₁ʳ : ∀ {A B} {f : A ⇒₁ B} → f ∘₁ id₁ ≣ f
-  identity₁ʳ {A} {B} {f} = ≡F-on-objects (idF {C = A ⇒ B} ∘ id {A}) (πˡ {C = A ⇒ B} {⊤}) identityʳ (f , unit)
+  identity₁ʳ {A} {B} {f} = ≡F-on-objects (idF {C = A ⇒ B} ∘′ id {A}) (πˡ {C = A ⇒ B} {⊤}) identityʳ (f , unit)
 
 
-  .vassoc : ∀ {A B} {f g h i : A ⇒₁ B} {η : f ⇒₂ g} {θ : g ⇒₂ h} {ι : h ⇒₂ i} → ((ι • θ) • η) ≡ (ι • (θ • η))
+  .vassoc : ∀ {A B} {f g h i : A ⇒₁ B} {η : f ⇒₂ g} {θ : g ⇒₂ h} {ι : h ⇒₂ i} → ((ι ∘ θ) ∘ η) ≡ (ι ∘ (θ ∘ η))
   vassoc = loosely vassoc′
 
   .hidentityˡ : ∀ {A B} {f f′ : A ⇒₁ B} {η : f ⇒₂ f′} → (id₁₂ ∘₂ η) ≡ η
@@ -126,22 +127,22 @@ record 2-Category (o a t : Level) : Set (suc (o ⊔ a ⊔ t)) where
   .ridentityˡ : ∀ {A B} {f f′ : A ⇒₁ B} {η : f ⇒₂ f′} → (id₁ ▹ η) ≡ η
   ridentityˡ {η = η} = Equiv.trans (∘₂-resp-≡ (Equiv.sym (loosely (Functor.identity id))) Equiv.refl) (identityˡ (unit , η))
 
-  .interchange′ : ∀ {A B C} {f g h : A ⇒₁ B} {i j k : B ⇒₁ C} {α : f ⇒₂ g} {β : g ⇒₂ h} {γ : i ⇒₂ j} {δ : j ⇒₂ k} → ((δ • γ) ∘₂ (β • α)) ≡′ ((δ ∘₂ β) • (γ ∘₂ α))
+  .interchange′ : ∀ {A B C} {f g h : A ⇒₁ B} {i j k : B ⇒₁ C} {α : f ⇒₂ g} {β : g ⇒₂ h} {γ : i ⇒₂ j} {δ : j ⇒₂ k} → ((δ ∘ γ) ∘₂ (β ∘ α)) ≡′ ((δ ∘₂ β) ∘ (γ ∘₂ α))
   interchange′ = Functor.homomorphism —∘—
 
-  .interchange : ∀ {A B C} {f g h : A ⇒₁ B} {i j k : B ⇒₁ C} {α : f ⇒₂ g} {β : g ⇒₂ h} {γ : i ⇒₂ j} {δ : j ⇒₂ k} → ((δ • γ) ∘₂ (β • α)) ≡ ((δ ∘₂ β) • (γ ∘₂ α))
+  .interchange : ∀ {A B C} {f g h : A ⇒₁ B} {i j k : B ⇒₁ C} {α : f ⇒₂ g} {β : g ⇒₂ h} {γ : i ⇒₂ j} {δ : j ⇒₂ k} → ((δ ∘ γ) ∘₂ (β ∘ α)) ≡ ((δ ∘₂ β) ∘ (γ ∘₂ α))
   interchange = loosely interchange′
 
-  .lvdistrib′ : ∀ {A B C} {f : A ⇒₁ B} {g h i : B ⇒₁ C} {η : g ⇒₂ h} {θ : h ⇒₂ i} → (θ • η) ◃ f ≡′ ((θ ◃ f) • (η ◃ f))
+  .lvdistrib′ : ∀ {A B C} {f : A ⇒₁ B} {g h i : B ⇒₁ C} {η : g ⇒₂ h} {θ : h ⇒₂ i} → (θ ∘ η) ◃ f ≡′ ((θ ◃ f) ∘ (η ◃ f))
   lvdistrib′ = Equiv′.trans (∘₂-resp-≡′ Equiv′.refl (Equiv′.sym videntityˡ′)) interchange′
 
-  .lvdistrib : ∀ {A B C} {f : A ⇒₁ B} {g h i : B ⇒₁ C} {η : g ⇒₂ h} {θ : h ⇒₂ i} → ((θ • η) ◃ f) ≡ ((θ ◃ f) • (η ◃ f))
+  .lvdistrib : ∀ {A B C} {f : A ⇒₁ B} {g h i : B ⇒₁ C} {η : g ⇒₂ h} {θ : h ⇒₂ i} → ((θ ∘ η) ◃ f) ≡ ((θ ◃ f) ∘ (η ◃ f))
   lvdistrib = loosely lvdistrib′
 
-  .rvdistrib′ : ∀ {A B C} {f g h : A ⇒₁ B} {i : B ⇒₁ C} {η : f ⇒₂ g} {θ : g ⇒₂ h} → (i ▹ (θ • η)) ≡′ ((i ▹ θ) • (i ▹ η))
+  .rvdistrib′ : ∀ {A B C} {f g h : A ⇒₁ B} {i : B ⇒₁ C} {η : f ⇒₂ g} {θ : g ⇒₂ h} → (i ▹ (θ ∘ η)) ≡′ ((i ▹ θ) ∘ (i ▹ η))
   rvdistrib′ = Equiv′.trans (∘₂-resp-≡′ (Equiv′.sym videntityˡ′) Equiv′.refl) interchange′
 
-  .rvdistrib : ∀ {A B C} {f g h : A ⇒₁ B} {i : B ⇒₁ C} {η : f ⇒₂ g} {θ : g ⇒₂ h} → (i ▹ (θ • η)) ≡ ((i ▹ θ) • (i ▹ η))
+  .rvdistrib : ∀ {A B C} {f g h : A ⇒₁ B} {i : B ⇒₁ C} {η : f ⇒₂ g} {θ : g ⇒₂ h} → (i ▹ (θ ∘ η)) ≡ ((i ▹ θ) ∘ (i ▹ η))
   rvdistrib = loosely rvdistrib′
 
   -- XXX mixed assocs still need proving
@@ -168,22 +169,22 @@ record 2-Category (o a t : Level) : Set (suc (o ⊔ a ⊔ t)) where
   hrassoc = {!!}
   -}
 
-  .lrsmoosh′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((θ ◃ g) • (h ▹ η)) ≡′ (θ ∘₂ η)
+  .lrsmoosh′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((θ ◃ g) ∘ (h ▹ η)) ≡′ (θ ∘₂ η)
   lrsmoosh′ = Equiv′.trans (Equiv′.sym interchange′) (∘₂-resp-≡′ videntityʳ′ videntityˡ′)
 
-  .lrsmoosh : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((θ ◃ g) • (h ▹ η)) ≡ (θ ∘₂ η)
+  .lrsmoosh : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((θ ◃ g) ∘ (h ▹ η)) ≡ (θ ∘₂ η)
   lrsmoosh = loosely lrsmoosh′
 
-  .rlsmoosh′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡′ (θ ∘₂ η)
+  .rlsmoosh′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) ∘ (θ ◃ f)) ≡′ (θ ∘₂ η)
   rlsmoosh′ = Equiv′.trans (Equiv′.sym interchange′) (∘₂-resp-≡′ videntityˡ′ videntityʳ′)
 
-  .rlsmoosh : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡ (θ ∘₂ η)
+  .rlsmoosh : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) ∘ (θ ◃ f)) ≡ (θ ∘₂ η)
   rlsmoosh = loosely rlsmoosh′
 
-  .lrexch′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡′ ((θ ◃ g) • (h ▹ η))
+  .lrexch′ : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) ∘ (θ ◃ f)) ≡′ ((θ ◃ g) ∘ (h ▹ η))
   lrexch′ = Equiv′.trans rlsmoosh′ (Equiv′.sym lrsmoosh′)
 
-  .lrexch : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) • (θ ◃ f)) ≡ ((θ ◃ g) • (h ▹ η))
+  .lrexch : ∀ {A B C} {f g : A ⇒₁ B} {h i : B ⇒₁ C} {η : f ⇒₂ g} {θ : h ⇒₂ i} → ((i ▹ η) ∘ (θ ◃ f)) ≡ ((θ ◃ g) ∘ (h ▹ η))
   lrexch = loosely lrexch′
 
   module Hom₁Reasoning = ≣-reasoning

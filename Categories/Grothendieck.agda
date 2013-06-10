@@ -6,6 +6,8 @@ open import Data.Product using (Σ; _,_; proj₂)
 
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.IProduct
+open import Categories.Operations
+
 open import Categories.Category
 open import Categories.Functor using (Functor; module Functor)
 open import Categories.Agda
@@ -17,7 +19,7 @@ Grothendieckᵉ {o′ = o′} {C = C} F = record
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
-  ; _∘_ = _∘′_
+  ; compose = _∘′_
   ; id = id , ≣-app identity _
   ; assoc = assoc
   ; identityˡ = identityˡ

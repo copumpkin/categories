@@ -7,6 +7,7 @@ open Category C
 
 open import Level
 
+open import Categories.Operations
 open import Categories.Square
 
 import Categories.Object.Product

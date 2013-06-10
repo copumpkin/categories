@@ -3,6 +3,7 @@ module Categories.Monad where
 
 open import Level
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor hiding (_≡_; assoc; identityˡ; identityʳ)
 open import Categories.NaturalTransformation renaming (id to idN)

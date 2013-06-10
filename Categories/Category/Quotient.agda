@@ -12,6 +12,7 @@ open import Categories.Support.Equivalence
 open import Categories.Support.EqReasoning
 open import Categories.Support.Quotients
 open import Data.Product
+open import Categories.Operations using (∘Spec; COMPOSES_)
 open import Categories.Category
 
 private
@@ -19,7 +20,7 @@ private
   ≋-ext = H.≡-ext-to-≅-ext ≣-ext
 
 record QCategory (o a e : Level) : Set (suc (o ⊔ a ⊔ e)) where 
-  infixr 9 _∘_ _⊘ˡ_ _⊘_
+  infixr 9 _⊘ˡ_ _⊘_
   infix  4 _≡_
 
   field
@@ -28,7 +29,14 @@ record QCategory (o a e : Level) : Set (suc (o ⊔ a ⊔ e)) where
     _≡_ : ∀ {A B} → Rel (A ⇒ B) e
 
     id  : ∀ {A} → (A ⇒ A)
+    compose : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
+
+  private
     _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
+    _∘_ = compose
+
+  QCategory-composes : ∀ {A B C} → ∘Spec (B ⇒ C) (A ⇒ B) (A ⇒ C)
+  QCategory-composes = COMPOSES compose
 
   field
     .assoc     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
@@ -172,7 +180,7 @@ record QCategory (o a e : Level) : Set (suc (o ⊔ a ⊔ e)) where
   category = record 
     { Obj = Obj
     ; _⇒_ = _⇏_
-    ; _∘_ = _⊘_
+    ; compose = _⊘_
     ; id = ⌊ id ⌉
     ; ASSOC = qelim
       assoc₁
@@ -197,12 +205,11 @@ _[[_,_]] = QCategory._⇒_
 _[[_≡_]] : ∀ {o a e} → (C : QCategory o a e) → ∀ {X Y} (f g : C [[ X , Y ]]) → Set e
 _[[_≡_]] = QCategory._≡_
 
-_[[_∘_]] : ∀ {o a e} → (C : QCategory o a e) → ∀ {X Y Z} (f : C [[ Y , Z ]]) → (g : C [[ X , Y ]]) → C [[ X , Z ]]
-_[[_∘_]] = QCategory._∘_
+open QCategory public using () renaming (compose to _[[_∘_]])
 
 -- Should this live in the Category record itself? It doesn't seem terribly useful for most situations
 module QHeterogeneous {o a e} (C : QCategory o a e) where
-  open QCategory C
+  open QCategory C renaming (compose to _∘_)
   open Equiv renaming (refl to refl′; sym to sym′; trans to trans′; reflexive to reflexive′)
 
   data _∼_ {A B} (f : A ⇒ B) : ∀ {X Y} → (X ⇒ Y) → Set (a ⊔ e) where

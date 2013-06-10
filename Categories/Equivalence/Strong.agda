@@ -9,6 +9,7 @@ open import Level
 open import Relation.Binary using (IsEquivalence; module IsEquivalence)
 open import Function using () renaming (_∘_ to _∙_)
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor hiding (equiv)
 open import Categories.NaturalIsomorphism as NI hiding (equiv)

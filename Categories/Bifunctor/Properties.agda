@@ -4,9 +4,10 @@ open import Data.Product
 open import Function renaming (_∘_ to _∙_)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category
-open import Categories.Functor renaming (_∘_ to _∘F_)
+open import Categories.Functor
 open import Categories.Bifunctor
 
 Chooseˡ : ∀ {o a} {o′ a′} {o″ a″} {C : Category o a} {D : Category o′ a′} {E : Category o″ a″} → Category.Obj C → Bifunctor C D E → Functor D E
@@ -22,7 +23,7 @@ Chooseˡ {C = C} c F = record
   open Functor F
   idᶜ = Category.id C {c}
 
-  .identityᶜ : Category._∘_ C idᶜ idᶜ ≣ idᶜ
+  .identityᶜ : C [ idᶜ ∘ idᶜ ] ≣ idᶜ
   identityᶜ = Category.identityˡ C
 
 Chooseʳ : ∀ {o a} {o′ a′} {o″ a″} {C : Category o a} {D : Category o′ a′} {E : Category o″ a″} → Category.Obj D → Bifunctor C D E → Functor C E
@@ -38,5 +39,5 @@ Chooseʳ {D = D} d F = record
   open Functor F
   idᵈ = Category.id D {d}
 
-  .identityᵈ : Category._∘_ D idᵈ idᵈ ≣ idᵈ
+  .identityᵈ : D [ idᵈ ∘ idᵈ ] ≣ idᵈ
   identityᵈ = Category.identityˡ D

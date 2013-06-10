@@ -3,7 +3,7 @@
 module Categories.Support.SetoidPi where
 
 open import Level
-open import Function as Fun using (_on_; type-signature)
+open import Function as Fun using (_on_)
 open import Relation.Binary as B using () renaming (_=[_]⇒_ to _=[_]⇒₀_; _⇒_ to _⊆_)
 open import Relation.Binary.PropositionalEquality as PE using (_≡_)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to ≅-refl)

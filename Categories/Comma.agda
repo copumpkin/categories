@@ -24,7 +24,7 @@ Commaᵉ {o₁}{a₁}
   { Obj         = Obj′
   ; _⇒_         = Hom′
   ; _≡_         = _≡′_
-  ; _∘_         = _∘′_
+  ; compose     = _∘′_
   ; id          = id′
   ; assoc       = A.assoc , B.assoc
   ; identityˡ   = A.identityˡ , B.identityˡ

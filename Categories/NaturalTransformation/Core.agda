@@ -7,8 +7,9 @@ open import Relation.Binary using (Rel; IsEquivalence)
 
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
+open import Categories.Operations
 open import Categories.Category
-open import Categories.Functor.Core renaming (id to idF; _∘_ to _∘F_)
+open import Categories.Functor.Core renaming (id to idF)
 
 record NaturalTransformation {o a o′ a′}
                              {C : Category o a}
@@ -96,7 +97,7 @@ _∘₁_ {C = C} {D} {F} {G} {H} X Y = record
 _∘₀_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂} 
         {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
         {F G : Functor C D} {H I : Functor D E}
-    → NaturalTransformation H I → NaturalTransformation F G → NaturalTransformation (H ∘F F) (I ∘F G)
+    → NaturalTransformation H I → NaturalTransformation F G → NaturalTransformation (H ∘ F) (I ∘ G)
 _∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record 
   { η = λ q → E [ I₁ (X.η q) ∘ Y.η (F₀ q) ]
   ; commute = commute′

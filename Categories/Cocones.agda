@@ -4,9 +4,10 @@ module Categories.Cocones where
 open import Level
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category
-open import Categories.Functor hiding (_∘_; _≡_; equiv; id; assoc; identityˡ; identityʳ; ∘-resp-≡)
+open import Categories.Functor hiding (_≡_; equiv; id; assoc; identityˡ; identityʳ; ∘-resp-≡)
 open import Categories.Cocone
 
 record CoconeMorphism {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} {F : Functor J C} (c₁ c₂ : Cocone F) : Set (a ⊔ o′ ⊔ a′) where
@@ -24,7 +25,7 @@ Coconesᵉ {C = C} F = record
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
-  ; _∘_ = _∘′_
+  ; compose = _∘′_
   ; id = record { f = id; commute = identityˡ }
   ; assoc = assoc
   ; identityˡ = identityˡ

@@ -13,6 +13,8 @@ open Equiv
 open import Level
 open import Relation.Binary as Bi using ()
 open import Categories.Support.Equivalence
+open import Categories.Operations
+
 import Categories.Object.Indexed as IObj
 import Categories.Morphism.Indexed as IArrow
 

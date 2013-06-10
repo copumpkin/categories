@@ -11,6 +11,7 @@ open import Level
 open import Relation.Binary using (Rel)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 record SliceObj (X : Obj) : Set (o ⊔ a) where
   constructor sliceobj
@@ -31,7 +32,7 @@ sliceᵉ x = record
   { Obj = Obj′
   ; _⇒_ = _⇒′_
   ; _≡_ = _≡′_
-  ; _∘_ = _∘′_
+  ; compose = _∘′_
   ; id = slicearr identityʳ
   ; assoc = λ {_} {_} {_} {_} {f} {g} {h} → assoc′ {f = f} {g} {h}
   ; identityˡ = identityˡ

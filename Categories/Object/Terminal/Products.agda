@@ -8,6 +8,7 @@ module Categories.Object.Terminal.Products {o a : Level}
     (C : Category o a)
     (T : Terminal C) where
 
+open import Categories.Operations
 open import Categories.Object.Product
 
 open Category C

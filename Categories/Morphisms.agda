@@ -5,9 +5,9 @@ module Categories.Morphisms {o a} (C : Category o a) where
 
 open import Level
 open import Relation.Binary using (IsEquivalence; Setoid)
-open import Function using (type-signature)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open Category C
 
@@ -134,7 +134,7 @@ Coreᵉ = record
   ; _⇒_ = _≅_
   ; _≡_ = _≡ⁱ_
   ; id = idⁱ
-  ; _∘_ = _ⓘ_
+  ; compose = _ⓘ_
   ; assoc = λ {A B C D f g h} → record { f-≡ = assoc; g-≡ = sym assoc }
   ; identityˡ = λ {A B f} → record { f-≡ = identityˡ; g-≡ = identityʳ }
   ; identityʳ = λ {A B f} → record { f-≡ = identityʳ; g-≡ = identityˡ }

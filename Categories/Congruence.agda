@@ -5,6 +5,7 @@ open import Relation.Binary hiding (_⇒_)
 
 open import Categories.Support.Irrelevance
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category hiding (module Heterogeneous; _[_∼_])
 
@@ -245,7 +246,7 @@ TrivialCongruence C = record
   ; coerce-refl = λ f → refl
   ; coerce-invariant = invariant
   ; coerce-trans = tranz
-  ; coerce-∘ = compose
+  ; coerce-∘ = compoze
   }
   where
   open Category C
@@ -268,8 +269,8 @@ TrivialCongruence C = record
              ≡ ≣-subst₂ _⇒_ xpf₂ ypf₂ (≣-subst₂ _⇒_ xpf₁ ypf₁ f)
   tranz ≣-refl xpf₂ ≣-refl ypf₂ f = refl
 
-  .compose : ∀ {X₁ X₂ Y₁ Y₂ Z₁ Z₂} (pfX : X₁ ≣ X₂)(pfY : Y₁ ≣ Y₂)(pfZ : Z₁ ≣ Z₂)
+  .compoze : ∀ {X₁ X₂ Y₁ Y₂ Z₁ Z₂} (pfX : X₁ ≣ X₂)(pfY : Y₁ ≣ Y₂)(pfZ : Z₁ ≣ Z₂)
              → (g : Y₁ ⇒ Z₁) (f : X₁ ⇒ Y₁)
              →   ≣-subst₂ _⇒_ pfX pfZ (g ∘ f)
                ≡ ≣-subst₂ _⇒_ pfY pfZ g ∘ ≣-subst₂ _⇒_ pfX pfY f
-  compose ≣-refl ≣-refl ≣-refl g f = refl
+  compoze ≣-refl ≣-refl ≣-refl g f = refl

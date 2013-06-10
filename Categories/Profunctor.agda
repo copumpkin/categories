@@ -9,6 +9,7 @@ open import Relation.Binary hiding (_⇒_)
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.Quotients
 import Categories.Support.ZigZag
+open import Categories.Operations
 
 open import Categories.Category
 open import Categories.Agda
@@ -30,9 +31,9 @@ _↛_ {o} {a} {o′} {a′} C D = Profunctor C D (a ⊔ a′)
 id : ∀ {o a} → {C : Category o a} → Profunctor C C _
 id {C = C} = Hom[ C ][-,-]
 
-_∘_ : ∀ {o a} {h} {o′ a′} {h′} {o″ a″} {C : Category o a} {D : Category o′ a′} {E : Category o″ a″} 
-    → Profunctor D E h′ → Profunctor C D h → Profunctor C E (h ⊔ o′ ⊔ a′ ⊔ h′)
-_∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
+compose : ∀ {o a} {h} {o′ a′} {h′} {o″ a″} {C : Category o a} {D : Category o′ a′} {E : Category o″ a″} 
+          → Profunctor D E h′ → Profunctor C D h → Profunctor C E (h ⊔ o′ ⊔ a′ ⊔ h′)
+compose {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
   { F₀ = uncurry′ _⇒_
   ; F₁ = uncurry′ action
   ; identity = identity
@@ -56,9 +57,9 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
   module G′ {c} = Functor (Chooseʳ {C = D ᵒᵖ}{D = C} c G)
   module G″ {d} = Functor (Chooseˡ {C = D ᵒᵖ}{D = C} d G)
 
-  open E using () renaming (_⇒_ to _⇒ᴱ_; id to idᴱ; _∘_ to _ᴱ∘ᴱ_)
-  open D using () renaming (_⇒_ to _⇒ᴰ_; id to idᴰ; _∘_ to _ᴰ∘ᴰ_)
-  open C using () renaming (_⇒_ to _⇒ᶜ_; id to idᶜ; _∘_ to _ᶜ∘ᶜ_)
+  open E using (Category-composes) renaming (_⇒_ to _⇒ᴱ_; id to idᴱ)
+  open D using (Category-composes) renaming (_⇒_ to _⇒ᴰ_; id to idᴰ)
+  open C using (Category-composes) renaming (_⇒_ to _⇒ᶜ_; id to idᶜ)
   open F′ using () renaming (F₁ to _ᴰ∘ᶠ_)
 
   _ᴳ∘ᴰ_ : ∀ {d₁ d₂ c} → (d₂ ⇒ᴳ c) → (d₁ ⇒ᴰ d₂) → (d₁ ⇒ᴳ c)
@@ -80,10 +81,10 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
                                     (≣-cong F.F₁ (≣-sym (id-comm (Product E D)))))
                            F.homomorphism) _
 
-  .assocᶠ : ∀ {A B C D} {f : A ⇒ᶠ B} {g : B ⇒ᴰ C} {h : C ⇒ᴰ D} → (h ᴰ∘ᴰ g) ᴰ∘ᶠ f ≣ h ᴰ∘ᶠ (g ᴰ∘ᶠ f)
+  .assocᶠ : ∀ {A B C D} {f : A ⇒ᶠ B} {g : B ⇒ᴰ C} {h : C ⇒ᴰ D} → (h ∘ g) ᴰ∘ᶠ f ≣ h ᴰ∘ᶠ (g ᴰ∘ᶠ f)
   assocᶠ = ≣-app F′.homomorphism _
 
-  .assocᴳ : ∀ {A B C D} {f : A ⇒ᴰ B} {g : B ⇒ᴰ C} {h : C ⇒ᴳ D} → (h ᴳ∘ᴰ g) ᴳ∘ᴰ f ≣ h ᴳ∘ᴰ (g ᴰ∘ᴰ f)
+  .assocᴳ : ∀ {A B C D} {f : A ⇒ᴰ B} {g : B ⇒ᴰ C} {h : C ⇒ᴳ D} → (h ᴳ∘ᴰ g) ᴳ∘ᴰ f ≣ h ᴳ∘ᴰ (g ∘ f)
   assocᴳ = ≣-app (≣-sym G′.homomorphism) _
 
   .assocᴳ′ : ∀ {A B C D} {f : A ⇒ᴰ B} {g : B ⇒ᴳ C} {h : C ⇒ᶜ D} → (h ᶜ∘ᴳ g) ᴳ∘ᴰ f ≣ h ᶜ∘ᴳ (g ᴳ∘ᴰ f)
@@ -126,9 +127,9 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
     trans′ : ∀ {i j k} → i ↝ j → j ↝ k → i ↝ k
     trans′ {d₁ , x₁ , y₁} {d₂ , x₂ , y₂} {d₃ , x₃ , y₃} 
            (equal v x-eq y-eq) (equal v′ x-eq′ y-eq′)
-      = equal (v′ ᴰ∘ᴰ v)
+      = equal (v′ ∘ v)
               (let open ≣-reasoning in begin
-                 x₃ ᴳ∘ᴰ (v′ ᴰ∘ᴰ v)
+                 x₃ ᴳ∘ᴰ (v′ ∘ v)
                ≣⟨ ≣-sym assocᴳ ⟩
                  (x₃ ᴳ∘ᴰ v′) ᴳ∘ᴰ v
                ≣⟨ ≣-cong (λ x → x ᴳ∘ᴰ v) x-eq′ ⟩
@@ -137,7 +138,7 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
                  x₁
                ∎)
               (let open ≣-reasoning in begin
-                 (v′ ᴰ∘ᴰ v) ᴰ∘ᶠ y₁
+                 (v′ ∘ v) ᴰ∘ᶠ y₁
                ≣⟨ assocᶠ ⟩
                  v′ ᴰ∘ᶠ (v ᴰ∘ᶠ y₁)
                ≣⟨ ≣-cong (λ y → v′ ᴰ∘ᶠ y) y-eq ⟩
@@ -173,7 +174,7 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
   .homomorphism′ : ∀ {e e′ e″ c c′ c″} {f : e′ ⇒ᴱ e} {f′ : e″ ⇒ᴱ e′}
                                        {g : c ⇒ᶜ c′} {g′ : c′ ⇒ᶜ c″}
                                        {z : e ⇒′ c}
-                 → action′ (f ᴱ∘ᴱ f′) (g′ ᶜ∘ᶜ g) z ≣ action′ f′ g′ (action′ f g z)
+                 → action′ (f ∘ f′) (g′ ∘ g) z ≣ action′ f′ g′ (action′ f g z)
   homomorphism′ {f = f} {f′} {g} {g′} {z = d , x , y}
     rewrite ≣-app (F″.homomorphism {f = f} {g = f′}) y
           | ≣-app (G″.homomorphism {f = g} {g = g′}) x = ≣-refl
@@ -202,7 +203,7 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
 
   .homomorphism : ∀ {e e′ e″ c c′ c″} {f : e′ ⇒ᴱ e} {f′ : e″ ⇒ᴱ e′}
                                       {g : c ⇒ᶜ c′} {g′ : c′ ⇒ᶜ c″}
-                → action (f ᴱ∘ᴱ f′) (g′ ᶜ∘ᶜ g) ≣ action f′ g′ ∙ action f g
+                → action (f ∘ f′) (g′ ∘ g) ≣ action f′ g′ ∙ action f g
   homomorphism = ⇒-ext λ z →
             (action-compute _ _ z)
     >trans> (≣-cong ⌞_⌝ homomorphism′)

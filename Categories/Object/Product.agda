@@ -10,6 +10,7 @@ open import Function using (flip)
 open import Level
 open import Function using (flip)
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Square
 open GlueSquares C

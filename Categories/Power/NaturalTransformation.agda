@@ -9,6 +9,7 @@ open import Data.Sum using (_⊎_; [_,_]′; inj₁; inj₂)
 open import Data.Product using (_,_)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 import Categories.Power
 module Pow = Categories.Power C
@@ -47,14 +48,14 @@ reduceN′ H {I} {F} {F′} φ {J} {G} {G′} γ = record
   my-commute Xs Ys fs = begin
       my-η Ys ∘ L.F₁ fs
     ↑⟨ H.homomorphism ⟩
-      H.F₁ ((φ.η (Ys ∙ inj₁) ∘ F.F₁ (fs ∙ inj₁)) , (γ.η (Ys ∙ inj₂) ∘ G.F₁ (fs ∙ inj₂)))
-    ↓⟨ H.F-resp-≡ (≣-cong₂ _,_ (φ.commute (fs ∙ inj₁))  (γ.commute (fs ∙ inj₂))) ⟩
-      H.F₁ ((F′.F₁ (fs ∙ inj₁) ∘ φ.η (Xs ∙ inj₁)) , (G′.F₁ (fs ∙ inj₂) ∘ γ.η (Xs ∙ inj₂)))
+      H.F₁ (φ.η (Ys ∙ inj₁) ∘ F.F₁ (fs ∙ inj₁) , γ.η (Ys ∙ inj₂) ∘ G.F₁ (fs ∙ inj₂))
+    ↓⟨ H.F-resp-≡ (≣-cong₂ _,_ (φ.commute (fs ∙ inj₁)) (γ.commute (fs ∙ inj₂))) ⟩
+      H.F₁ (F′.F₁ (fs ∙ inj₁) ∘ φ.η (Xs ∙ inj₁) , G′.F₁ (fs ∙ inj₂) ∘ γ.η (Xs ∙ inj₂))
     ↓⟨ H.homomorphism ⟩
       R.F₁ fs ∘ my-η Xs
     ∎
     where
-    open C using (_∘_; _≡_)
+    open C using (Category-composes; _≡_)
     open C.HomReasoning
 
 reduceN : ∀ (H : Bifunctor C C C) {n} {F F′ : Powerendo n} (φ : NaturalTransformation F F′) {m} {G G′ : Powerendo m} (γ : NaturalTransformation G G′) → NaturalTransformation (reduce H F G) (reduce H F′ G′)

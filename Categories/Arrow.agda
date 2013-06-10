@@ -9,6 +9,7 @@ open import Relation.Binary using (Rel)
 open import Data.Product using (_×_; _,_; map; zip; uncurry)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open Category C
 open Category.Equiv C
@@ -34,7 +35,7 @@ arrow = record
   { Obj = Obj′
   ; _⇒_ = _⇒′_
   ; _≡_ = _≡′_
-  ; _∘_ = _∘′_
+  ; compose = _∘′_
   ; id = id′
   ; assoc = λ {_} {_} {_} {_} {f} {g} {h} → assoc′ {f = f} {g} {h}
   ; identityˡ = identityˡ , identityˡ

@@ -4,6 +4,7 @@ module Categories.Bifunctor where
 open import Level
 open import Data.Product using (_,_; swap)
 
+open import Categories.Operations
 open import Categories.Category
 
 open import Categories.Functor public

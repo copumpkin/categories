@@ -6,6 +6,7 @@ module Categories.Pullback {o a} (C : Category o a) where
 open Category C
 
 open import Level
+open import Categories.Operations
 
 record Pullback {X Y Z}(f : X ⇒ Z)(g : Y ⇒ Z) : Set (o ⊔ a) where
   field

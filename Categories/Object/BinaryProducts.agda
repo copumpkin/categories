@@ -11,6 +11,7 @@ open import Level
 import Categories.Object.Product as Product
 import Categories.Object.Product.Morphisms as ProductMorphisms
 
+open import Categories.Operations
 open import Categories.Morphisms
 
 open Product C

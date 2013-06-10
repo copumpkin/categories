@@ -6,6 +6,7 @@ open import Function renaming (id to idᶠ; _∘_ to _©_)
 
 open import Categories.Support.PropositionalEquality
 
+open import Categories.Operations
 open import Categories.Category
 import Categories.Morphisms as Mor
 
@@ -306,6 +307,9 @@ module AUReasoning {o a} (C : Category o a) where
     module g = Yon g
     module f = Yon f
 
+  Yon-composes : ∀ {X Y Z} → ∘Spec (Yon Y Z) (Yon X Y) (Yon X Z)
+  Yon-composes = COMPOSES Yon-compose
+
   yeval : ∀ {X Y} → Climb X Y → Yon X Y
   yeval = interp Yon Yon-id Yon-inject Yon-compose
 
@@ -316,7 +320,7 @@ module AUReasoning {o a} (C : Category o a) where
 
   .ynormal : ∀ {X Y} → (y₁ y₂ : Yon X Y) → Yon.arr y₁ ≡ Yon.arr y₂ → y₁ ≣ y₂
   ynormal {X} {Y} y₁ y₂ pf = lemma pf
-      (≣-trans ok-ext (≣-trans (≣-cong (λ f {W} → _∘_ {W} f) pf) (≣-sym y₂.ok-ext)))
+      (≣-trans ok-ext (≣-trans (≣-cong (λ f {W} → compose {W} f) pf) (≣-sym y₂.ok-ext)))
     where
     open Yon y₁
     module y₂ = Yon y₂
@@ -326,20 +330,20 @@ module AUReasoning {o a} (C : Category o a) where
                           ; ok = λ {W} f → ≣-subst₂ (λ arr″ f″ → f″ ≣ arr″ ∘ f) eq₁ (≣-app (≣-appʰ eq₂ {W}) f) (ok f) }
     lemma ≣-refl ≣-refl = ≣-refl
 
-  .Yon-assoc : ∀ {X Y Z W} (f : Yon Z W) (g : Yon Y Z) (h : Yon X Y) → Yon-compose f (Yon-compose g h) ≣ Yon-compose (Yon-compose f g) h
+  .Yon-assoc : ∀ {X Y Z W} (f : Yon Z W) (g : Yon Y Z) (h : Yon X Y) → f ∘ (g ∘ h) ≣ (f ∘ g) ∘ h
   Yon-assoc f g h = ≣-refl
 
-  .Yon-identityˡ : ∀ {X Y} (f : Yon X Y) → Yon-compose Yon-id f ≣ f
+  .Yon-identityˡ : ∀ {X Y} (f : Yon X Y) → Yon-id ∘ f ≣ f
   Yon-identityˡ f = ≣-refl
 
-  .Yon-identityʳ : ∀ {X Y} (f : Yon X Y) → Yon-compose f Yon-id ≣ f
-  Yon-identityʳ f = ynormal (Yon-compose f Yon-id) f (Yon.norm≡arr f)
+  .Yon-identityʳ : ∀ {X Y} (f : Yon X Y) → f ∘ Yon-id ≣ f
+  Yon-identityʳ f = ynormal (f ∘ Yon-id) f (Yon.norm≡arr f)
 
   record Eda (X Y : Obj) : Set (o ⊔ a) where
     field
       yon : Yon X Y
       fun : ∀ {Z} (f : Yon Y Z) → Yon X Z
-      .ok : ∀ {Z} (f : Yon Y Z) → fun f ≣ Yon-compose f yon
+      .ok : ∀ {Z} (f : Yon Y Z) → fun f ≣ f ∘ yon
 
     norm : Yon X Y
     norm = fun Yon-id
@@ -364,11 +368,14 @@ module AUReasoning {o a} (C : Category o a) where
   Eda-compose g f = record
     { yon = f.fun g.yon
     ; fun = f.fun © g.fun
-    ; ok = λ h → ≣-trans (≣-cong f.fun (g.ok h)) (≣-trans (f.ok (Yon-compose h g.yon)) (≣-sym (≣-cong (Yon-compose h) (f.ok g.yon))))
+    ; ok = λ h → ≣-trans (≣-cong f.fun (g.ok h)) (≣-trans (f.ok (h ∘ g.yon)) (≣-sym (≣-cong (Yon-compose h) (f.ok g.yon))))
     }
     where
     module g = Eda g
     module f = Eda f
+
+  Eda-composes : ∀ {X Y Z} → ∘Spec (Eda Y Z) (Eda X Y) (Eda X Z)
+  Eda-composes = COMPOSES Eda-compose
 
   eeval : ∀ {X Y} → Climb X Y → Eda X Y
   eeval = interp Eda Eda-id (Eda-inject © Yon-inject) Eda-compose
@@ -387,7 +394,11 @@ module AUReasoning {o a} (C : Category o a) where
     lemma : ∀ {yon′ : Yon X Y} {fun′ : ∀ {Z} → Yon Y Z → Yon X Z}
             → (eq₁ : yon ≣ yon′) (eq₂ : (λ {Z} → fun) ≣ fun′)
             → y₁ ≣ record { yon = yon′; fun = fun′
-                          ; ok = λ {Z} f → ≣-subst₂ (λ yon″ f″ → f″ ≣ Yon-compose f yon″) eq₁ (≣-app (≣-appʰ eq₂ {Z}) f) (ok f) }
+                          ; ok = λ {Z} f → ≣-subst₂ (λ yon″ f″ → f″ ≣ f ∘ yon″)
+                                                    eq₁
+                                                    (≣-app (≣-appʰ eq₂ {Z}) f)
+                                                    (ok f)
+                          }
     lemma ≣-refl ≣-refl = ≣-refl
 
   .earr : ∀ {X Y} → (t : Climb X Y) → Eda.arr (eeval t) ≣ eval t
@@ -396,13 +407,13 @@ module AUReasoning {o a} (C : Category o a) where
   .yynormal : ∀ {X Y} → (y₁ y₂ : Eda X Y) → Eda.arr y₁ ≡ Eda.arr y₂ → y₁ ≣ y₂
   yynormal y₁ y₂ = enormal y₁ y₂ © ynormal (Eda.yon y₁) (Eda.yon y₂)
 
-  .Eda-assoc : ∀ {X Y Z W} (f : Eda Z W) (g : Eda Y Z) (h : Eda X Y) → Eda-compose f (Eda-compose g h) ≣ Eda-compose (Eda-compose f g) h
+  .Eda-assoc : ∀ {X Y Z W} (f : Eda Z W) (g : Eda Y Z) (h : Eda X Y) → f ∘ (g ∘ h) ≣ (f ∘ g) ∘ h
   Eda-assoc f g h = ≣-refl
 
   -- .Eda-identityˡ : ∀ {X Y} (f : Eda X Y) → Eda-compose Eda-id f ≣ f
   -- Eda-identityˡ f = {!!}
 
-  .Eda-identityʳ : ∀ {X Y} (f : Eda X Y) → Eda-compose f Eda-id ≣ f
+  .Eda-identityʳ : ∀ {X Y} (f : Eda X Y) → f ∘ Eda-id ≣ f
   Eda-identityʳ f = ≣-refl
 
   yyeval : ∀ {X Y} → (t : Climb X Y) → (X ⇒ Y)

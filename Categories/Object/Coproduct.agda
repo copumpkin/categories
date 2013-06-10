@@ -7,6 +7,7 @@ module Categories.Object.Coproduct {o a} (C : Category o a) where
 open Category C
 
 open import Level
+open import Categories.Operations
 open import Categories.Opposite
 
 import Categories.Object.Product as ProductObject

@@ -11,6 +11,7 @@ open Category C
 open import Level
 
 open import Categories.Support.Equivalence using (Setoid; module Setoid)
+open import Categories.Operations
 
 import Categories.Object.Indexed as IObj
 import Categories.Object.IndexedProduct as IProduct

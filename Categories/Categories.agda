@@ -4,6 +4,7 @@ module Categories.Categories where
 open import Level
 open import Relation.Binary using (module IsEquivalence)
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor
 
@@ -11,7 +12,7 @@ Categories : ∀ o a → Category (suc (o ⊔ a)) (o ⊔ a)
 Categories o a = record 
   { Obj = Category o a
   ; _⇒_ = Functor
-  ; _∘_ = _∘_
+  ; compose = _∘_
   ; id = id
   ; ASSOC = λ F G H → assoc {F = F} {G} {H}
   ; IDENTITYˡ = λ F → identityˡ {F = F}

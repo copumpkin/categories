@@ -1,11 +1,12 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Monad.Strong where
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Monoidal
 
 open import Categories.Functor
-  renaming (id to idF; _∘_ to _∘F_; _≡_ to _≡F_)
+  renaming (id to idF; _≡_ to _≡F_)
 open import Categories.Functor.Constant
 open import Categories.NaturalTransformation
   renaming (id to idN; _≡_ to _≡N_)
@@ -65,7 +66,7 @@ record Strength
     renaming (η to μ)
   
   field
-    σ : NaturalTransformation (⊗ ∘F (idF {C = C} ⁂ F)) (F ∘F ⊗)
+    σ : NaturalTransformation (⊗ ∘ (idF {C = C} ⁂ F)) (F ∘ ⊗)
   
   module σ = NaturalTransformation σ
   

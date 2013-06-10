@@ -1,6 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Monoidal.Cartesian.Pentagon where
 
+open import Categories.Operations
 open import Categories.Support.PropositionalEquality using (_≣_; ≣-refl)
 open import Categories.Category using (Category; module Category)
 open import Categories.Object.BinaryProducts

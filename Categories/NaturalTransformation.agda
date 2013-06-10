@@ -3,8 +3,9 @@ module Categories.NaturalTransformation where
 
 open import Level
 
+open import Categories.Operations
 open import Categories.Category
-open import Categories.Functor hiding (equiv; promote) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
+open import Categories.Functor hiding (equiv; promote) renaming (id to idF; _≡_ to _≡F_)
 open import Categories.NaturalTransformation.Core public
 
 record EasyNaturalTransformation {o a o′ a′ e′}
@@ -35,31 +36,31 @@ EASED-NT F ⇒ G VIA rel AS ent = EasyNaturalTransformation.std ent
 _∘ˡ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
      → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D} 
-     → (H : Functor D E) → (η : NaturalTransformation F G) → NaturalTransformation (H ∘F F) (H ∘F G)
+     → (H : Functor D E) → (η : NaturalTransformation F G) → NaturalTransformation (H ∘ F) (H ∘ G)
 _∘ˡ_ {C = C} {D} {E} {F} {G} H η′ = record 
   { η       = λ X → Functor.F₁ H (NaturalTransformation.η η′ X)
   ; commute = commute′
   }
   where
   module C = Category C
-  module D = Category D renaming (_∘_ to _∘D_; _≡_ to _≡D_)
-  module E = Category E renaming (_∘_ to _∘E_; _≡_ to _≡E_)
+  module D = Category D renaming (_≡_ to _≡D_)
+  module E = Category E renaming (_≡_ to _≡E_)
   module H = Functor H
   open D
   open E
 
   .commute′ : ∀ {X Y} (f : C [ X , Y ]) →
-      Functor.F₁ H (NaturalTransformation.η η′ Y) ∘E Functor.F₁ H (Functor.F₁ F f) ≡E
-      Functor.F₁ H (Functor.F₁ G f) ∘E Functor.F₁ H (NaturalTransformation.η η′ X)
+      Functor.F₁ H (NaturalTransformation.η η′ Y) ∘ Functor.F₁ H (Functor.F₁ F f) ≡E
+      Functor.F₁ H (Functor.F₁ G f) ∘ Functor.F₁ H (NaturalTransformation.η η′ X)
   commute′ {X} {Y} f = 
       begin
-        Functor.F₁ H (NaturalTransformation.η η′ Y) ∘E Functor.F₁ H (Functor.F₁ F f)
+        Functor.F₁ H (NaturalTransformation.η η′ Y) ∘ Functor.F₁ H (Functor.F₁ F f)
       ↑⟨ H.homomorphism ⟩
-        Functor.F₁ H (NaturalTransformation.η η′ Y ∘D Functor.F₁ F f)
+        Functor.F₁ H (NaturalTransformation.η η′ Y ∘ Functor.F₁ F f)
       ↓⟨ H.F-resp-≡ (NaturalTransformation.commute η′ f) ⟩
-        Functor.F₁ H (Functor.F₁ G f ∘D NaturalTransformation.η η′ X)
+        Functor.F₁ H (Functor.F₁ G f ∘ NaturalTransformation.η η′ X)
       ↓⟨ H.homomorphism ⟩
-        Functor.F₁ H (Functor.F₁ G f) ∘E Functor.F₁ H (NaturalTransformation.η η′ X)
+        Functor.F₁ H (Functor.F₁ G f) ∘ Functor.F₁ H (NaturalTransformation.η η′ X)
       ∎
     where
     open E.HomReasoning
@@ -68,7 +69,7 @@ _∘ˡ_ {C = C} {D} {E} {F} {G} H η′ = record
 _∘ʳ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
      → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D} 
-     → (η : NaturalTransformation F G) → (K : Functor E C) → NaturalTransformation (F ∘F K) (G ∘F K)
+     → (η : NaturalTransformation F G) → (K : Functor E C) → NaturalTransformation (F ∘ K) (G ∘ K)
 _∘ʳ_ η K = record
   { η       = λ X → NaturalTransformation.η η (Functor.F₀ K X)
   ; commute = λ f → NaturalTransformation.commute η (Functor.F₁ K f)
@@ -127,15 +128,15 @@ identity₀ʳ {C = C} {D} {F} {G} {X} =
         → (Z ∘₀ Y) ∘₀ X ≡ Z ∘₀ (Y ∘₀ X) 
 assoc₀ {C₀ = C₀} {C₁} {C₂} {C₃} {F} {G} {H} {I} {J} {K} {X} {Y} {Z} = 
     begin
-      K₁ (I₁ (X.η _)) ∘C₃ (K₁ (Y.η (F₀ _)) ∘C₃ Z.η (H₀ (F₀ _)))
+      K₁ (I₁ (X.η _)) ∘ (K₁ (Y.η (F₀ _)) ∘ Z.η (H₀ (F₀ _)))
     ↑⟨ C₃.assoc ⟩
-      (K₁ (I₁ (X.η _)) ∘C₃ K₁ (Y.η (F₀ _))) ∘C₃ Z.η (H₀ (F₀ _))
+      (K₁ (I₁ (X.η _)) ∘ K₁ (Y.η (F₀ _))) ∘ Z.η (H₀ (F₀ _))
     ↑⟨ C₃.∘-resp-≡ˡ K.homomorphism ⟩
-      (K₁ ((I₁ (X.η _)) ∘C₂ Y.η (F₀ _))) ∘C₃ Z.η (H₀ (F₀ _))
+      (K₁ ((I₁ (X.η _)) ∘ Y.η (F₀ _))) ∘ Z.η (H₀ (F₀ _))
     ∎
   where
-  module C₂ = Category C₂ renaming (_∘_ to _∘C₂_; _≡_ to _≡C₂_)
-  module C₃ = Category C₃ renaming (_∘_ to _∘C₃_; _≡_ to _≡C₃_)
+  module C₂ = Category C₂ renaming (_≡_ to _≡C₂_)
+  module C₃ = Category C₃ renaming (_≡_ to _≡C₃_)
   module F = Functor F
   module G = Functor G renaming (F₀ to G₀; F₁ to G₁; F-resp-≡ to G-resp-≡)
   module H = Functor H renaming (F₀ to H₀; F₁ to H₁; F-resp-≡ to H-resp-≡)
@@ -176,10 +177,10 @@ interchange {C₀ = C₀} {C₁} {C₂} {F₀} {F₁} {F₅} {F₂} {F₃} {F₄
     ↑⟨ C₂.assoc ⟩
       (F₄.F₁ (β.η _) ∘ F₄.F₁ (δ.η _)) ∘ (α.η (F₀.F₀ _) ∘ γ.η (F₀.F₀ _))
     ↑⟨ C₂.∘-resp-≡ˡ F₄.homomorphism ⟩
-      F₄.F₁ (β.η _ ∘C₁ δ.η _) ∘ (α.η (F₀.F₀ _) ∘ γ.η (F₀.F₀ _))
+      F₄.F₁ (β.η _ ∘ δ.η _) ∘ (α.η (F₀.F₀ _) ∘ γ.η (F₀.F₀ _))
     ∎
   where
-  module C₁ = Category C₁ renaming (_∘_ to _∘C₁_; _≡_ to _≡C₁_)
+  module C₁ = Category C₁ renaming (_≡_ to _≡C₁_)
   module C₂ = Category C₂ 
   module F₀ = Functor F₀
   module F₁ = Functor F₁

@@ -35,7 +35,7 @@ Globe = record
   { Obj = ℕ
   ; _⇒_ = GlobeHom
   ; id = I
-  ; _∘_ = _⊚_
+  ; compose = _⊚_
   ; ASSOC = assoc
   ; IDENTITYˡ = λ _ → ≣-refl
   ; IDENTITYʳ = identityʳ
@@ -120,7 +120,7 @@ Globe′Q = record
   ; _⇒_ = GlobeHom′
   ; _≡_ = GlobeEq′
   ; id = I
-  ; _∘_ = _⊚′_
+  ; compose = _⊚′_
   ; assoc = λ {_ _ _ _ f g h} → assoc {f = f} {g} {h}
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ

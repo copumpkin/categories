@@ -2,6 +2,7 @@ open import Categories.Category
 
 module Categories.FunctorCategory.Morphisms {o a o′ a′} (C : Category o a) (D : Category o′ a′) where
 
+open import Categories.Operations
 open import Categories.FunctorCategory
 import Categories.Morphisms as Mor
 open import Categories.NaturalIsomorphism

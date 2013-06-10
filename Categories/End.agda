@@ -6,6 +6,7 @@ private
   module V = Category V
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Bifunctor using (Bifunctor; Functor; module Functor)
 open import Categories.DinaturalTransformation
@@ -45,25 +46,26 @@ record End (F : Bifunctor C.op C V) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
     Data : End-data F
 
   open End-data Data
+  open V
 
   IsUni : (Q : End-data F) → (u : End-data.E Q V.⇒ E) → Set _
-  IsUni Q u = ∀ c → (α π c) V.∘ (u) V.≡ (α (End-data.π Q) c)
+  IsUni Q u = ∀ c → (α π c) ∘ u ≡ α (End-data.π Q) c
 
   field
-    universal : (Q : End-data F) → End-data.E Q V.⇒ E
+    universal : (Q : End-data F) → End-data.E Q ⇒ E
 
     .π[c]∘universal≡δ[c] : {Q : End-data F} → IsUni Q (universal Q)
 
-    .universal-unique : {Q : End-data F} → ∀ u → IsUni Q u → u V.≡ universal Q
+    .universal-unique : {Q : End-data F} → ∀ u → IsUni Q u → u ≡ universal Q
 
 
-  .eta-rule : universal Data V.≡ V.id
+  .eta-rule : universal Data ≡ V.id
   eta-rule = begin universal Data ↑⟨ universal-unique {Data} V.id (λ c → V.identityʳ) ⟩ 
                    V.id           ∎
    where
     open V.HomReasoning
 
-  .π-mono : ∀ {Q} (g₁ g₂ : Q V.⇒ E) → (∀ c → α π c V.∘ g₁ V.≡ α π c V.∘ g₂) → g₁ V.≡ g₂
+  .π-mono : ∀ {Q} (g₁ g₂ : Q ⇒ E) → (∀ c → α π c ∘ g₁ ≡ α π c ∘ g₂) → g₁ ≡ g₂
   π-mono {Q} g₁ g₂ π∘g₁≡π∘g₂ = begin 
      g₁                ↓⟨ universal-unique {π∘ g₁} g₁ (λ c → V.Equiv.refl) ⟩ 
      universal (π∘ g₁) ↑⟨ universal-unique {π∘ g₁} g₂ (λ c → V.Equiv.sym (π∘g₁≡π∘g₂ c)) ⟩ 

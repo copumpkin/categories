@@ -1,6 +1,7 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Functor.Product where
 
+open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor using (Functor)
 import Categories.Object.Product as Product

@@ -10,6 +10,7 @@ open import Relation.Binary.HeterogeneousEquality as H
 open import Function using () renaming (_∘_ to _∙_)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Graphs.Quiver
 
@@ -24,7 +25,6 @@ record QuiverMorphism {o₁ a₁ o₂ a₂}
   .F-resp-≈ : ∀ {X Y}{f g : A [ X , Y ]} → f ≣ g → F₁ f ≣ F₁ g
   F-resp-≈ = ≣-cong F₁
 
-infixr 9 _∘_
 infix  4 _≈_
 
 id : ∀ {o a} {A : Quiver o a} → QuiverMorphism A A
@@ -33,15 +33,20 @@ id = record
   ; F₁        = λ f → f
   }
 
-_∘_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
-        {A : Quiver o₀ a₀} {B : Quiver o₁ a₁} {C : Quiver o₂ a₂}
-    → QuiverMorphism B C → QuiverMorphism A B → QuiverMorphism A C
-G ∘ F = record
+compose : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
+            {A : Quiver o₀ a₀} {B : Quiver o₁ a₁} {C : Quiver o₂ a₂}
+        → QuiverMorphism B C → QuiverMorphism A B → QuiverMorphism A C
+compose G F = record
   { F₀ = λ A → G₀ (F₀ A)
   ; F₁ = λ f → G₁ (F₁ f)
   } where
     open QuiverMorphism F
     open QuiverMorphism G renaming (F₀ to G₀; F₁ to G₁; F-resp-≈ to G-resp-≈)
+
+QM-composes : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
+                {A : Quiver o₀ a₀} {B : Quiver o₁ a₁} {C : Quiver o₂ a₂}
+              → ∘Spec (QuiverMorphism B C) (QuiverMorphism A B) (QuiverMorphism A C)
+QM-composes = COMPOSES compose
 
 _≈₀_ : ∀ {o₁ a₁ o₂ a₂} {A : Quiver o₁ a₁} {B : Quiver o₂ a₂}
   → (F G : QuiverMorphism A B)

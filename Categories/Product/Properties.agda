@@ -18,6 +18,7 @@ module C×D = Category C×D
 import Categories.Product.Projections
 open Categories.Product.Projections C D
 
+open import Categories.Operations
 open import Categories.Functor
 
 open import Relation.Binary using (module IsEquivalence)

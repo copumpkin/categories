@@ -6,8 +6,9 @@ open import Relation.Binary using (IsEquivalence; Setoid; module Setoid)
 
 open import Categories.Support.PropositionalEquality
 
+open import Categories.Operations
 open import Categories.Category
-open import Categories.Functor hiding (_≡_; _∘_)
+open import Categories.Functor hiding (_≡_)
 
 module ConeOver {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) where
   module J = Category J

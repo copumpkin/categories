@@ -2,6 +2,7 @@
 module Categories.Yoneda where
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Operations
 
 open import Categories.Category
 open import Categories.Functor using (Functor)
@@ -14,11 +15,11 @@ Embed C = record
   { F₀ = λ x → Hom[ C ][-, x ]
   ; F₁ = λ {A B} → F₁ {A} {B}
   ; identity = promoteNT (F₁ id) idᴾ (≣-ext (λ _ → identityˡ))
-  ; homomorphism = λ {_ _ _ f g} → promoteNT (F₁ (g ∘ f)) (F₁ g ∘ᴾ F₁ f) (≣-ext (λ _ → assoc))
+  ; homomorphism = λ {_ _ _ f g} → promoteNT (F₁ (g ∘ f)) (F₁ g ∘ F₁ f) (≣-ext (λ _ → assoc))
   }
   where
   open Category C
-  open Category (Presheaves C) using () renaming (_∘_ to _∘ᴾ_; id to idᴾ)
+  open Category (Presheaves C) using (Category-composes) renaming (id to idᴾ)
   open Equiv
 
   .commute′ : {A B X Y : Obj} (f : A ⇒ B) (g : Y ⇒ X) (x : X ⇒ A) → f ∘ id ∘ x ∘ g ≡ id ∘ (f ∘ x) ∘ g

@@ -8,8 +8,9 @@ open import Relation.Binary using (IsEquivalence)
 open import Categories.Support.Irrelevance
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
+open import Categories.Operations
 open import Categories.Category
-open import Categories.Functor hiding (id; equiv) renaming (_∘_ to _∘F_; _≡_ to _≡F_)
+open import Categories.Functor hiding (id; equiv) renaming (_≡_ to _≡F_)
 open import Categories.NaturalTransformation.Core hiding (_≡_; equiv; setoid)
 open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_)
 import Categories.Morphisms as Morphisms
@@ -126,7 +127,7 @@ setoid {C = C} {D} = record
 _ⓘˡ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
      → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D}
-     → (H : Functor D E) → (η : NaturalIsomorphism F G) → NaturalIsomorphism (H ∘F F) (H ∘F G)
+     → (H : Functor D E) → (η : NaturalIsomorphism F G) → NaturalIsomorphism (H ∘ F) (H ∘ G)
 _ⓘˡ_ {C = C} {D} {E} {F} {G} H η = record
   { F⇒G = H ∘ˡ η.F⇒G
   ; F⇐G = H ∘ˡ η.F⇐G
@@ -138,7 +139,7 @@ _ⓘˡ_ {C = C} {D} {E} {F} {G} H η = record
 _ⓘʳ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
      → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
      → {F G : Functor C D}
-     → (η : NaturalIsomorphism F G) → (K : Functor E C) → NaturalIsomorphism (F ∘F K) (G ∘F K)
+     → (η : NaturalIsomorphism F G) → (K : Functor E C) → NaturalIsomorphism (F ∘ K) (G ∘ K)
 η ⓘʳ K = record
   { F⇒G = η.F⇒G ∘ʳ K
   ; F⇐G = η.F⇐G ∘ʳ K

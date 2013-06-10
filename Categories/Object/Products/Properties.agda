@@ -9,6 +9,8 @@ open Category C
 
 open import Level
 
+open import Categories.Operations
+
 import Categories.Object.Terminal
 open Categories.Object.Terminal C
 

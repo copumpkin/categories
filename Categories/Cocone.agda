@@ -3,8 +3,9 @@ module Categories.Cocone where
 
 open import Level
 
+open import Categories.Operations
 open import Categories.Category
-open import Categories.Functor hiding (_≡_; _∘_)
+open import Categories.Functor hiding (_≡_)
 
 record Cocone {o a} {o′ a′} {C : Category o a} {J : Category o′ a′} (F : Functor J C) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   module J = Category J

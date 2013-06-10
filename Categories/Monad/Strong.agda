@@ -86,4 +86,3 @@ record Strength
     μ-assoc : ∀ {A B}
       → μ (⊗₀ (A , B)) ∘ F₁ (σ.η (A , B)) ∘ σ.η (A , F₀ B)
       ≡ σ.η (A , B) ∘ ⊗₁ (id , μ B)
-    

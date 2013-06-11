@@ -16,6 +16,8 @@ import Categories.2-Category
 
 -- Adjunctions between functors
 import Categories.Adjunction
+import Categories.Adjunction.Composition
+import Categories.Adjunction.CompositionLaws
 
 -- The Agda Set category
 import Categories.Agda
@@ -40,6 +42,9 @@ import Categories.Categories
 -- Cat has products
 import Categories.Categories.Products
 
+-- Solver for the theory of generic categories, functors, and NTs
+import Categories.CategorySolver
+
 -- Closed categories
 import Categories.Closed
 
@@ -60,6 +65,7 @@ import Categories.Colimit
 
 -- Comma categories
 import Categories.Comma
+import Categories.Comma.Functors
 
 -- Comonads, defined directly (not as monads on the opposite category)
 import Categories.Comonad

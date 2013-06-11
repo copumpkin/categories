@@ -31,38 +31,38 @@ Commaᵉ {o₁}{a₁}
   ; identityʳ   = A.identityʳ , B.identityʳ
   ; promote     = promote′
   ; REFL        = A.Equiv.refl , B.Equiv.refl
-  } where
+  } module Comma where
     module A = Category A
     module B = Category B
     module C = Category C
     module T = Functor T
     module S = Functor S
-    
+
     open T using () renaming (F₀ to T₀; F₁ to T₁)
     open S using () renaming (F₀ to S₀; F₁ to S₁)
-    
+
     infixr 9 _∘′_
     infix  4 _≡′_
-    
+
     record Obj′ : Set (o₁ ⊔ o₂ ⊔ a₃) where
         constructor _,_,_
         field
             α : A.Obj
             β : B.Obj
             f : C [ T₀ α , S₀ β ]
-    
+
     record Hom′ (X₁ X₂ : Obj′) : Set (a₁ ⊔ a₂ ⊔ a₃) where
         constructor _,_[_]
         open Obj′ X₁ renaming (α to α₁; β to β₁; f to f₁)
         open Obj′ X₂ renaming (α to α₂; β to β₂; f to f₂)
-        
+
         field
             g         : A [ α₁ , α₂ ]
             h         : B [ β₁ , β₂ ]
             .commutes : C.CommutativeSquare f₁ (T₁ g) (S₁ h) f₂
-    
+
     _≡′_ : ∀ {X₁ X₂} → Rel (Hom′ X₁ X₂) _
-    (g₁ , h₁ [ _ ]) ≡′ (g₂ , h₂ [ _ ]) 
+    (g₁ , h₁ [ _ ]) ≡′ (g₂ , h₂ [ _ ])
         = A [ g₁ ≡ g₂ ]
         × B [ h₁ ≡ h₂ ]
 
@@ -83,7 +83,7 @@ Commaᵉ {o₁}{a₁}
             open Obj′ A
             open C.HomReasoning
             open C.Equiv
-    
+
     _∘′_ : ∀ {X₁ X₂ X₃} → Hom′ X₂ X₃ → Hom′ X₁ X₂ → Hom′ X₁ X₃
     _∘′_ {X₁}{X₂}{X₃} (g₁ , h₁ [ commutes₁ ]) (g₂ , h₂ [ commutes₂ ])
         = A [ g₁ ∘ g₂ ] , B [ h₁ ∘ h₂ ]

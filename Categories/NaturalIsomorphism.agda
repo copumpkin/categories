@@ -12,9 +12,10 @@ open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor hiding (id; equiv) renaming (_≡_ to _≡F_)
 open import Categories.NaturalTransformation.Core hiding (_≡_; equiv; setoid)
-open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_)
+open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_) renaming (promote to promoteNT)
 import Categories.Morphisms as Morphisms
 open import Categories.Functor.Properties using (module FunctorsAlways)
+open import Categories.Square
 
 record NaturalIsomorphism {o a o′ a′}
                           {C : Category o a}
@@ -38,6 +39,9 @@ record NaturalIsomorphism {o a o′ a′}
 
   field
     .iso : ∀ X → Iso (⇒.η X) (⇐.η X)
+
+  ηⁱ : ∀ X → F₀ X ≅ G₀ X
+  ηⁱ X = record { f = ⇒.η X; g = ⇐.η X; iso = iso X }
 
 equiv : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → IsEquivalence (NaturalIsomorphism {C = C} {D})
 equiv {C = C} {D} = record 
@@ -86,36 +90,26 @@ equiv {C = C} {D} = record
       isoˡ′ : (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ≡ D.id
       isoˡ′ = begin
                 (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z)
-              ↓⟨ D.assoc ⟩
-                η (F⇐G X) Z ∘ (η (F⇐G Y) Z ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z))
-              ↑⟨ D.∘-resp-≡ʳ D.assoc ⟩
-                η (F⇐G X) Z ∘ ((η (F⇐G Y) Z ∘ η (F⇒G Y) Z) ∘ η (F⇒G X) Z)
-              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (Morphisms.Iso.isoˡ D (iso Y Z))) ⟩
-                η (F⇐G X) Z ∘ (D.id ∘ η (F⇒G X) Z)
-              ↓⟨ D.∘-resp-≡ʳ D.identityˡ ⟩
+              ↓⟨ cancelInner (Morphisms.Iso.isoˡ D (iso Y Z)) ⟩
                 η (F⇐G X) Z ∘ η (F⇒G X) Z
               ↓⟨ Morphisms.Iso.isoˡ D (iso X Z) ⟩
                 D.id
               ∎
         where
         open D.HomReasoning
+        open GlueSquares D
 
       isoʳ′ : (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ∘ (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ≡ D.id
       isoʳ′ = begin
                 (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ∘ (η (F⇐G X) Z ∘ η (F⇐G Y) Z)
-              ↓⟨ D.assoc ⟩
-                η (F⇒G Y) Z ∘ (η (F⇒G X) Z ∘ (η (F⇐G X) Z ∘ η (F⇐G Y) Z))
-              ↑⟨ D.∘-resp-≡ʳ D.assoc ⟩
-                η (F⇒G Y) Z ∘ ((η (F⇒G X) Z ∘ η (F⇐G X) Z) ∘ η (F⇐G Y) Z)
-              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (Morphisms.Iso.isoʳ D (iso X Z))) ⟩
-                η (F⇒G Y) Z ∘ (D.id ∘ η (F⇐G Y) Z)
-              ↓⟨ D.∘-resp-≡ʳ D.identityˡ ⟩
+              ↓⟨ cancelInner (Morphisms.Iso.isoʳ D (iso X Z)) ⟩
                 η (F⇒G Y) Z ∘ η (F⇐G Y) Z
               ↓⟨ Morphisms.Iso.isoʳ D (iso Y Z) ⟩
                 D.id
               ∎
         where
         open D.HomReasoning
+        open GlueSquares D
 
 setoid : ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} → Setoid _ _
 setoid {C = C} {D} = record 
@@ -209,3 +203,20 @@ _ⓘʳ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
     module F = Functor F
     module G = Functor G
   my-iso F G F≡G G≡F x | _ | ._ | _ | _ | ≡⇒∼ _ | ≡⇒∼ _ = D.identityʳ
+
+promoteⁱ : let open NaturalIsomorphism using (ηⁱ) in
+           ∀ {o a o′ a′} {C : Category o a} {D : Category o′ a′} {F G : Functor C D}
+             (i j : NaturalIsomorphism F G) → (∀ X → ηⁱ i X ≣ ηⁱ j X) → i ≣ j
+promoteⁱ {D = D} i j eqs = helper (promoteNT i.F⇒G j.F⇒G (≣-cong fwd (eqs _)))
+                                  (promoteNT i.F⇐G j.F⇐G (≣-cong rev (eqs _)))
+  where
+  module i = NaturalIsomorphism i
+  module j = NaturalIsomorphism j
+  open NaturalTransformation using () renaming (η to _©_)
+  open Morphisms D using (Iso; module _≅_)
+  open _≅_ using () renaming (f to fwd; g to rev)
+  helper : ∀ {F⇒G} {F⇐G} (eq⇒ : i.F⇒G ≣ F⇒G) (eq⇐ : i.F⇐G ≣ F⇐G)
+         → (i ≣ record { F⇒G = F⇒G; F⇐G = F⇐G
+                       ; iso = ≣-subst₂ (λ η⇒ η⇐ → ∀ X → Iso (η⇒ © X) (η⇐ © X))
+                                        eq⇒ eq⇐ i.iso })
+  helper ≣-refl ≣-refl = ≣-refl

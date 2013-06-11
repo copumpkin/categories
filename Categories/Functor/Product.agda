@@ -1,87 +1,43 @@
 {-# OPTIONS --universe-polymorphism #-}
 module Categories.Functor.Product where
 
+open import Data.Product using (uncurry′)
+
 open import Categories.Operations
 open import Categories.Category
 open import Categories.Functor using (Functor)
-import Categories.Object.Product as Product
-import Categories.Object.BinaryProducts as BinaryProducts
+open import Categories.Bifunctor using (Bifunctor)
+open import Categories.Object.BinaryProducts using (BinaryProducts; module BinaryProducts)
 
 -- Ugh, we should start bundling things (categories with binary products, in this case) up consistently
-_[_][_×-] : ∀ {o a} → (C : Category o a) → BinaryProducts.BinaryProducts C → Category.Obj C → Functor C C
-C [ P ][ O ×-] = record 
-  { F₀ = λ x → Product.A×B (product {O} {x})
-  ; F₁ = λ f → ⟨ π₁ , f ∘ π₂ ⟩
-  ; identity = λ {x} → identity′ {x}
-  ; homomorphism = λ {x} {y} {z} {f} {g} → homomorphism′ {x} {y} {z} {f} {g}
-  }
-  where
+module ProductFunctors {o a} (C : Category o a) (BP : BinaryProducts C) where
   open Category C
-  open Equiv
-  open Product C
-  open BinaryProducts.BinaryProducts C P
+  open BinaryProducts C BP
 
-  .identity′ : {A : Obj} → ⟨ π₁ , id ∘ π₂ ⟩ ≡ id
-  identity′ = 
-    begin
-      ⟨ π₁ , id ∘ π₂ ⟩
-    ≈⟨ ⟨⟩-cong₂ refl identityˡ ⟩
-      ⟨ π₁ , π₂ ⟩
-    ≈⟨ η ⟩
-      id
-    ∎
-    where open HomReasoning
+  ─×─ : Bifunctor C C C
+  ─×─ = record
+    { F₀ = uncurry′ _×_
+    ; F₁ = uncurry′ _⁂_
+    ; identity = universal (id-comm {f = π₁}) (id-comm {f = π₂})
+    ; homomorphism = Equiv.sym ⁂∘⁂
+    }
 
-  .homomorphism′ : {X Y Z : Obj} {f : X ⇒ Y} {g : Y ⇒ Z} → ⟨ π₁ , (g ∘ f) ∘ π₂ ⟩ ≡ ⟨ π₁ , g ∘ π₂ ⟩ ∘ ⟨ π₁ , f ∘ π₂ ⟩ 
-  homomorphism′ {f = f} {g} =
-    begin
-      ⟨ π₁ , (g ∘ f) ∘ π₂ ⟩
-    ↓⟨ ⟨⟩-cong₂ refl assoc ⟩
-      ⟨ π₁ , g ∘ (f ∘ π₂) ⟩
-    ↑⟨ ⟨⟩-cong₂ refl (∘-resp-≡ʳ commute₂) ⟩
-      ⟨ π₁ , g ∘ (π₂ ∘ ⟨ π₁ , f ∘ π₂ ⟩) ⟩
-    ↑⟨ ⟨⟩-cong₂ commute₁ assoc ⟩
-       ⟨ π₁ ∘ ⟨ π₁ , f ∘ π₂ ⟩  , (g ∘ π₂) ∘ ⟨ π₁ , f ∘ π₂ ⟩ ⟩
-    ↑⟨ ⟨⟩∘ ⟩
-      ⟨ π₁ , g ∘ π₂ ⟩ ∘ ⟨ π₁ , f ∘ π₂ ⟩ 
-    ∎
-    where open HomReasoning
+  _×─ : Obj → Functor C C
+  O ×─ = record
+    { F₀ = _×_ O
+    ; F₁ = second
+    ; identity = universal (id-comm {f = π₁}) (id-comm {f = π₂})
+    ; homomorphism = Equiv.sym second∘second
+    }
 
-_[_][-×_] : ∀ {o a} → (C : Category o a) → BinaryProducts.BinaryProducts C → Category.Obj C → Functor C C
-C [ P ][-× O ] = record 
-  { F₀ = λ x → Product.A×B (product {x} {O})
-  ; F₁ = λ f → ⟨ f ∘ π₁ , π₂ ⟩
-  ; identity = λ {x} → identity′ {x}
-  ; homomorphism = λ {x} {y} {z} {f} {g} → homomorphism′ {x} {y} {z} {f} {g}
-  }
-  where
-  open Category C
-  open Equiv
-  open Product C
-  open BinaryProducts.BinaryProducts C P
+  ─×_ : Obj → Functor C C
+  ─× O = record
+   { F₀ = λ X → X × O
+   ; F₁ = first
+   ; identity = universal (id-comm {f = π₁}) (id-comm {f = π₂})
+   ; homomorphism = Equiv.sym first∘first
+   }
 
-  .identity′ : {A : Obj} → ⟨ id ∘ π₁ , π₂ ⟩ ≡ id
-  identity′ = 
-    begin
-      ⟨ id ∘ π₁ , π₂ ⟩
-    ≈⟨ ⟨⟩-cong₂ identityˡ refl ⟩
-      ⟨ π₁ , π₂ ⟩
-    ≈⟨ η ⟩
-      id
-    ∎
-    where open HomReasoning
-
-  .homomorphism′ : {X Y Z : Obj} {f : X ⇒ Y} {g : Y ⇒ Z} → ⟨ (g ∘ f) ∘ π₁ , π₂ ⟩ ≡ ⟨ g ∘ π₁ , π₂ ⟩ ∘ ⟨ f ∘ π₁ , π₂ ⟩ 
-  homomorphism′ {f = f} {g} =
-    begin
-      ⟨ (g ∘ f) ∘ π₁ , π₂ ⟩
-    ↓⟨ ⟨⟩-cong₂ assoc refl ⟩
-      ⟨ g ∘ (f ∘ π₁) , π₂ ⟩
-    ↑⟨ ⟨⟩-cong₂ (∘-resp-≡ʳ commute₁) refl ⟩
-      ⟨ g ∘ (π₁ ∘ ⟨ f ∘ π₁ , π₂ ⟩) , π₂ ⟩
-    ↑⟨ ⟨⟩-cong₂ assoc commute₂ ⟩
-      ⟨ (g ∘ π₁) ∘ ⟨ f ∘ π₁ , π₂ ⟩ , π₂ ∘ ⟨ f ∘ π₁ , π₂ ⟩ ⟩
-    ↑⟨ ⟨⟩∘ ⟩
-      ⟨ g ∘ π₁ , π₂ ⟩ ∘ ⟨ f ∘ π₁ , π₂ ⟩ 
-    ∎
-    where open HomReasoning
+open ProductFunctors public using () renaming ( ─×─ to _[_][-×-]
+                                              ; _×─ to _[_][_×-]
+                                              ; ─×_ to _[_][-×_] )

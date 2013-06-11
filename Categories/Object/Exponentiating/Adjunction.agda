@@ -31,7 +31,7 @@ open import Categories.Functor
   using (Functor; Contravariant)
   renaming (id to idF; _≡_ to _≡F_)
 
-open import Categories.Adjunction hiding (id)
+open import Categories.Adjunction hiding (_≡_; id)
 open import Categories.NaturalTransformation
   using (NaturalTransformation; module NaturalTransformation)
 open import Categories.Monad

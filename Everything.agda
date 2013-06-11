@@ -16,13 +16,16 @@ import Categories.2-Category
 
 -- Adjunctions between functors
 import Categories.Adjunction
+import Categories.Adjunction.Composition
+import Categories.Adjunction.CompositionLaws
 
 -- The Agda Set category
 import Categories.Agda
 
--- XXX port this to Sets and fix it up
 -- The fact that one version of it is cocomplete
 import Categories.Agda.Cocomplete
+import Categories.Agda.Coequalizers
+import Categories.Agda.Coends
 
 -- The arrow category construction on any category
 import Categories.Arrow
@@ -39,6 +42,9 @@ import Categories.Categories
 
 -- Cat has products
 import Categories.Categories.Products
+
+-- Solver for the theory of generic categories, functors, and NTs
+import Categories.CategorySolver
 
 -- Closed categories
 import Categories.Closed
@@ -60,6 +66,7 @@ import Categories.Colimit
 
 -- Comma categories
 import Categories.Comma
+import Categories.Comma.Functors
 
 -- Comonads, defined directly (not as monads on the opposite category)
 import Categories.Comonad

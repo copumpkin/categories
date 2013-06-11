@@ -4,24 +4,22 @@ open import Categories.Category
 module Categories.Object.IndexedProduct {o a} (C : Category o a) where
 
 -- An indexed product is similar to a limit, but the diagram is from a Set
---  (irrelevant Setoid here) rather than a category, so there are no subobjects
---  involved.
+--  rather than a category, so there are no subobjects involved.
  
 open Category C
 open Equiv
 
 open import Level
 open import Relation.Binary as Bi using ()
-open import Categories.Support.Equivalence
+
+open import Categories.Support.PropositionalEquality
 open import Categories.Operations
 
 import Categories.Object.Indexed as IObj
 import Categories.Morphism.Indexed as IArrow
 
 -- Borrowed from Dan Doel's definition of products
-record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a ⊔ c ⊔ q) where
-  module B = Setoid B
-  open B using (_≈_)
+record IndexedProduct {c} (B : Set c) (As : IObj.Dust C B) : Set (o ⊔ a ⊔ c) where
   open Heterogeneous C
   open IObj C B
   open IArrow C B
@@ -29,22 +27,19 @@ record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a
   Cone : Obj → _
   Cone apex = apex ⇒∗ As
 
-  cone-setoid : Obj → Setoid _ _
-  cone-setoid apex = fan-setoid apex As
-
   _≜_ : ∀ {apex} → Bi.Rel (Cone apex) _
-  _≜_ {apex} = Setoid._≈_ (cone-setoid apex)
+  _≜_ {apex} = _≣_
 
   field
     ∏ : Obj
     π : Cone ∏
 
   -- convenience!
-  π[_] : (x : B.Carrier) → (∏ ⇒ (As ! x))
-  π[_] x = π ‼ x
-  -- ↑ XXX for some reason it won't parse as π[ x ]
-  .π-cong : ∀ {x y} → x ≈ y → (π[ x ] ∼ π[ y ])
-  π-cong x≈y = cong₁ π x≈y
+  π[_] : (x : B) → (∏ ⇒ (As ! x))
+  π[_] = π
+
+  -- .π-cong : ∀ {x y} → x ≣ y → (π[ x ] ∼ π[ y ])
+  -- π-cong = Heterogeneous.cong C
 
   π▹_ : ∀ {X} (f : X ⇒ ∏) → Cone X
   π▹_ f = _▹_ {Zs = As} π f 
@@ -55,15 +50,15 @@ record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a
     --   because of eta-driven irrelevant-field dropping
     .commute∗ : ∀ {V} (fs : Cone V) → (π▹ uncurry fs) ≜ fs
     .universal : ∀ {V} (fs : Cone V) {i : V ⇒ ∏}
-               → (∀ {x} → π[ x ] ∘ i ≡ fs ‼ x) → uncurry fs ≡ i
+               → (∀ {x} → π[ x ] ∘ i ≡ fs x) → uncurry fs ≡ i
 
   -- convenience?
-  .commute : ∀ {V} (fs : Cone V) {x} → (π[ x ] ∘ uncurry fs) ≡ fs ‼ x
-  commute fs {x} = ∼⇒≡ (commute∗ fs B.refl)
+  .commute : ∀ {V} (fs : Cone V) {x} → (π[ x ] ∘ uncurry fs) ≡ fs x
+  commute fs {x} = ≣-app (commute∗ fs) x
 
   .universal∗ : ∀ {V} (fs : Cone V) {i : V ⇒ ∏}
               → ((π▹ i) ≜ fs) → uncurry fs ≡ i
-  universal∗ fs pf = universal fs (∼⇒≡ (pf B.refl))
+  universal∗ fs pf = universal fs (≣-app pf _)
 
   .g-η : ∀ {C} {f : C ⇒ ∏} → (uncurry (π▹ f) ≡ f)
   g-η {f = f} = universal (π▹ f) Equiv.refl
@@ -71,296 +66,181 @@ record IndexedProduct {c q} (B : Setoid c q) (As : IObj.Dust C B) : Set (o ⊔ a
   .η : uncurry π ≡ Category.id C
   η = universal π identityʳ
 
-  .uncurry-cong : ∀ {V} {fs gs : Cone V} → (∀ {x} → fs ‼ x ≡ gs ‼ x) → uncurry fs ≡ uncurry gs
+  .uncurry-cong : ∀ {V} {fs gs : Cone V} → (∀ {x} → fs x ≡ gs x) → uncurry fs ≡ uncurry gs
   uncurry-cong {fs = fs} {gs} eq = 
     universal fs (Equiv.trans (commute gs) (Equiv.sym eq))
 
   .uncurry-cong∗ : ∀ {V} {fs gs : Cone V} → fs ≜ gs → uncurry fs ≡ uncurry gs
   uncurry-cong∗ {V} {fs} {gs} eq = universal∗ fs 
-      (≜-trans {π▹ uncurry gs} {gs} {fs} (commute∗ gs) (≜-sym {fs} {gs} eq))
-    where
-    open Setoid (cone-setoid V) using ()
-                                renaming (trans to ≜-trans; sym to ≜-sym)
-
+      (≣-trans (commute∗ gs) (≣-sym eq))
 
   .uncurry∘ : ∀ {V W} (fs : Cone V) {q : W ⇒ V} → (uncurry fs) ∘ q ≡ uncurry (_▹_ {Zs = As} fs q)
   uncurry∘ fs {q} = Equiv.sym (universal (_▹_ {Zs = As} fs q) (Equiv.trans (Equiv.sym assoc) (∘-resp-≡ˡ (commute fs))))
 
+import Categories.Morphisms
+open import Categories.Square
+open Categories.Morphisms C
+open GlueSquares C
+
+module _ {c B As} where
+  open IndexedProduct {c} {B} {As}
+  Prod = IndexedProduct B As
+  open IObj C B
+  open IArrow C B
+  open _≅_ using () renaming (f to fwd; g to rev)
+
+  private
+    module Lemmas where
+
+      repack : (p₁ p₂ : Prod) → ∏ p₁ ⇒ ∏ p₂
+      repack p₁ p₂ = uncurry p₂ (π p₁)
+
+      .repack∘ : (p₁ p₂ p₃ : Prod) → repack p₂ p₃ ∘ repack p₁ p₂ ≡ repack p₁ p₃
+      repack∘ p₁ p₂ p₃ = sym (universal p₃ _
+        (glueTrianglesʳ (commute p₃ _) (commute p₂ _)))
+
+      .repack≡id : (p : Prod) → repack p p ≡ id
+      repack≡id p = η p
+
+      .repack-cancel : (p₁ p₂ : Prod) → repack p₁ p₂ ∘ repack p₂ p₁ ≡ id
+      repack-cancel p₁ p₂ = trans (repack∘ p₂ p₁ p₂) (repack≡id p₂)
+
+  up-to-iso : ∀ (p₁ p₂ : Prod) → ∏ p₁ ≅ ∏ p₂
+  up-to-iso p₁ p₂ = record
+    { f = repack p₁ p₂
+    ; g = repack p₂ p₁
+    ; iso = record
+      { isoˡ = repack-cancel p₂ p₁
+      ; isoʳ = repack-cancel p₁ p₂
+      }
+    }
+    where
+    open Lemmas
+
+  .up-to-iso-ok : ∀ (p₁ p₂ : Prod) → π p₁ ▹ rev (up-to-iso p₁ p₂) ≣ π p₂
+  up-to-iso-ok p₁ p₂ = commute∗ p₁ (π p₂)
+
+  .up-to-iso-unique : (p₁ p₂ : Prod) (i : ∏ p₁ ≅ ∏ p₂) (eq : π p₁ ▹ rev i ≣ π p₂)
+                   → up-to-iso p₁ p₂ ≣ i
+  up-to-iso-unique p₁ p₂ i eq = promote (up-to-iso p₁ p₂) i (record
+    { f-≡ = universal p₂ (π p₁) (≣-sym (switch-gfʳ i (≣-app eq _)))
+    ; g-≡ = universal∗ p₁ (π p₂) eq
+    })
+    where
+    open EasyCategory Coreᵉ using (promote)
+
+  .iso-unique : (p₁ p₂ : Prod) (i j : ∏ p₁ ≅ ∏ p₂)
+                (eq-i : π p₁ ▹ _≅_.g i ≣ π p₂) (eq-j : π p₁ ▹ _≅_.g j ≣ π p₂)
+              → i ≣ j
+  iso-unique p₁ p₂ i j eq-i eq-j = ≣-trans (≣-sym (up-to-iso-unique p₁ p₂ i eq-i))
+                                           (       up-to-iso-unique p₁ p₂ j eq-j )
+
+  transport-by-iso : (p : Prod) → ∀ {X} → ∏ p ≅ X → Prod
+  transport-by-iso p {X} p≅X = record
+    { ∏ = X
+    ; π = p.π ▹ g
+    ; uncurry = λ fs → f ∘ p.uncurry fs
+    ; commute∗ = λ fs → ≣-ext λ b → trans (cancelInner isoˡ) (p.commute fs)
+    ; universal = λ fs {i} pfs → let open HomReasoning in
+        begin
+          f ∘ p.uncurry fs
+        ↑⟨ ∘-resp-≡ʳ (p.uncurry-cong pfs) ⟩
+          f ∘ p.uncurry ((p.π ▹ g) ▹ i)
+        ↓⟨ ∘-resp-≡ʳ (p.universal _ (sym assoc)) ⟩
+          f ∘ (g ∘ i)
+        ↓⟨ cancelLeft isoʳ ⟩
+          i
+        ∎
+    }
+    where
+    module p = IndexedProduct p
+    open _≅_ p≅X
+
+  .iso-classify : (p : Prod) → ∀ {X} {i j : ∏ p ≅ X} → π p ▹ rev i ≣ π p ▹ rev j
+                → i ≣ j
+  iso-classify p {i = i} {j} eq = iso-unique p (transport-by-iso p j) i j eq ≣-refl
+
+  -- more general
+  .jointly-monic : (p : Prod) → ∀ {X} {f g : X ⇒ ∏ p} → π p ▹ f ≣ π p ▹ g → f ≣ g
+  jointly-monic p {f = f} {g} eq = ≣-trans (≣-sym (universal∗ p _ eq)) (g-η p)
 {-
-open import Categories.Morphisms
+Reversible : ∀ {A B} → (p : Product A B) → Product B A
+Reversible p = record
+  { A×B = p.A×B
+  ; π₁ = p.π₂
+  ; π₂ = p.π₁
+  ; ⟨_,_⟩ = flip p.⟨_,_⟩
+  ; commute₁ = p.commute₂
+  ; commute₂ = p.commute₁
+  ; universal = flip p.universal
+  }
+  where module p = Product p
 
-Commutative : ∀ {A B} → (p₁ : Product A B) (p₂ : Product B A) → _≅_ C (Product.A×B p₁) (Product.A×B p₂)
-Commutative p₁ p₂ = record 
-  { f = ⟨ π₂ , π₁ ⟩′
-  ; g = ⟨ π′₂ , π′₁ ⟩
-  ; iso = record 
-    { isoˡ = isoˡ
-    ; isoʳ = isoʳ
-    }
+Commutative : ∀ {A B} (p₁ : Product A B) (p₂ : Product B A) → Product.A×B p₁ ≅ Product.A×B p₂
+Commutative p₁ p₂ = up-to-iso p₁ (Reversible p₂)
+
+Associable : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) → Product (Product.A×B p₁) Z
+Associable p₁ p₂ p₃ = record
+  { A×B = A×B p₃
+  ; π₁ = p₁ ⟨ π₁ p₃ , π₁ p₂ ∘ π₂ p₃ ⟩
+  ; π₂ = π₂ p₂ ∘ π₂ p₃
+  ; ⟨_,_⟩ = λ f g → p₃ ⟨ π₁ p₁ ∘ f , p₂ ⟨ π₂ p₁ ∘ f , g ⟩ ⟩
+  ; commute₁ = λ {_ f g} → let open HomReasoning in begin
+      p₁ ⟨ π₁ p₃ , π₁ p₂ ∘ π₂ p₃ ⟩ ∘ p₃ ⟨ π₁ p₁ ∘ f , p₂ ⟨ π₂ p₁ ∘ f , g ⟩ ⟩
+    ↓⟨ ⟨⟩∘ p₁ ⟩
+      p₁ ⟨ π₁ p₃ ∘ p₃ ⟨ π₁ p₁ ∘ f , _ ⟩ , (π₁ p₂ ∘ π₂ p₃) ∘ p₃ ⟨ _ , p₂ ⟨ π₂ p₁ ∘ f , g ⟩ ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ p₁ (commute₁ p₃) (glueTrianglesˡ (commute₁ p₂) (commute₂ p₃)) ⟩
+      p₁ ⟨ π₁ p₁ ∘ f , π₂ p₁ ∘ f ⟩
+    ↓⟨ g-η p₁ ⟩
+      f
+    ∎
+  ; commute₂ = λ {_ f g} → glueTrianglesˡ (commute₂ p₂) (commute₂ p₃)
+  ; universal = λ {D l r i} pfˡ pfʳ → let open HomReasoning in begin
+      p₃ ⟨ π₁ p₁ ∘ l , p₂ ⟨ π₂ p₁ ∘ l , r ⟩ ⟩
+    ↑⟨ ⟨⟩-cong₂ p₃ (∘-resp-≡ʳ pfˡ) (⟨⟩-cong₂ p₂ (∘-resp-≡ʳ pfˡ) pfʳ) ⟩
+      p₃ ⟨ π₁ p₁ ∘ (p₁ ⟨ π₁ p₃ , _ ⟩ ∘ i) , p₂ ⟨ π₂ p₁ ∘ (p₁ ⟨ _ , π₁ p₂ ∘ π₂ p₃ ⟩ ∘ i) , (π₂ p₂ ∘ π₂ p₃) ∘ i ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ p₃ (pullˡ (commute₁ p₁)) (⟨⟩-cong₂ p₂ (pullˡ (commute₂ p₁)) refl) ⟩
+      p₃ ⟨ π₁ p₃ ∘ i , p₂ ⟨ (π₁ p₂ ∘ π₂ p₃) ∘ i , (π₂ p₂ ∘ π₂ p₃) ∘ i ⟩ ⟩
+    ↓⟨ ⟨⟩-cong₂ p₃ refl (universal p₂ (sym assoc) (sym assoc)) ⟩
+      p₃ ⟨ π₁ p₃ ∘ i , π₂ p₃ ∘ i ⟩
+    ↓⟨ g-η p₃ ⟩
+      i
+    ∎
   }
   where
-  module p₁ = Product p₁
-  module p₂ = Product p₂
-  open Product p₁
-  open Product p₂ renaming (A×B to B×A; π₁ to π′₁; π₂ to π′₂; ⟨_,_⟩ to ⟨_,_⟩′)
+  open Product renaming (⟨_,_⟩ to _⟨_,_⟩)
 
-  idˡ : A×B ⇒ A×B
-  idˡ = ⟨ π′₂ , π′₁ ⟩ ∘ ⟨ π₂ , π₁ ⟩′
+Associative : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → (Product.A×B p₃) ≅ (Product.A×B p₄)
+Associative p₁ p₂ p₃ p₄ = up-to-iso (Associable p₁ p₂ p₃) p₄
 
-  idʳ : B×A ⇒ B×A
-  idʳ = ⟨ π₂ , π₁ ⟩′ ∘ ⟨ π′₂ , π′₁ ⟩
+open Lemmas public
 
-  .idˡ-commutes₁ : π₁ ∘ idˡ ≡ π₁
-  idˡ-commutes₁ = begin
-                    π₁ ∘ idˡ
-                  ↑⟨ assoc ⟩ 
-                    (π₁ ∘ ⟨ π′₂ , π′₁ ⟩) ∘ ⟨ π₂ , π₁ ⟩′
-                  ↓⟨ ∘-resp-≡ˡ p₁.commute₁ ⟩
-                    π′₂ ∘ ⟨ π₂ , π₁ ⟩′
-                  ↓⟨ p₂.commute₂ ⟩
-                    π₁
-                  ∎
-    where 
-    open HomReasoning
-
-  .idˡ-commutes₂ : π₂ ∘ idˡ ≡ π₂
-  idˡ-commutes₂ = begin
-                    π₂ ∘ idˡ
-                  ↑⟨ assoc ⟩ 
-                    (π₂ ∘ ⟨ π′₂ , π′₁ ⟩) ∘ ⟨ π₂ , π₁ ⟩′
-                  ↓⟨ ∘-resp-≡ˡ p₁.commute₂ ⟩
-                    π′₁ ∘ ⟨ π₂ , π₁ ⟩′
-                  ↓⟨ p₂.commute₁ ⟩
-                    π₂
-                  ∎
-    where 
-    open HomReasoning
-
-  .isoˡ : idˡ ≡ id
-  isoˡ = begin
-           idˡ
-         ↑⟨ p₁.universal idˡ-commutes₁ idˡ-commutes₂ ⟩
-           ⟨ π₁ , π₂ ⟩
-         ↓⟨ p₁.η ⟩
-           id
-         ∎
-    where 
-    open HomReasoning
-
-
-  .idʳ-commutes₁ : π′₁ ∘ idʳ ≡ π′₁
-  idʳ-commutes₁ = begin
-                    π′₁ ∘ idʳ
-                  ↑⟨ assoc ⟩ 
-                    (π′₁ ∘ ⟨ π₂ , π₁ ⟩′) ∘ ⟨ π′₂ , π′₁ ⟩
-                  ↓⟨ ∘-resp-≡ˡ p₂.commute₁ ⟩
-                    π₂ ∘ ⟨ π′₂ , π′₁ ⟩
-                  ↓⟨ p₁.commute₂ ⟩
-                    π′₁
-                  ∎
-    where 
-    open HomReasoning
-
-  .idʳ-commutes₂ : π′₂ ∘ idʳ ≡ π′₂
-  idʳ-commutes₂ = begin
-                    π′₂ ∘ idʳ
-                  ↑⟨ assoc ⟩ 
-                    (π′₂ ∘ ⟨ π₂ , π₁ ⟩′) ∘ ⟨ π′₂ , π′₁ ⟩
-                  ↓⟨ ∘-resp-≡ˡ p₂.commute₂ ⟩
-                    π₁ ∘ ⟨ π′₂ , π′₁ ⟩
-                  ↓⟨ p₁.commute₁ ⟩
-                    π′₂
-                  ∎
-    where 
-    open HomReasoning
-
-  .isoʳ : idʳ ≡ id
-  isoʳ = begin
-           idʳ
-         ↑⟨ p₂.universal idʳ-commutes₁ idʳ-commutes₂ ⟩
-           ⟨ π′₁ , π′₂ ⟩′
-         ↓⟨ p₂.η ⟩
-           id
-         ∎
-    where 
-    open HomReasoning
-
-
-Associative : ∀ {X Y Z} (p₁ : Product X Y) (p₂ : Product Y Z) (p₃ : Product X (Product.A×B p₂)) (p₄ : Product (Product.A×B p₁) Z) → _≅_ C (Product.A×B p₃) (Product.A×B p₄)
-Associative p₁ p₂ p₃ p₄ = record 
-  { f = f
-  ; g = g
-  ; iso = record 
-    { isoˡ = isoˡ
-    ; isoʳ = isoʳ
-    }
+Mobile : ∀ {A₁ B₁ A₂ B₂} (p : Product A₁ B₁) → A₁ ≅ A₂ → B₁ ≅ B₂ → Product A₂ B₂
+Mobile p A₁≅A₂ B₁≅B₂ = record
+  { A×B = p.A×B
+  ; π₁ = f A₁≅A₂ ∘ p.π₁
+  ; π₂ = f B₁≅B₂ ∘ p.π₂
+  ; ⟨_,_⟩ = λ h k → p ⟨ g A₁≅A₂ ∘ h , g B₁≅B₂ ∘ k ⟩
+  ; commute₁ = let open HomReasoning in begin
+      (f A₁≅A₂ ∘ p.π₁) ∘ p ⟨ g A₁≅A₂ ∘ _ , g B₁≅B₂ ∘ _ ⟩
+    ↓⟨ pullʳ p.commute₁ ⟩
+      f A₁≅A₂ ∘ (g A₁≅A₂ ∘ _)
+    ↓⟨ cancelLeft (isoʳ A₁≅A₂) ⟩
+      _
+    ∎
+  ; commute₂ = let open HomReasoning in begin
+      (f B₁≅B₂ ∘ p.π₂) ∘ p ⟨ g A₁≅A₂ ∘ _ , g B₁≅B₂ ∘ _ ⟩
+    ↓⟨ pullʳ p.commute₂ ⟩
+      f B₁≅B₂ ∘ (g B₁≅B₂ ∘ _)
+    ↓⟨ cancelLeft (isoʳ B₁≅B₂) ⟩
+      _
+    ∎
+  ; universal = λ pfˡ pfʳ → p.universal 
+                              (switch-fgˡ A₁≅A₂ (trans (sym assoc) pfˡ))
+                              (switch-fgˡ B₁≅B₂ (trans (sym assoc) pfʳ))
   }
   where
-  module p₁ = Product p₁
-  module p₂ = Product p₂
-  module p₃ = Product p₃
-  module p₄ = Product p₄
-  open Product p₁ hiding (π₁; π₂) renaming (⟨_,_⟩ to ⟨_,_⟩p₁)
-  open Product p₂ hiding (π₁; π₂) renaming (A×B to B×C; ⟨_,_⟩ to ⟨_,_⟩p₂)
-  open Product p₃ renaming (A×B to A×[B×C])
-  open Product p₄ renaming (A×B to [A×B]×C; π₁ to π′₁; π₂ to π′₂; ⟨_,_⟩ to ⟨_,_⟩′)
-  
-  f : A×[B×C] ⇒ [A×B]×C
-  f = ⟨ ⟨ π₁ , p₂.π₁ ∘ π₂ ⟩p₁ , p₂.π₂ ∘ π₂ ⟩′
-
-  g : [A×B]×C ⇒ A×[B×C]
-  g = ⟨ p₁.π₁ ∘ π′₁ , ⟨ p₁.π₂ ∘ π′₁ , π′₂ ⟩p₂ ⟩
-  
-  idˡ : A×[B×C] ⇒ A×[B×C]
-  idˡ = g ∘ f
-
-  idʳ : [A×B]×C ⇒ [A×B]×C
-  idʳ = f ∘ g
-
-  .cmˡ₁ : π₁ ∘ idˡ ≡ π₁
-  cmˡ₁ = begin 
-           π₁ ∘ idˡ
-         ↑⟨ assoc ⟩
-           (π₁ ∘ g) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₃.commute₁ ⟩
-           (p₁.π₁ ∘ π′₁) ∘ f
-         ↓⟨ assoc ⟩
-           p₁.π₁ ∘ (π′₁ ∘ f)
-         ↓⟨ ∘-resp-≡ʳ p₄.commute₁ ⟩
-           p₁.π₁ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁
-         ↓⟨ p₁.commute₁ ⟩
-           p₃.π₁
-         ∎
-    where
-    open HomReasoning
-
-  .cmˡ₂₁ : p₂.π₁ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f) ≡ p₂.π₁ ∘ p₃.π₂
-  cmˡ₂₁ = begin
-           p₂.π₁ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f)
-         ↑⟨ assoc ⟩
-           (p₂.π₁ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₂.commute₁ ⟩
-           (p₁.π₂ ∘ p₄.π₁) ∘ f
-         ↓⟨ assoc ⟩
-           p₁.π₂ ∘ (p₄.π₁ ∘ f)
-         ↓⟨ ∘-resp-≡ʳ p₄.commute₁ ⟩
-           p₁.π₂ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁
-         ↓⟨ p₁.commute₂ ⟩
-           p₂.π₁ ∘ p₃.π₂
-         ∎
-    where
-      open HomReasoning
-
-  .cmˡ₂₂ : p₂.π₂ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f) ≡ p₂.π₂ ∘ p₃.π₂
-  cmˡ₂₂ = begin
-           p₂.π₂ ∘ (⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f)
-         ↑⟨ assoc ⟩
-           (p₂.π₂ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₂.commute₂ ⟩
-           p₄.π₂ ∘ f
-         ↓⟨ p₄.commute₂ ⟩
-           p₂.π₂ ∘ p₃.π₂
-         ∎
-    where
-      open HomReasoning
-
-  .cmˡ₂ : π₂ ∘ idˡ ≡ π₂
-  cmˡ₂ = begin
-           π₂ ∘ idˡ
-         ↑⟨ assoc ⟩
-           (π₂ ∘ g) ∘ f
-         ↓⟨ ∘-resp-≡ˡ p₃.commute₂ ⟩
-           ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂ ∘ f
-         ↑⟨ p₂.universal cmˡ₂₁ cmˡ₂₂ ⟩
-           ⟨ p₂.π₁ ∘ p₃.π₂ , p₂.π₂ ∘ p₃.π₂ ⟩p₂
-         ↓⟨ p₂.g-η ⟩
-           p₃.π₂
-         ∎
-    where
-    open HomReasoning
-
-  .isoˡ : idˡ ≡ id
-  isoˡ = begin
-           idˡ
-         ↑⟨ p₃.universal cmˡ₁ cmˡ₂ ⟩
-           ⟨ π₁ , π₂ ⟩
-         ↓⟨ p₃.η ⟩
-           id
-         ∎
-    where
-    open HomReasoning
-
-  .cmʳ₁₁ : p₁.π₁ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g) ≡ p₁.π₁ ∘ p₄.π₁
-  cmʳ₁₁ = begin
-            p₁.π₁ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g)
-          ↑⟨ assoc ⟩
-            (p₁.π₁ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁) ∘ g
-          ↓⟨ ∘-resp-≡ˡ p₁.commute₁ ⟩
-            p₃.π₁ ∘ g
-          ↓⟨ p₃.commute₁ ⟩
-            p₁.π₁ ∘ p₄.π₁
-          ∎
-    where 
-    open HomReasoning
-
-  .cmʳ₁₂ : p₁.π₂ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g) ≡ p₁.π₂ ∘ p₄.π₁
-  cmʳ₁₂ = begin
-            p₁.π₂ ∘ (⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g)
-          ↑⟨ assoc ⟩
-            (p₁.π₂ ∘ ⟨ p₃.π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁) ∘ g
-          ↓⟨ ∘-resp-≡ˡ p₁.commute₂ ⟩
-            (p₂.π₁ ∘ p₃.π₂) ∘ g
-          ↓⟨ assoc ⟩
-            p₂.π₁ ∘ (p₃.π₂ ∘ g)
-          ↓⟨ ∘-resp-≡ʳ p₃.commute₂ ⟩
-            p₂.π₁ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂
-          ↓⟨ p₂.commute₁ ⟩
-            p₁.π₂ ∘ p₄.π₁
-          ∎
-    where 
-    open HomReasoning
-
-
-  .cmʳ₁ : π′₁ ∘ idʳ ≡ π′₁
-  cmʳ₁ = begin
-           π′₁ ∘ idʳ
-         ↑⟨ assoc ⟩
-           (π′₁ ∘ f) ∘ g
-         ↓⟨ ∘-resp-≡ˡ p₄.commute₁ ⟩
-           ⟨ π₁ , p₂.π₁ ∘ p₃.π₂ ⟩p₁ ∘ g
-         ↑⟨ p₁.universal cmʳ₁₁ cmʳ₁₂ ⟩
-           ⟨ p₁.π₁ ∘ p₄.π₁ , p₁.π₂ ∘ p₄.π₁ ⟩p₁
-         ↓⟨ p₁.g-η ⟩
-           π′₁
-         ∎
-    where 
-    open HomReasoning
-
-  .cmʳ₂ : π′₂ ∘ idʳ ≡ π′₂
-  cmʳ₂ = begin
-           π′₂ ∘ idʳ
-         ↑⟨ assoc ⟩
-           (π′₂ ∘ f) ∘ g
-         ↓⟨ ∘-resp-≡ˡ p₄.commute₂ ⟩
-           (p₂.π₂ ∘ p₃.π₂) ∘ g
-         ↓⟨ assoc ⟩
-           p₂.π₂ ∘ (p₃.π₂ ∘ g)
-         ↓⟨ ∘-resp-≡ʳ p₃.commute₂ ⟩
-           p₂.π₂ ∘ ⟨ p₁.π₂ ∘ p₄.π₁ , p₄.π₂ ⟩p₂
-         ↓⟨ p₂.commute₂ ⟩
-           p₄.π₂
-         ∎
-    where 
-    open HomReasoning
-    
-  .isoʳ : idʳ ≡ id
-  isoʳ = begin
-           idʳ
-         ↑⟨ p₄.universal cmʳ₁ cmʳ₂ ⟩
-           ⟨ π′₁ , π′₂ ⟩′
-         ↓⟨ p₄.η ⟩
-           id
-         ∎
-    where
-    open HomReasoning
+  module p = Product p
+  open Product renaming (⟨_,_⟩ to _⟨_,_⟩)
+  open _≅_
 -}

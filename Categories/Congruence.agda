@@ -1,9 +1,11 @@
 module Categories.Congruence where
 
 open import Level
-open import Relation.Binary hiding (_⇒_)
+open import Relation.Binary hiding (_⇒_; Setoid)
 
 open import Categories.Support.PropositionalEquality
+open import Categories.Support.Equivalence
+open import Categories.Support.EqReasoning
 
 open import Categories.Category hiding (module Heterogeneous; _[_∼_])
 
@@ -231,7 +233,25 @@ module Heterogeneous {o ℓ e} {C : Category o ℓ e} {q} (Q : Congruence C q) w
 
   -- floatʳ-resp-∼ : ∀ {A A′ B} (A≣A′ : A ≣ A′) {f : C [ A , B ]} → f ∼ floatʳ A≣A′ f
   -- floatʳ-resp-∼ ≣-refl = refl
-  
+
+  infix 3 ▹_
+
+  record -⇒- : Set (o ⊔ ℓ) where
+    constructor ▹_
+    field
+      {Dom} : Obj
+      {Cod} : Obj
+      morphism : Dom ⇒ Cod
+
+  ∼-setoid : Setoid _ _
+  ∼-setoid = record {
+               Carrier = -⇒-;
+               _≈_ = λ x y → -⇒-.morphism x ∼ -⇒-.morphism y;
+               isEquivalence = record { refl = refl; sym = sym; trans = trans } }
+
+  module HetReasoning where
+    open SetoidReasoning ∼-setoid public
+
 _[_∼_] : ∀ {o ℓ e} {C : Category o ℓ e} {q} (Q : Congruence C q) {A B} (f : C [ A , B ]) {X Y} (g : C [ X , Y ]) → Set (q ⊔ o ⊔ ℓ ⊔ e)
 Q [ f ∼ g ] = Heterogeneous._∼_ Q f g
 

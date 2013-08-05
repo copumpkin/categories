@@ -4,6 +4,7 @@ module Categories.Grothendieck where
 open import Relation.Binary using (Rel)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 
+open import Categories.Support.Experimental
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.IProduct
 import Categories.Category as CCat
@@ -72,23 +73,21 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
   }
   where
   open Functor F
-  module Fc {c} where 
+  module Fc {c} where
     open Category (F₀ c) public
     open Equiv public
-  open Category C 
+  open Category C
   open Equiv
   module Cat = Category (Categories o′ ℓ′ e′)
   module Cong {c} where
    open Congruence (TrivialCongruence (F₀ c)) public
   open Cong renaming (coerce to coe)
   module Het {c} = Heterogeneous (TrivialCongruence (F₀ c))
-  open Het using (▹_)    
+  open Het using (▹_)
   module OHet {c} where
    open CCat.Heterogeneous (F₀ c) public
    ohet⇒het : ∀ {A B} {f : A Fc.⇒ B} -> ∀ {X Y} → {g : X Fc.⇒ Y} → f ∼ g -> f Het.∼ g
    ohet⇒het (≡⇒∼ x) = Het.≡⇒∼ ≣-refl ≣-refl x
-
-  postulate ≣-relevant : ∀ {l} {A : Set l} {X Y : A} -> .(X ≣ Y) -> X ≣ Y
 
   Obj′ = Σ Obj (\ c -> Category.Obj (F₀ c))
   
@@ -99,13 +98,13 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
   _≡′_ {c₁ , x₁} {c₂ , x₂} (f , α) (g , β) = f ≡ g × α Het.∼ β
 
   ∘-eq : ∀ {cx xx cy cz} -> (f : cy ⇒ cz) (g : cx ⇒ cy) -> Functor.F₀ (F₁ f Cat.∘ F₁ g) xx ≣ Functor.F₀ (F₁ (f ∘ g)) xx
-  ∘-eq {cx}{xx}{cy}{cz} f g = ≣-relevant (≣-sym (≡⇒≣ (F₁ (f ∘ g)) (F₁ f Cat.∘ F₁ g) (homomorphism {f = g} {g = f}) xx))
+  ∘-eq {cx} {xx} {cy} {cz} f g = ≣-relevant (≣-sym (≡⇒≣ (F₁ (f ∘ g)) (F₁ f Cat.∘ F₁ g) (homomorphism {f = g} {g = f}) xx))
 
   _∘′_ : ∀ {X Y Z} → Hom′ Y Z → Hom′ X Y → Hom′ X Z
   _∘′_ {cx , xx} {Y} {cz , xz} (f , α) (g , β) = (f ∘ g) , α Fc.∘ Cong.coerce (∘-eq f g) ≣-refl (Functor.F₁ (F₁ f) β)
 
   id-eq : ∀ {c x} -> Functor.F₀ (Cat.id {F₀ c}) x ≣ Functor.F₀ (F₁ id) x
-  id-eq {c} {x} = (≣-relevant (≣-sym (≡⇒≣ (F₁ id) Cat.id (identity {c}) x)))
+  id-eq {c} {x} = ≣-relevant (≣-sym (≡⇒≣ (F₁ id) Cat.id (identity {c}) x))
 
   id′ : {A : Obj′} → Hom′ A A
   id′ {c , x} = id , Cong.coerce id-eq ≣-refl Fc.id
@@ -161,7 +160,7 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
    where
     open Het.HetReasoning
     eq : Functor.F₀ (F₁ ((h ∘ g) ∘ f)) xa ≣ Functor.F₀ (F₁ (h ∘ g ∘ f)) xa
-    eq = (≡⇒≣ (F₁ ((h ∘ g) ∘ f)) (F₁ (h ∘ g ∘ f)) (F-resp-≡ (assoc {f = f})) xa)
+    eq = ≡⇒≣ (F₁ ((h ∘ g) ∘ f)) (F₁ (h ∘ g ∘ f)) (F-resp-≡ (assoc {f = f})) xa
     eq0 = ∘-eq h g
     eq1 = ∘-eq (h ∘ g) f
     eq2 = ∘-eq h (g ∘ f)

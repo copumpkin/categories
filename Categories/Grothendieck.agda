@@ -10,11 +10,14 @@ import Categories.Category as CCat
 open CCat hiding (module Heterogeneous)
 open import Categories.Functor using (Functor; module Functor; ≡⇒≣)
 open import Categories.Agda
-{-
+open import Categories.Categories
+open import Categories.Congruence
+
+
 -- TODO: don't use sigmas
 -- Break into modules Strict and Weak using Sets and Setoids?
-Grothendieck : ∀ {o ℓ e o′} {C : Category o ℓ e} → Functor C (Sets o′) → Category _ _ _
-Grothendieck {o′ = o′} {C = C} F = record 
+Elements : ∀ {o ℓ e o′} {C : Category o ℓ e} → Functor C (Sets o′) → Category _ _ _
+Elements {o′ = o′} {C = C} F = record 
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
@@ -50,12 +53,9 @@ Grothendieck {o′ = o′} {C = C} F = record
     .pf : F₁ (f ∘ g) (proj₂ X) ≣ proj₂ Z
     pf = ≣-trans homomorphism (≣-sym (≣-trans (≣-sym pf₁) (≣-cong (F₁ f) (≣-sym pf₂))))
 
--}
-open import Categories.Categories
-open import Categories.Congruence
 
-Grothendieck2 : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} → Functor C (Categories o′ ℓ′ e′) → Category _ _ _
-Grothendieck2 {o′ = o′} {ℓ′} {e′} {C = C} F = record 
+Grothendieck : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} → Functor C (Categories o′ ℓ′ e′) → Category _ _ _
+Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record 
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_

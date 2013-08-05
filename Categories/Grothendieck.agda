@@ -61,14 +61,14 @@ Grothendieck2 {o′ = o′} {ℓ′} {e′} {C = C} F = record
   ; _≡_ = _≡′_
   ; _∘_ = _∘′_
   ; id = id′
-  ; assoc = {! assoc′ !}
-  ; identityˡ = {! identityˡ′ !}
-  ; identityʳ = {! identityʳ !}
+  ; assoc = assoc′
+  ; identityˡ = identityˡ′
+  ; identityʳ = identityʳ′
   ; equiv = record { 
      refl = refl , Het.refl;
      sym  = λ { (eq₁ , eq₂) → sym eq₁ , Het.sym eq₂}; 
      trans = λ { (xeq₁ , xeq₂) (yeq₁ , yeq₂) → trans xeq₁ yeq₁ , Het.trans xeq₂ yeq₂} }
-  ; ∘-resp-≡ = {! !}
+  ; ∘-resp-≡ = ∘-resp-≡′
   }
   where
   open Functor F
@@ -104,38 +104,23 @@ Grothendieck2 {o′ = o′} {ℓ′} {e′} {C = C} F = record
 
   id-eq : ∀ {c x} -> Functor.F₀ (Cat.id {F₀ c}) x ≣ Functor.F₀ (F₁ id) x
   id-eq {c} {x} = (≣-relevant (≣-sym (≡⇒≣ (F₁ id) Cat.id (identity {c}) x)))
+
   id′ : {A : Obj′} → Hom′ A A
   id′ {c , x} = id , Cong.coerce id-eq ≣-refl Fc.id
-
-  .identityˡ′ : {A B : Obj′} {f : Hom′ A B} → (id′ ∘′ f) ≡′ f
-  identityˡ′ {ca , xa} {cb , xb} {f , α} = identityˡ , Het.≡⇒∼ eq ≣-refl
-    (begin 
-     coe eq ≣-refl
-         (coe eq0 ≣-refl Fc.id 
-          Fc.∘ coe eq1 ≣-refl (Functor.F₁ (F₁ id) α))                   ↓⟨ coerce-∘ eq (≣-sym eq0) ≣-refl (coe eq0 ≣-refl Fc.id)
-                                                                            (coe eq1 ≣-refl (Functor.F₁ (F₁ id) α)) ⟩
-     coe (≣-sym eq0) ≣-refl (coe eq0 ≣-refl Fc.id) 
-      Fc.∘ (coe eq (≣-sym eq0) (coe eq1 ≣-refl (Functor.F₁ (F₁ id) α))) ↑⟨ Fc.∘-resp-≡ (coerce-trans eq0 (≣-sym eq0) ≣-refl ≣-refl Fc.id)
-                                                                            (coerce-trans eq1 eq ≣-refl (≣-sym eq0) (Functor.F₁ (F₁ id) α)) ⟩ 
-     coe (≣-trans eq0 (≣-sym eq0)) ≣-refl Fc.id 
-      Fc.∘ coe (≣-trans eq1 eq) (≣-sym eq0) (Functor.F₁ (F₁ id) α)      ↓⟨ Fc.∘-resp-≡ˡ (coerce-invariant (≣-trans eq0 (≣-sym eq0)) 
-                                                                                  ≣-refl ≣-refl ≣-refl Fc.id) ⟩ 
-     Fc.id Fc.∘ coe (≣-trans eq1 eq) (≣-sym eq0) (Functor.F₁ (F₁ id) α) ↓⟨ Fc.identityˡ ⟩ 
-     coe (≣-trans eq1 eq) (≣-sym eq0) (Functor.F₁ (F₁ id) α)            ↓⟨ Het.∼⇒≡₂ (OHet.ohet⇒het (identity α)) (≣-trans eq1 eq) (≣-sym eq0) ⟩ 
-     α                                                                  ∎)
-   where
-    open Fc.HomReasoning
-    open Cong renaming (coerce to coe)
-    eq0 : Functor.F₀ (Cat.id {F₀ cb}) xb ≣ Functor.F₀ (F₁ id) xb
-    eq0 = id-eq
-    eq1 : Functor.F₀ (F₁ id Cat.∘ F₁ f) xa ≣ Functor.F₀ (F₁ (id ∘ f)) xa
-    eq1 = ∘-eq id f
-    eq : Functor.F₀ (F₁ (id ∘ f)) xa ≣ Functor.F₀ (F₁ f) xa
-    eq = (≣-relevant (≡⇒≣ (F₁ (id ∘ f)) (F₁ f) (F-resp-≡ (identityˡ {f = f})) xa))
 
   F-resp-∼ : ∀ {b c} -> (H : Functor (F₀ b) (F₀ c)) -> {A B A' B' : Category.Obj (F₀ b)} {α : A Fc.⇒ B }{β : A' Fc.⇒ B'} →
              (α Het.∼ β) → (Functor.F₁ H α Het.∼ Functor.F₁ H β)
   F-resp-∼ H (Heterogeneous.≡⇒∼ ≣-refl ≣-refl x) = Heterogeneous.≡⇒∼ ≣-refl ≣-refl (Functor.F-resp-≡ H x)
+
+  .identityˡ′ : {A B : Obj′} {f : Hom′ A B} → (id′ ∘′ f) ≡′ f
+  identityˡ′ {ca , xa} {cb , xb} {f , α} = identityˡ , 
+    Het.trans (Het.∘-resp-∼ (Het.sym (Het.coerce-resp-∼ id-eq ≣-refl)) 
+                            (Het.trans (Het.sym (Het.coerce-resp-∼ (∘-eq id f) ≣-refl)) 
+                                       (OHet.ohet⇒het (identity α)))) 
+              (Het.≡⇒∼ ≣-refl ≣-refl Fc.identityˡ)
+   where
+    open Fc.HomReasoning
+    open Cong renaming (coerce to coe)
 
   .assoc′ : {A B C₁ D : Obj′} {f : Hom′ A B} {g : Hom′ B C₁} {h : Hom′ C₁ D} →
                  ((h ∘′ g) ∘′ f) ≡′ (h ∘′ (g ∘′ f))
@@ -168,3 +153,12 @@ Grothendieck2 {o′ = o′} {ℓ′} {e′} {C = C} F = record
      (F-resp-∼ (F₁ h) γ~ι)) 
      (Het.coerce-resp-∼ (∘-eq h i) ≣-refl))))
 
+  .identityʳ′ : {A B : Obj′} {f : Hom′ A B} → (f ∘′ id′) ≡′ f
+  identityʳ′ {ca , xa} {cb , xb} {f , α} = identityʳ , (Het.trans (Het.∘-resp-∼ʳ 
+   (Het.trans (Het.sym (Het.coerce-resp-∼ (∘-eq f id) ≣-refl)) 
+   (Het.trans (F-resp-∼ (F₁ f) (Het.sym (Het.coerce-resp-∼ id-eq ≣-refl))) 
+              (Het.≡⇒∼ ≣-refl ≣-refl (Functor.identity (F₁ f)))))) 
+   (Het.≡⇒∼ ≣-refl ≣-refl Fc.identityʳ))
+   where
+    open Fc.HomReasoning
+    open Cong renaming (coerce to coe)

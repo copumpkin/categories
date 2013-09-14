@@ -54,6 +54,16 @@ Elements {o′ = o′} {C = C} F = record
     .pf : F₁ (f ∘ g) (proj₂ X) ≣ proj₂ Z
     pf = ≣-trans homomorphism (≣-sym (≣-trans (≣-sym pf₁) (≣-cong (F₁ f) (≣-sym pf₂))))
 
+Dom : ∀ {o ℓ e o′} {C : Category o ℓ e} → (F : Functor C (Sets o′)) -> Functor (Elements F) C
+Dom {C = C} F = record {
+                  F₀ = proj₁;
+                  F₁ = proj₁′;
+                  identity = Equiv.refl;
+                  homomorphism = Equiv.refl;
+                  F-resp-≡ = λ x → x }
+  where
+   open Category C
+
 
 Grothendieck : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} → Functor C (Categories o′ ℓ′ e′) → Category _ _ _
 Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record 
@@ -199,3 +209,4 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
      ▹ coe (∘-eq h i) ≣-refl (Functor.F₁ (F₁ h) ι) ∎)
    where
     open Het.HetReasoning
+

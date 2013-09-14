@@ -10,6 +10,7 @@ import Categories.Support.SetoidFunctions
 
 open import Categories.Support.PropositionalEquality
 open import Categories.Category
+open import Categories.Functor using (Functor)
 
 Sets : ∀ o → Category _ _ _
 Sets o = record
@@ -87,3 +88,16 @@ ISetoids c ℓ = record
   open Relation.Binary using (Rel)
   open Categories.Support.Equivalence
   open Categories.Support.SetoidFunctions renaming (id to id′)
+
+
+Lift-IS : ∀ {c ℓ} a b → Functor (ISetoids c ℓ) (ISetoids (c ⊔ a) (ℓ ⊔ b))
+Lift-IS {c} {ℓ} a b = record {
+                   F₀ = Lift-setoid {c} {ℓ} {a} {b};
+                   F₁ = λ f → record { _⟨$⟩_ = λ x → lift (f ⟨$⟩ (lower x)); cong = λ eq → lift (cong f (lower eq)) };
+                   identity = λ x → x;
+                   homomorphism = λ {_} {_} {_} {f} {g} eq → lift (cong g (cong f (lower eq)));
+                   F-resp-≡ = λ eq₀ eq₁ → lift (eq₀ (lower eq₁)) }
+  where
+    open import Categories.Support.Equivalence
+    open Categories.Support.SetoidFunctions renaming (id to id′)
+

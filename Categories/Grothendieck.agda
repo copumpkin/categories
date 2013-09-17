@@ -210,3 +210,12 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
    where
     open Het.HetReasoning
 
+DomGr : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} → (F : Functor C (Categories o′ ℓ′ e′)) → Functor (Grothendieck F) C
+DomGr {C = C} F = record {
+                    F₀ = proj₁;
+                    F₁ = proj₁;
+                    identity = C.Equiv.refl;
+                    homomorphism = C.Equiv.refl;
+                    F-resp-≡ = proj₁ }
+  where 
+    module C = Category C

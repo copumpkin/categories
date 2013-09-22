@@ -10,26 +10,37 @@ open import Categories.Functor.Constant
 open import Level
 open import Categories.Morphisms V
 open import Categories.Square
+open import Data.Product
 
 record End-data (F : Bifunctor C.op C V) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
   field
     E : V.Obj
     π : DinaturalTransformation {C = C} (Constant E) F
-  
-  open DinaturalTransformation π using (α; commute)
+
+  module π = DinaturalTransformation π
+  open π using (α)
   π∘_ : ∀ {Q} → Q V.⇒ E → End-data F
   π∘ g = record { π = record { α = λ c → α c ∘ g; commute = λ {c c′} f → 
           begin
             F.F₁ (f , C.id) ∙ (α c′ ∙ g) ∙ ID ↓⟨ Equiv.refl ⟩
-            (F.F₁ (f , C.id) ∙ α c′ ∙ ID) ∙ g ↓≡⟨ ∘-resp-≡ˡ (commute f) ⟩ 
+            (F.F₁ (f , C.id) ∙ α c′ ∙ ID) ∙ g ↓≡⟨ ∘-resp-≡ˡ (π.commute f) ⟩ 
             (F.F₁ (C.id , f) ∙ α c ∙ ID) ∙ g  ↓⟨ Equiv.refl ⟩ 
             F.F₁ (C.id , f) ∙ (α c ∙ g) ∙ ID  ∎ } }
    where
      open AUReasoning V
-     module F = Functor F
-     open import Data.Product
+     module F = Functor F 
      open V
-
+  
+  .commute : ∀ {a b} (f : a C.⇒ b) -> Functor.F₁ F (f , C.id) V.∘ α b V.≡ Functor.F₁ F (C.id , f) V.∘ α a
+  commute {c} {c′} f = begin
+            F.F₁ (f , C.id) ∙ α c′      ↓⟨ Equiv.refl ⟩
+            F.F₁ (f , C.id) ∙ α c′ ∙ ID ↓≡⟨ π.commute f ⟩ 
+            F.F₁ (C.id , f) ∙ α c  ∙ ID ↓⟨ Equiv.refl ⟩ 
+            F.F₁ (C.id , f) ∙ α c       ∎
+    where 
+      open AUReasoning V
+      module F = Functor F 
+      open V
 
 open DinaturalTransformation using (α)
 

@@ -81,7 +81,7 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
      trans = λ { (xeq₁ , xeq₂) (yeq₁ , yeq₂) → trans xeq₁ yeq₁ , Het.trans xeq₂ yeq₂} }
   ; ∘-resp-≡ = ∘-resp-≡′
   }
-  where
+  module Groth where
   open Functor F
   module Fc {c} where
     open Category (F₀ c) public
@@ -91,7 +91,7 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
   module Cat = Category (Categories o′ ℓ′ e′)
   module Cong {c} where
    open Congruence (TrivialCongruence (F₀ c)) public
-  open Cong renaming (coerce to coe)
+  open Cong public using () renaming (coerce to coe) 
   module Het {c} = Heterogeneous (TrivialCongruence (F₀ c))
   open Het using (▹_)
   module OHet {c} where
@@ -210,6 +210,8 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
    where
     open Het.HetReasoning
 
+Gr = Grothendieck
+
 DomGr : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} → (F : Functor C (Categories o′ ℓ′ e′)) → Functor (Grothendieck F) C
 DomGr {C = C} F = record {
                     F₀ = proj₁;
@@ -219,3 +221,22 @@ DomGr {C = C} F = record {
                     F-resp-≡ = proj₁ }
   where 
     module C = Category C
+
+inGr : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} (F : Functor C (Categories o′ ℓ′ e′)) → ∀ c -> Functor (Functor.F₀ F c) (Gr F)
+inGr {C = C} F c = record {
+                     F₀ = _,_ c;
+                     F₁ = λ f → C.id , GrF.coe GrF.id-eq ≣-refl f;
+                     identity = Category.Equiv.refl (Grothendieck F);
+                     homomorphism = C.Equiv.sym C.identityʳ , Het.trans (Het.sym (Het.coerce-resp-∼ GrF.id-eq ≣-refl))
+                                                                (Het.∘-resp-∼ (Het.coerce-resp-∼ GrF.id-eq ≣-refl)
+                                                                 (Het.trans
+                                                                  (Het.trans (Het.coerce-resp-∼ GrF.id-eq ≣-refl)
+                                                                   (Het.sym (GrF.OHet.ohet⇒het (F.identity _))))
+                                                                  (Het.coerce-resp-∼ (GrF.∘-eq C.id C.id) ≣-refl)));
+                     F-resp-≡ = λ x → C.Equiv.refl , (Het.trans (Het.trans (Het.sym (Het.coerce-resp-∼ GrF.id-eq ≣-refl)) 
+                              (Heterogeneous.≡⇒∼ ≣-refl ≣-refl x)) (Het.coerce-resp-∼ GrF.id-eq ≣-refl)) }
+  where
+    module C = Category C
+    module F = Functor F
+    module GrF = Groth F
+    open GrF using (module Het; module Cong)

@@ -2,6 +2,7 @@
 module Categories.Fibration where
 
 open import Level hiding (lift)
+open import Data.Product
 
 open import Categories.Category
 open import Categories.Functor hiding (_∘_; _≡_)
@@ -21,7 +22,7 @@ record CartesianLifting {o₀ ℓ₀ e₀} {o₁ ℓ₁ e₁} {E : Category o₀
     e′ : E.Obj
 
     φ : E [ e′ , e ]
-    proof : (h : a ≅ p₀ e′) → f ∘ _≅_.g h ≡ p₁ φ
+    proof : ∃ \ (h : a ≅ p₀ e′) → f ∘ _≅_.g h ≡ p₁ φ
     φ-cartesian : Cartesian p φ
 
 

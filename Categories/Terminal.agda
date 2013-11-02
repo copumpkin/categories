@@ -14,25 +14,28 @@ open Terminal (Categories o ℓ e)
 record Unit {x : _} : Set x where
   constructor unit
 
+OneC : Category o ℓ e
+OneC = record 
+  { Obj = Unit
+  ; _⇒_ = λ _ _ → Unit
+  ; _≡_ = λ _ _ → Unit
+  ; _∘_ = λ _ _ → unit
+  ; id = unit
+  ; assoc = unit
+  ; identityˡ = unit
+  ; identityʳ = unit
+  ; equiv = record 
+    { refl = unit
+    ; sym = λ _ → unit
+    ; trans = λ _ _ → unit
+    }
+  ; ∘-resp-≡ = λ _ _ → unit
+  }
+
 -- I can probably use Discrete here once we get universe cumulativity in Agda
 One : Terminal
 One = record 
-  { ⊤ = record 
-    { Obj = Unit
-    ; _⇒_ = λ _ _ → Unit
-    ; _≡_ = λ _ _ → Unit
-    ; _∘_ = λ _ _ → unit
-    ; id = unit
-    ; assoc = unit
-    ; identityˡ = unit
-    ; identityʳ = unit
-    ; equiv = record 
-      { refl = unit
-      ; sym = λ _ → unit
-      ; trans = λ _ _ → unit
-      }
-    ; ∘-resp-≡ = λ _ _ → unit
-    }
+  { ⊤ = OneC
   ; ! = record
     { F₀ = λ _ → unit
     ; F₁ = λ _ → unit

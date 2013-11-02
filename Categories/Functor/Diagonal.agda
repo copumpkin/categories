@@ -6,6 +6,8 @@ open import Data.Product
 open import Categories.Category
 open import Categories.Functor
 open import Categories.Product
+open import Categories.FunctorCategory
+open import Categories.Functor.Constant
 
 import Categories.Power as Power
 
@@ -33,3 +35,16 @@ import Categories.Power as Power
   open Power C
   open Category C
   open Equiv
+
+ΔF : ∀ {o ℓ e o₁ ℓ₁ e₁} {C : Category o ℓ e} (I : Category o₁ ℓ₁ e₁) → Functor C (Functors I C)
+ΔF {C = C} I = record 
+  { F₀ = λ c → Constant c
+  ; F₁ = λ f → record { η = λ X → f; commute = λ g → trans C.identityʳ (sym C.identityˡ) }
+  ; identity = refl
+  ; homomorphism = refl
+  ; F-resp-≡ = λ x → x
+  }
+ where
+   module C = Category C
+   open C.Equiv
+   module I = Category I

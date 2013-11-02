@@ -47,12 +47,12 @@ equiv {C = C} {D} = record
       ; isoʳ = D.identityˡ
       }
     }
-  ; sym = λ X → record
+  ; sym = λ X → let module X Z = Morphisms.Iso D (NaturalIsomorphism.iso X Z) in record
     { F⇒G = NaturalIsomorphism.F⇐G X
     ; F⇐G = NaturalIsomorphism.F⇒G X
     ; iso = λ Y → record 
-      { isoˡ = Morphisms.Iso.isoʳ D (NaturalIsomorphism.iso X Y)
-      ; isoʳ = Morphisms.Iso.isoˡ D (NaturalIsomorphism.iso X Y)
+      { isoˡ = X.isoʳ Y
+      ; isoʳ = X.isoˡ Y
       }
     }
   ; trans = trans′
@@ -80,6 +80,8 @@ equiv {C = C} {D} = record
       where
       open NaturalIsomorphism
       open NaturalTransformation
+      module Y Z = Morphisms.Iso D (iso Y Z)
+      module X Z = Morphisms.Iso D (iso X Z)
 
       isoˡ′ : (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ≡ D.id
       isoˡ′ = begin
@@ -88,11 +90,11 @@ equiv {C = C} {D} = record
                 η (F⇐G X) Z ∘ (η (F⇐G Y) Z ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z))
               ↑⟨ D.∘-resp-≡ʳ D.assoc ⟩
                 η (F⇐G X) Z ∘ ((η (F⇐G Y) Z ∘ η (F⇒G Y) Z) ∘ η (F⇒G X) Z)
-              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (Morphisms.Iso.isoˡ D (iso Y Z))) ⟩
+              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (Y.isoˡ Z)) ⟩
                 η (F⇐G X) Z ∘ (D.id ∘ η (F⇒G X) Z)
               ↓⟨ D.∘-resp-≡ʳ D.identityˡ ⟩
                 η (F⇐G X) Z ∘ η (F⇒G X) Z
-              ↓⟨ Morphisms.Iso.isoˡ D (iso X Z) ⟩
+              ↓⟨ X.isoˡ Z ⟩
                 D.id
               ∎
         where
@@ -105,11 +107,11 @@ equiv {C = C} {D} = record
                 η (F⇒G Y) Z ∘ (η (F⇒G X) Z ∘ (η (F⇐G X) Z ∘ η (F⇐G Y) Z))
               ↑⟨ D.∘-resp-≡ʳ D.assoc ⟩
                 η (F⇒G Y) Z ∘ ((η (F⇒G X) Z ∘ η (F⇐G X) Z) ∘ η (F⇐G Y) Z)
-              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (Morphisms.Iso.isoʳ D (iso X Z))) ⟩
+              ↓⟨ D.∘-resp-≡ʳ (D.∘-resp-≡ˡ (X.isoʳ Z)) ⟩
                 η (F⇒G Y) Z ∘ (D.id ∘ η (F⇐G Y) Z)
               ↓⟨ D.∘-resp-≡ʳ D.identityˡ ⟩
                 η (F⇒G Y) Z ∘ η (F⇐G Y) Z
-              ↓⟨ Morphisms.Iso.isoʳ D (iso Y Z) ⟩
+              ↓⟨ Y.isoʳ Z ⟩
                 D.id
               ∎
         where

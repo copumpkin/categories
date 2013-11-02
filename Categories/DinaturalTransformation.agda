@@ -86,7 +86,7 @@ _∘ʳ_ {C = C} {D = D} {E} {F} {G} η K = record
         ∎
   }
   where
-    module K = Functor K -- ((Functor.op K) ⁂ K)
+    module K = Functor K
     module C = Category C
     module D = Category D
     module E = Category E

@@ -156,3 +156,16 @@ record BinaryCoproducts : Set (o ⊔ ℓ ⊔ e) where
 
   .∘[] : ∀ {A B C D} {f : B ⇒ A} {g : C ⇒ A} {q : A ⇒ D} → q ∘ [ f , g ] ≡ [ q ∘ f , q ∘ g ]
   ∘[] = sym (universal (trans assoc (∘-resp-≡ʳ commute₁)) (trans assoc (∘-resp-≡ʳ commute₂)))
+
+
+Bin→Binary : BinCoproducts -> BinaryCoproducts
+Bin→Binary bc = record { coproduct = λ A B → record {
+                                               A+B = A + B;
+                                               i₁ = i₁;
+                                               i₂ = i₂;
+                                               [_,_] = [_,_];
+                                               commute₁ = commute₁;
+                                               commute₂ = commute₂;
+                                               universal = universal } }
+  where
+    open BinCoproducts bc

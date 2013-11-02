@@ -38,6 +38,20 @@ record Coproduct (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     universal (trans commute₁ (sym f≡f′)) (trans commute₂ (sym g≡g′))
     where open Equiv
 
+record BinCoproducts : Set (suc o ⊔ ℓ ⊔ e) where
+  field
+    _+_ : (A B : Obj) -> Obj
+    i₁ : {A B : Obj} -> A ⇒ (A + B)
+    i₂ : {A B : Obj} -> B ⇒ (A + B)
+    [_,_] : {A B : Obj} -> ∀ {C} → (A ⇒ C) → (B ⇒ C) → ((A + B) ⇒ C)
+
+    .commute₁ : {A B : Obj} -> ∀ {C} {f : A ⇒ C} {g : B ⇒ C} → [ f , g ] ∘ i₁ ≡ f
+    .commute₂ : {A B : Obj} -> ∀ {C} {f : A ⇒ C} {g : B ⇒ C} → [ f , g ] ∘ i₂ ≡ g
+    .universal : {A B : Obj} -> ∀ {C} {f : A ⇒ C} {g : B ⇒ C} {h : (A + B) ⇒ C}
+               → h ∘ i₁ ≡ f
+               → h ∘ i₂ ≡ g
+               → [ f , g ] ≡ h
+
 coproduct→product : ∀ {A B} → Coproduct A B → Op×.Product A B
 coproduct→product A+B = record
   { A×B = A+B.A+B

@@ -11,7 +11,7 @@ open import Level
 import Categories.Object.Product as Product
 import Categories.Object.Product.Morphisms as ProductMorphisms
 
-open import Categories.Morphisms
+open import Categories.Morphisms C
 
 open Product C
 open ProductMorphisms C
@@ -25,10 +25,10 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   _×_ : Obj → Obj → Obj
   A × B = Product.A×B (product {A} {B})
 
-  ×-comm : ∀ {A B} → _≅_ C (A × B) (B × A)
+  ×-comm : ∀ {A B} → _≅_ (A × B) (B × A)
   ×-comm = Commutative product product
 
-  ×-assoc : ∀ {X Y Z} → _≅_ C (X × (Y × Z)) ((X × Y) × Z)
+  ×-assoc : ∀ {X Y Z} → _≅_ (X × (Y × Z)) ((X × Y) × Z)
   ×-assoc = Associative product product product product
 
   -- Convenience!
@@ -52,16 +52,16 @@ record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
   universal = Product.universal product
 
   assocˡ : ∀ {A B C} → (((A × B) × C) ⇒ (A × (B × C)))
-  assocˡ = _≅_.g C ×-assoc
+  assocˡ = _≅_.g ×-assoc
 
   assocʳ : ∀ {A B C} → ((A × (B × C)) ⇒ ((A × B) × C))
-  assocʳ = _≅_.f C ×-assoc
+  assocʳ = _≅_.f ×-assoc
 
   .assocʳ∘assocˡ : ∀ {A B C} → assocʳ {A}{B}{C} ∘ assocˡ {A}{B}{C} ≡ id
-  assocʳ∘assocˡ = Iso.isoʳ C (_≅_.iso C ×-assoc)
+  assocʳ∘assocˡ = Iso.isoʳ (_≅_.iso ×-assoc)
   
   .assocˡ∘assocʳ : ∀ {A B C} → assocˡ {A}{B}{C} ∘ assocʳ {A}{B}{C} ≡ id
-  assocˡ∘assocʳ = Iso.isoˡ C (_≅_.iso C ×-assoc)
+  assocˡ∘assocʳ = Iso.isoˡ (_≅_.iso ×-assoc)
   
   .g-η : ∀ {A B C} {f : C ⇒ (A × B)} → ⟨ π₁ ∘ f , π₂ ∘ f ⟩ ≡ f
   g-η = Product.g-η product

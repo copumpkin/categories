@@ -4,6 +4,7 @@ module Categories.FunctorCategory where
 open import Data.Product
 
 open import Categories.Category
+import Categories.Functor as Cat
 open import Categories.Functor hiding (equiv; id; _∘_; _≡_)
 open import Categories.NaturalTransformation
 open import Categories.Product
@@ -55,3 +56,15 @@ eval {C = C} {D = D} =
     open Functor
     open NaturalTransformation
     open D.HomReasoning
+
+Cat[-∘_] : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} {A : Category o₁ ℓ₁ e₁} {B : Category o₂ ℓ₂ e₂}
+             {C : Category o₃ ℓ₃ e₃} -> Functor A B -> Functor (Functors B C) (Functors A C)
+Cat[-∘_] {C = C} r = record 
+  { F₀ = λ X → X Cat.∘ r
+  ; F₁ = λ η → η ∘ʳ r
+  ; identity = C.Equiv.refl
+  ; homomorphism = C.Equiv.refl
+  ; F-resp-≡ = λ x → x 
+  }
+ where
+   module C = Category C

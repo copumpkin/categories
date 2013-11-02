@@ -12,7 +12,7 @@ open import Categories.Object.Products.Properties
   renaming (module Properties to ProductProperties)
 open import Categories.Object.Terminal
 open import Categories.Bifunctor using (Bifunctor)
-open import Categories.Morphisms
+import Categories.Morphisms
 open import Categories.Square
 import Categories.Monoidal.Cartesian.Pentagon as Pentagon
 
@@ -29,7 +29,7 @@ Cartesian C Ps = record
       { η = λ X → ⟨ ! , id ⟩
       ; commute = λ f → unitˡ-natural
       }
-    ; iso = λ X → _≅_.iso C unitˡ
+    ; iso = λ X → _≅_.iso unitˡ
     }
   ; identityʳ = record
     { F⇒G = record
@@ -40,7 +40,7 @@ Cartesian C Ps = record
       { η = λ X → ⟨ id , ! ⟩
       ; commute = λ f → unitʳ-natural
       }
-    ; iso = λ X → _≅_.iso C unitʳ
+    ; iso = λ X → _≅_.iso unitʳ
     }
   ; assoc = record
     { F⇒G = record
@@ -52,14 +52,15 @@ Cartesian C Ps = record
       ; commute = λ f → assocʳ∘⁂
       }
     ; iso = λ X → record
-      { isoˡ = Iso.isoʳ C (_≅_.iso C ×-assoc)
-      ; isoʳ = Iso.isoˡ C (_≅_.iso C ×-assoc)
+      { isoˡ = Iso.isoʳ (_≅_.iso ×-assoc)
+      ; isoʳ = Iso.isoˡ (_≅_.iso ×-assoc)
       }
     }
   ; triangle = λ {X} → triangle {X}
   ; pentagon = pentagon
   }
   where
+  open Categories.Morphisms C
   open Category C
   open Products C Ps renaming (terminal to T₀; binary to P₀)
   open ProductProperties C Ps

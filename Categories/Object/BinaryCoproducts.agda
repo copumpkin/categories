@@ -9,7 +9,7 @@ open Equiv
 open import Level
 
 import Categories.Object.Coproduct as Coproduct
-open import Categories.Morphisms
+open import Categories.Morphisms C
 
 open Coproduct C
 
@@ -22,10 +22,10 @@ record BinaryCoproducts : Set (o ⊔ ℓ ⊔ e) where
   _∐_ : Obj → Obj → Obj
   A ∐ B = Coproduct.A+B (coproduct {A} {B})
 
-  ∐-comm : ∀ {A B} → _≅_ C (A ∐ B) (B ∐ A)
+  ∐-comm : ∀ {A B} → _≅_ (A ∐ B) (B ∐ A)
   ∐-comm = Commutative coproduct coproduct
 
-  ∐-assoc : ∀ {X Y Z} → _≅_ C (X ∐ (Y ∐ Z)) ((X ∐ Y) ∐ Z)
+  ∐-assoc : ∀ {X Y Z} → _≅_ (X ∐ (Y ∐ Z)) ((X ∐ Y) ∐ Z)
   ∐-assoc = Associative coproduct coproduct coproduct coproduct
 
   -- Convenience!
@@ -49,10 +49,10 @@ record BinaryCoproducts : Set (o ⊔ ℓ ⊔ e) where
   universal = Coproduct.universal coproduct
 
   assocˡ : ∀ {A B C} → (((A ∐ B) ∐ C) ⇒ (A ∐ (B ∐ C)))
-  assocˡ = _≅_.g C ∐-assoc
+  assocˡ = _≅_.g ∐-assoc
 
   assocʳ : ∀ {A B C} → ((A ∐ (B ∐ C)) ⇒ ((A ∐ B) ∐ C))
-  assocʳ = _≅_.f C ∐-assoc
+  assocʳ = _≅_.f ∐-assoc
 
   .g-η : ∀ {A B C} {f : (A ∐ B) ⇒ C} → [ f ∘ i₁ , f ∘ i₂ ] ≡ f
   g-η = Coproduct.g-η coproduct
@@ -159,7 +159,7 @@ record BinaryCoproducts : Set (o ⊔ ℓ ⊔ e) where
 
 
 Bin→Binary : BinCoproducts -> BinaryCoproducts
-Bin→Binary bc = record { coproduct = λ A B → record {
+Bin→Binary bc = record { coproduct = λ {A} {B} → record {
                                                A+B = A + B;
                                                i₁ = i₁;
                                                i₂ = i₂;

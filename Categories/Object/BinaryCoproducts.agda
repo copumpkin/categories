@@ -11,7 +11,8 @@ open import Level
 import Categories.Object.Coproduct as Coproduct
 open import Categories.Morphisms C
 
-open Coproduct C
+open module CP = Coproduct C hiding (module BinCoproducts)
+open CP public using (BinCoproducts)
 
 record BinaryCoproducts : Set (o ⊔ ℓ ⊔ e) where
   infix 10 _⧻_
@@ -168,4 +169,9 @@ Bin→Binary bc = record { coproduct = λ {A} {B} → record {
                                                commute₂ = commute₂;
                                                universal = universal } }
   where
-    open BinCoproducts bc
+    open CP.BinCoproducts bc
+
+module BinCoproducts (coprod : BinCoproducts) where
+  open CP.BinCoproducts coprod public
+  open BinaryCoproducts (Bin→Binary coprod) public hiding ([_,_]; i₁; i₂; commute₁; commute₂; universal)
+

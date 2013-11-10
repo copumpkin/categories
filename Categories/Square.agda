@@ -274,41 +274,10 @@ module GlueSquares {o ℓ e} (C : Category o ℓ e) where
 
   open Switch public
 
-module AUReasoning {o ℓ e} (C : Category o ℓ e) where
+module Yon-Eda {o ℓ e} (C : Category o ℓ e) where
   private module C = Category C
   open C
   open Equiv
-
-  infix  4 _IsRelatedTo_
-  infix  2 _∎
-  infixr 2 _≈⟨_⟩_
-  infixr 2 _↓⟨_⟩_
-  infixr 2 _↑⟨_⟩_
-  infixr 2 _↓≡⟨_⟩_
-  infixr 2 _↑≡⟨_⟩_
-  infixr 2 _↕_
-  infix  1 begin_
-  infixr 8 _∙_
-
-  data Climb : Rel Obj (o ⊔ ℓ) where
-    ID : ∀ {X} → Climb X X
-    leaf : ∀ {X Y} → (X ⇒ Y) → Climb X Y
-    _branch_ : ∀ {X Y Z} (l : Climb Y Z) (r : Climb X Y) → Climb X Z
-
-  interp : ∀ {p} (P : Rel Obj p)
-           (f-id : ∀ {X} → P X X)
-           (f-leaf : ∀ {X Y} → X ⇒ Y → P X Y)
-           (f-branch : ∀ {X Y Z} → P Y Z → P X Y → P X Z)
-         → ∀ {X Y} → Climb X Y → P X Y
-  interp P f-id f-leaf f-branch ID = f-id
-  interp P f-id f-leaf f-branch (leaf y) = f-leaf y
-  interp P f-id f-leaf f-branch (l branch r) = f-branch
-    (interp P f-id f-leaf f-branch l)
-    (interp P f-id f-leaf f-branch r)
-
-  eval : ∀ {X Y} → Climb X Y → X ⇒ Y
-  eval = interp _⇒_ id idᶠ _∘_
-
   record Yon (X Y : Obj) : Set (o ⊔ ℓ ⊔ e) where
     field
       arr : X ⇒ Y
@@ -326,7 +295,7 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
     field
       arr-≡ : Yon.arr f ≡ Yon.arr g
 
-  open _≡′_ using (arr-≡)
+  open _≡′_ public using (arr-≡) 
 
   module _ {X Y} where
     .Yon-refl : Reflexive (_≡′_ {X} {Y})
@@ -355,14 +324,6 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
     where
     module g = Yon g
     module f = Yon f
-
-  yeval : ∀ {X Y} → Climb X Y → Yon X Y
-  yeval = interp Yon Yon-id Yon-inject Yon-compose
-
-  .yarr : ∀ {X Y} → (t : Climb X Y) → Yon.arr (yeval t) ≡ eval t
-  yarr ID = refl
-  yarr (leaf y) = refl
-  yarr (t branch t1) = trans (Yon.ok (yeval t) (Yon.arr (yeval t1))) (∘-resp-≡ (yarr t) (yarr t1))
 
   .Yon-assoc : ∀ {X Y Z W} (f : Yon Z W) (g : Yon Y Z) (h : Yon X Y) → Yon-compose f (Yon-compose g h) ≣ Yon-compose (Yon-compose f g) h
   Yon-assoc f g h = ≣-refl
@@ -414,6 +375,118 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
     module g = Eda g
     module f = Eda f
 
+  .Eda-assoc : ∀ {X Y Z W} (f : Eda Z W) (g : Eda Y Z) (h : Eda X Y) → Eda-compose f (Eda-compose g h) ≣ Eda-compose (Eda-compose f g) h
+  Eda-assoc f g h = ≣-refl
+
+  -- .Eda-identityˡ : ∀ {X Y} (f : Eda X Y) → Eda-compose Eda-id f ≣ f
+  -- Eda-identityˡ f = {!!}
+
+  .Eda-identityʳ : ∀ {X Y} (f : Eda X Y) → Eda-compose f Eda-id ≣ f
+  Eda-identityʳ f = ≣-refl
+
+record NormReasoning {o ℓ e} (C : Category o ℓ e) (o′ ℓ′ : _) : Set (suc o′ ⊔ o ⊔ ℓ ⊔ e ⊔ suc ℓ′) where
+  private module C = Category C
+  field
+    U : Set o′ 
+    T : U -> C.Obj
+    _#⇒_ : U -> U -> Set ℓ′
+    eval : ∀ {A B} -> A #⇒ B -> T A C.⇒ T B
+    norm : ∀ {A B} -> A #⇒ B -> T A C.⇒ T B
+    .norm≡eval : ∀ {A B} (f : A #⇒ B) -> norm f C.≡ eval f
+ 
+  open C.Equiv
+  open C
+
+  infix  4 _IsRelatedTo_
+  infix  2 _∎
+  infixr 2 _≈⟨_⟩_
+  infixr 2 _↓⟨_⟩_
+  infixr 2 _↑⟨_⟩_
+  infixr 2 _↓≡⟨_⟩_
+  infixr 2 _↑≡⟨_⟩_
+  infixr 2 _↕_
+  infix  1 begin_
+
+  data _IsRelatedTo_ {X Y} (f g : _#⇒_ X Y) : Set e where
+    relTo : (f∼g : norm f ≡ norm g) → f IsRelatedTo g
+
+  .begin_ : ∀ {X Y} {f g : _#⇒_ X Y} → f IsRelatedTo g → eval f ≡ eval g
+  begin_ {f = f} {g} (relTo f∼g) = trans (sym (norm≡eval f)) (trans f∼g (norm≡eval g))
+
+  ._↓⟨_⟩_ : ∀ {X Y} (f : _#⇒_ X Y) {g h} → (norm f ≡ norm g) → g IsRelatedTo h → f IsRelatedTo h
+  _ ↓⟨ f∼g ⟩ relTo g∼h = relTo (trans f∼g g∼h)
+
+  ._↑⟨_⟩_ : ∀ {X Y} (f : _#⇒_ X Y) {g h} → (norm g ≡ norm f) → g IsRelatedTo h → f IsRelatedTo h
+  _ ↑⟨ g∼f ⟩ relTo g∼h = relTo (trans (sym g∼f) g∼h)
+
+  -- the syntax of the ancients, for compatibility
+  ._≈⟨_⟩_ : ∀ {X Y} (f : _#⇒_ X Y) {g h} → (norm f ≡ norm g) → g IsRelatedTo h → f IsRelatedTo h
+  _ ≈⟨ f∼g ⟩ relTo g∼h = relTo (trans f∼g g∼h)
+
+  ._↓≡⟨_⟩_ : ∀ {X Y} (f : _#⇒_ X Y) {g h} → eval f ≡ eval g → g IsRelatedTo h → f IsRelatedTo h
+  _↓≡⟨_⟩_ f {g} f∼g (relTo g∼h) = relTo (trans (norm≡eval f) (trans f∼g (trans (sym (norm≡eval g)) g∼h)))
+
+  ._↑≡⟨_⟩_ : ∀ {X Y} (f : _#⇒_ X Y) {g h} → eval g ≡ eval f → g IsRelatedTo h → f IsRelatedTo h
+  _↑≡⟨_⟩_ f {g} g∼f (relTo g∼h) = relTo (trans (norm≡eval f) (trans (sym g∼f) (trans (sym (norm≡eval g)) g∼h)))
+
+  ._↕_ : ∀ {X Y} (f : _#⇒_ X Y) {h} → f IsRelatedTo h → f IsRelatedTo h
+  _ ↕ f∼h = f∼h
+
+  ._∎ : ∀ {X Y} (f : _#⇒_ X Y) → f IsRelatedTo f
+  _∎ _ = relTo refl
+
+  .by_ : ∀ {X Y} {f g h : X ⇒ Y} -> ((h ≡ h) -> f ≡ g) -> f ≡ g
+  by eq = eq refl
+
+  .computation : ∀ {X Y} (f g : X #⇒ Y) -> norm f ≡ norm g → eval f ≡ eval g
+  computation f g eq = begin f ↓⟨ eq ⟩ g ∎
+
+module AUReasoning {o ℓ e} (C : Category o ℓ e) where
+  private module C = Category C
+  open C
+  open Equiv
+{-
+  infix  4 _IsRelatedTo_
+  infix  2 _∎
+  infixr 2 _≈⟨_⟩_
+  infixr 2 _↓⟨_⟩_
+  infixr 2 _↑⟨_⟩_
+  infixr 2 _↓≡⟨_⟩_
+  infixr 2 _↑≡⟨_⟩_
+  infixr 2 _↕_
+  infix  1 begin_
+-}
+  infixr 8 _∙_
+
+  open Yon-Eda C public
+
+  data Climb : Rel Obj (o ⊔ ℓ) where
+    ID : ∀ {X} → Climb X X
+    leaf : ∀ {X Y} → (X ⇒ Y) → Climb X Y
+    _branch_ : ∀ {X Y Z} (l : Climb Y Z) (r : Climb X Y) → Climb X Z
+
+  interp : ∀ {p} (P : Rel Obj p)
+           (f-id : ∀ {X} → P X X)
+           (f-leaf : ∀ {X Y} → X ⇒ Y → P X Y)
+           (f-branch : ∀ {X Y Z} → P Y Z → P X Y → P X Z)
+         → ∀ {X Y} → Climb X Y → P X Y
+  interp P f-id f-leaf f-branch ID = f-id
+  interp P f-id f-leaf f-branch (leaf y) = f-leaf y
+  interp P f-id f-leaf f-branch (l branch r) = f-branch
+    (interp P f-id f-leaf f-branch l)
+    (interp P f-id f-leaf f-branch r)
+
+  eval : ∀ {X Y} → Climb X Y → X ⇒ Y
+  eval = interp _⇒_ id idᶠ _∘_
+
+  yeval : ∀ {X Y} → Climb X Y → Yon X Y
+  yeval = interp Yon Yon-id Yon-inject Yon-compose
+
+  .yarr : ∀ {X Y} → (t : Climb X Y) → Yon.arr (yeval t) ≡ eval t
+  yarr ID = refl
+  yarr (leaf y) = refl
+  yarr (t branch t1) = trans (Yon.ok (yeval t) (Yon.arr (yeval t1))) (∘-resp-≡ (yarr t) (yarr t1))
+
   eeval : ∀ {X Y} → Climb X Y → Eda X Y
   eeval = interp Eda Eda-id (Eda-inject © Yon-inject) Eda-compose
 
@@ -425,15 +498,6 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
 
   .earr : ∀ {X Y} → (t : Climb X Y) → Eda.arr (eeval t) ≡ eval t
   earr t = trans (arr-≡ (eyon t)) (yarr t)
-
-  .Eda-assoc : ∀ {X Y Z W} (f : Eda Z W) (g : Eda Y Z) (h : Eda X Y) → Eda-compose f (Eda-compose g h) ≣ Eda-compose (Eda-compose f g) h
-  Eda-assoc f g h = ≣-refl
-
-  -- .Eda-identityˡ : ∀ {X Y} (f : Eda X Y) → Eda-compose Eda-id f ≣ f
-  -- Eda-identityˡ f = {!!}
-
-  .Eda-identityʳ : ∀ {X Y} (f : Eda X Y) → Eda-compose f Eda-id ≣ f
-  Eda-identityʳ f = ≣-refl
 
   yyeval : ∀ {X Y} → (t : Climb X Y) → (X ⇒ Y)
   yyeval = Eda.arr © eeval
@@ -450,6 +514,19 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
   _∙_ : ∀ {X Y Z} {s} {S : Set s} {{Sb : ClimbBuilder Y Z S}} (f : S) {t} {T : Set t} {{Tb : ClimbBuilder X Y T}} (g : T) → Climb X Z
   _∙_ {{Sb}} f {{Tb}} g = ClimbBuilder.build Sb f branch ClimbBuilder.build Tb g
 
+  aureasoning : NormReasoning C o (ℓ ⊔ o)
+  aureasoning = record
+                  { U = Obj 
+                  ; T = λ A → A 
+                  ; _#⇒_ = Climb 
+                  ; eval = eval
+                  ; norm = yyeval
+                  ; norm≡eval = earr
+                  }
+  
+  open NormReasoning aureasoning public hiding (eval)
+
+{-
   data _IsRelatedTo_ {X Y} (f g : Climb X Y) : Set e where
     relTo : (f∼g : yyeval f ≡ yyeval g) → f IsRelatedTo g
 
@@ -471,11 +548,12 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
 
   ._↑≡⟨_⟩_ : ∀ {X Y} (f : Climb X Y) {g h} → eval g ≡ eval f → g IsRelatedTo h → f IsRelatedTo h
   _↑≡⟨_⟩_ f {g} g∼f (relTo g∼h) = relTo (trans (earr f) (trans (sym g∼f) (trans (sym (earr g)) g∼h)))
-
+{-
   -- XXX i want this to work whenever the Edas are equal -- but that probably
   -- requires Climb to be indexed by yyeval!  oh, for cheap ornamentation.
   ._↕_ : ∀ {X Y} (f : Climb X Y) {h} → f IsRelatedTo h → f IsRelatedTo h
   _ ↕ f∼h = f∼h
-
+-}
   ._∎ : ∀ {X Y} (f : Climb X Y) → f IsRelatedTo f
   _∎ _ = relTo refl
+-}

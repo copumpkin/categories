@@ -1,0 +1,8 @@
+## This file allows joining different accounts of a single person.
+## Cf for instance: git shortlog -nse. More details via: man git shortlog
+
+# having the same name <email> name <email> on a line will fix capitalization
+Daniel Peebles <pumpkingod@gmail.com>            Daniel Peebles <pumpkin@me.com>
+James Cook <mokus@deepbondi.net>                 james.cook <james.cook@usma.edu>
+James Deikun <james@place.org>                   James Deikun <james@yakumo.(none)>
+

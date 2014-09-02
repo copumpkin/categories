@@ -21,8 +21,8 @@ Commaᵉ {o₁}{a₁}
        {o₃}{a₃}
        {A}{B}{C} T S
   = record
-  { Obj         = Obj′
-  ; _⇒_         = Hom′
+  { Obj         = Obj
+  ; _⇒_         = Hom
   ; _≡_         = _≡′_
   ; _∘_         = _∘′_
   ; id          = id′
@@ -44,29 +44,29 @@ Commaᵉ {o₁}{a₁}
     infixr 9 _∘′_
     infix  4 _≡′_
 
-    record Obj′ : Set (o₁ ⊔ o₂ ⊔ a₃) where
+    record Obj : Set (o₁ ⊔ o₂ ⊔ a₃) where
         constructor _,_,_
         field
             α : A.Obj
             β : B.Obj
             f : C [ T₀ α , S₀ β ]
 
-    record Hom′ (X₁ X₂ : Obj′) : Set (a₁ ⊔ a₂ ⊔ a₃) where
+    record Hom (X₁ X₂ : Obj) : Set (a₁ ⊔ a₂ ⊔ a₃) where
         constructor _,_[_]
-        open Obj′ X₁ renaming (α to α₁; β to β₁; f to f₁)
-        open Obj′ X₂ renaming (α to α₂; β to β₂; f to f₂)
+        open Obj X₁ renaming (α to α₁; β to β₁; f to f₁)
+        open Obj X₂ renaming (α to α₂; β to β₂; f to f₂)
 
         field
             g         : A [ α₁ , α₂ ]
             h         : B [ β₁ , β₂ ]
             .commutes : C.CommutativeSquare f₁ (T₁ g) (S₁ h) f₂
 
-    _≡′_ : ∀ {X₁ X₂} → Rel (Hom′ X₁ X₂) _
+    _≡′_ : ∀ {X₁ X₂} → Rel (Hom X₁ X₂) _
     (g₁ , h₁ [ _ ]) ≡′ (g₂ , h₂ [ _ ])
         = A [ g₁ ≡ g₂ ]
         × B [ h₁ ≡ h₂ ]
 
-    id′ : {A : Obj′} → Hom′ A A
+    id′ : {A : Obj} → Hom A A
     id′ { A } = A.id , B.id
         [ begin
               C [ S₁ B.id ∘ f ]
@@ -80,11 +80,11 @@ Commaᵉ {o₁}{a₁}
               C [ f ∘ T₁ A.id ]
           ∎ ]
           where
-            open Obj′ A
+            open Obj A
             open C.HomReasoning
             open C.Equiv
 
-    _∘′_ : ∀ {X₁ X₂ X₃} → Hom′ X₂ X₃ → Hom′ X₁ X₂ → Hom′ X₁ X₃
+    _∘′_ : ∀ {X₁ X₂ X₃} → Hom X₂ X₃ → Hom X₁ X₂ → Hom X₁ X₃
     _∘′_ {X₁}{X₂}{X₃} (g₁ , h₁ [ commutes₁ ]) (g₂ , h₂ [ commutes₂ ])
         = A [ g₁ ∘ g₂ ] , B [ h₁ ∘ h₂ ]
         [ begin
@@ -109,11 +109,11 @@ Commaᵉ {o₁}{a₁}
         where
             open C.HomReasoning
             open C.Equiv
-            open Obj′ X₁ renaming (α to α₁; β to β₁; f to f₁)
-            open Obj′ X₂ renaming (α to α₂; β to β₂; f to f₂)
-            open Obj′ X₃ renaming (α to α₃; β to β₃; f to f₃)
+            open Obj X₁ renaming (α to α₁; β to β₁; f to f₁)
+            open Obj X₂ renaming (α to α₂; β to β₂; f to f₂)
+            open Obj X₃ renaming (α to α₃; β to β₃; f to f₃)
 
-    promote′ : EasyLaws.Promote Hom′ _∘′_ id′ _≡′_
+    promote′ : EasyLaws.Promote Hom _∘′_ id′ _≡′_
     promote′ (g , h [ _ ]) (.g , .h [ _ ]) (≣-refl , ≣-refl) = ≣-refl
 
 Comma :
@@ -132,3 +132,78 @@ _↓_ : ∀ {o₁ a₁ o₂ a₂ o₃ a₃}
       → (S : Functor B C) (T : Functor A C)
       → Category _ _
 T ↓ S = Comma T S
+
+Dom : {o₁ a₁ o₂ a₂ o₃ a₃ : Level}
+    {A : Category o₁ a₁}
+    {B : Category o₂ a₂}
+    {C : Category o₃ a₃}
+    → (T : Functor A C) → (S : Functor B C)
+    → Functor (Comma T S) A
+Dom {A = A} {B} {C} T S = record 
+  { F₀ = Obj.α
+  ; F₁ = Hom.g
+  ; identity = ≣-refl
+  ; homomorphism = ≣-refl
+  }
+ where
+  open Comma T S 
+  open A.Equiv
+
+Cod : {o₁ a₁ o₂ a₂ o₃ a₃ : Level}
+    {A : Category o₁ a₁}
+    {B : Category o₂ a₂}
+    {C : Category o₃ a₃}
+    → (T : Functor A C) → (S : Functor B C)
+    → Functor (Comma T S) B
+Cod {A = A} {B} {C} T S = record 
+  { F₀ = Obj.β
+  ; F₁ = Hom.h
+  ; identity = ≣-refl
+  ; homomorphism = ≣-refl
+  }
+ where
+  open Comma T S 
+  open B.Equiv
+
+open import Categories.Functor.Diagonal
+open import Categories.FunctorCategory
+open import Categories.Categories
+open import Categories.NaturalTransformation
+
+CommaF : ∀ {o a o₁ a₁ o₂ a₂ o₃ a₃}
+      → {O : Category o  a }
+      → {A : Category o₁ a₁}
+      → {B : Category o₂ a₂}
+      → {C : Category o₃ a₃}
+      → (T : Functor A C) (S : Functor O (Functors B C)) -> Functor O (Categories _ _)
+CommaF {O = O} {A} {B} {C} T S = record 
+ { F₀ = λ o → Comma T (S.F₀ o)
+ ; F₁ = λ {o₁} {o₂} f → record 
+   { F₀ = λ { (a Comma., b , g) → a Comma., b , (S₁.η f b C.∘ g) }
+   ; F₁ = λ { {a₁ Comma., b₁ , g₁} {a₂ Comma., b₂ , g₂} (g Comma., h [ comm ]) → 
+              g Comma., h [ begin S₀.F₁ o₂ h C.∘ S₁.η f b₁ C.∘ g₁ 
+                                    ↓⟨ C.Equiv.sym C.assoc ⟩ 
+                                  (S₀.F₁ o₂ h C.∘ S₁.η f b₁) C.∘ g₁ 
+                                    ↓⟨ C.∘-resp-≡ˡ (C.Equiv.sym (S₁.commute f h)) ⟩ 
+                                  (S₁.η f b₂ C.∘ S₀.F₁ o₁ h) C.∘ g₁ 
+                                    ↓⟨ C.assoc ⟩ 
+                                  S₁.η f b₂ C.∘ S₀.F₁ o₁ h C.∘ g₁
+                                    ↓⟨ C.∘-resp-≡ʳ comm ⟩ 
+                                  S₁.η f b₂ C.∘ g₂ C.∘ T.F₁ g
+                                    ↓⟨ C.Equiv.sym C.assoc ⟩ 
+                                  (S₁.η f b₂ C.∘ g₂) C.∘ T.F₁ g 
+                                    ∎
+                          ]};
+                          identity = TODO;
+                          homomorphism = TODO }
+ ; identity = TODO
+ ; homomorphism = TODO
+ }
+  where
+   module C = Category C
+   module T = Functor T
+   module S = Functor S
+   module S₀ o = Functor (S.F₀ o) 
+   module S₁ {a b} f = NaturalTransformation (S.F₁ {a} {b} f) 
+   postulate TODO : ∀ {l} {A : Set l} -> A
+   open C.HomReasoning

@@ -13,36 +13,37 @@ open import Categories.Functor.Constant
 open import Level
 open import Categories.Morphisms V
 open import Categories.Square
+open import Data.Product
 
 record End-data (F : Bifunctor C.op C V) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   field
     E : V.Obj
     π : DinaturalTransformation {C = C} (Constant E) F
-  
-  open DinaturalTransformation π using (α; commute)
-  π∘_ : ∀ {Q} → Q V.⇒ E → End-data F
-  π∘ g = record
-    { π = record
-      { α = λ c → α c ∘ g
-      ; commute = λ {c c′} f → 
-        begin
-          F.F₁ (f , C.id) ∘ (α c′ ∘ g) ∘ id
-        ↓⟨ pushʳ (extendˡ id-comm) ⟩
-          (F.F₁ (f , C.id) ∘ α c′ ∘ id) ∘ g
-        ↓⟨ commute f ⟩∘⟨ Equiv.refl ⟩ 
-          (F.F₁ (C.id , f) ∘ α c ∘ id) ∘ g
-        ↑⟨ pushʳ (extendˡ id-comm) ⟩ 
-          F.F₁ (C.id , f) ∘ (α c ∘ g) ∘ id
-        ∎
-      }
-    }
-   where
-     open V.HomReasoning
-     open GlueSquares V
-     module F = Functor F
-     open import Data.Product
-     open V
 
+  module π = DinaturalTransformation π
+  open π using (α)
+  π∘_ : ∀ {Q} → Q V.⇒ E → End-data F
+  π∘ g = record { π = record { α = λ c → α c ∘ g; commute = λ {c c′} f → 
+          begin
+            F.F₁ (f , C.id) ∙ (α c′ ∙ g) ∙ ID ↓⟨ Equiv.refl ⟩
+            (F.F₁ (f , C.id) ∙ α c′ ∙ ID) ∙ g ↓≡⟨ ∘-resp-≡ˡ (π.commute f) ⟩ 
+            (F.F₁ (C.id , f) ∙ α c ∙ ID) ∙ g  ↓⟨ Equiv.refl ⟩ 
+            F.F₁ (C.id , f) ∙ (α c ∙ g) ∙ ID  ∎ } }
+   where
+     open AUReasoning V
+     module F = Functor F 
+     open V
+  
+  .commute : ∀ {a b} (f : a C.⇒ b) -> Functor.F₁ F (f , C.id) V.∘ α b V.≡ Functor.F₁ F (C.id , f) V.∘ α a
+  commute {c} {c′} f = begin
+            F.F₁ (f , C.id) ∙ α c′      ↓⟨ Equiv.refl ⟩
+            F.F₁ (f , C.id) ∙ α c′ ∙ ID ↓≡⟨ π.commute f ⟩ 
+            F.F₁ (C.id , f) ∙ α c  ∙ ID ↓⟨ Equiv.refl ⟩ 
+            F.F₁ (C.id , f) ∙ α c       ∎
+    where 
+      open AUReasoning V
+      module F = Functor F 
+      open V
 
 open DinaturalTransformation using (α)
 
@@ -91,15 +92,13 @@ endF : ∀ {o a} {A : Category o a} (F : Functor A (Functors (Product C.op C) V)
 endF {A = A} F mke = record
   { F₀ = λ a → End.E (mke a)
   ; F₁ = λ {a b} → F₁ {a} {b}
-  ; identity = λ {a} → V.Equiv.sym (End.universal-unique (mke a) V.id (λ c → 
-               begin
-                 α (End.π (mke a)) c ∘ id
-               ↓⟨ id-comm ⟩
-                 id ∘ α (End.π (mke a)) c
-               ↑⟨ ≣-cong (λ f → η f (c , c)) F.identity ⟩∘⟨ Equiv.refl ⟩
-                 η (F.F₁ A.id) (c , c) ∘ α (End.π (mke a)) c
-               ∎))
+  ; identity = λ {a} → V.Equiv.sym (End.universal-unique (mke a) V.id (λ c →
+                     let open AUReasoning V in 
+                     begin α (End.π (mke a)) c ∙ ID                    ↓⟨ Equiv.refl ⟩ 
+                           ID ∙ α (End.π (mke a)) c                    ↑≡⟨ ∘-resp-≡ˡ (≣-cong (λ x → η x (c , c)) F.identity) ⟩ 
+                           η (F.F₁ A.id) (c , c) ∙ α (End.π (mke a)) c ∎))
   ; homomorphism = λ {X Y Z f g} → V.Equiv.sym (End.universal-unique (mke Z) _ (λ c →
+                   let open V.HomReasoning in
                    begin
                      α (End.π (mke Z)) c ∘ F₁ g ∘ F₁ f
                    ↓⟨ pullˡ (End.π[c]∘universal≡δ[c] (mke Z) c) ⟩
@@ -114,6 +113,5 @@ endF {A = A} F mke = record
   module A = Category A
   module F = Functor F
   open V
-  open V.HomReasoning
   open GlueSquares V
   F₁ = λ {a b} f → End.universal (mke b) (record { π = (F.F₁ f) <∘ (End.π (mke a)) })

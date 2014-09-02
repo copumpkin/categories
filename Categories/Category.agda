@@ -55,9 +55,9 @@ record Category (o a : Level) : Set (suc (o ⊔ a)) where
   open Laws _⇒_ _∘_ id
 
   field
-    .ASSOC     : Assoc
-    .IDENTITYˡ : Identityˡ
-    .IDENTITYʳ : Identityʳ
+    .{ASSOC}     : Assoc
+    .{IDENTITYˡ} : Identityˡ
+    .{IDENTITYʳ} : Identityʳ
 
   _≡_ : ∀ {A B} → Rel (A ⇒ B) a
   _≡_ = _≣_
@@ -172,19 +172,19 @@ record EasyCategory (o a e : Level) : Set (suc (o ⊔ a ⊔ e)) where
   field
     Obj : Set o
     _⇒_ : Rel Obj a
-    _≡_ : ∀ {A B} → Rel (A ⇒ B) e
+    {_≡_} : ∀ {A B} → Rel (A ⇒ B) e
 
-    id  : ∀ {A} → (A ⇒ A)
-    _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
+    {id}  : ∀ {A} → (A ⇒ A)
+    {_∘_} : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
 
   open EasyLaws _⇒_ _∘_ id _≡_
 
   field
-    .assoc     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
-    .identityˡ : ∀ {A B} {f : A ⇒ B} → id ∘ f ≡ f
-    .identityʳ : ∀ {A B} {f : A ⇒ B} → f ∘ id ≡ f
-    .promote   : Promote
-    .REFL      : Refl
+    .{assoc}     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
+    .{identityˡ} : ∀ {A B} {f : A ⇒ B} → id ∘ f ≡ f
+    .{identityʳ} : ∀ {A B} {f : A ⇒ B} → f ∘ id ≡ f
+    .{promote}   : Promote
+    .{REFL}      : Refl
 
   category : Category o a
   category = record
@@ -340,6 +340,7 @@ module Heterogeneous {o a} (C : Category o a) where
   ∼⇒≣ : ∀ {A B} {f g : A ⇒ B} → f ∼ g → f ≡ g
   ∼⇒≣ (≡⇒∼ f≡g) = trustMe
 
+  
   domain-≣ : ∀ {A A′ B B′} {f : A ⇒ B} {f′ : A′ ⇒ B′} → f ∼ f′ → A ≣ A′
   domain-≣ (≡⇒∼ _) = ≣-refl
 
@@ -352,6 +353,9 @@ module Heterogeneous {o a} (C : Category o a) where
   -- floating morphisms on ≣
   float₂ : ∀ {A A′ B B′} → A ≣ A′ → B ≣ B′ → A ⇒ B → A′ ⇒ B′
   float₂ = ≣-subst₂ _⇒_
+
+  relaxed : ∀ {A B} {f : A ⇒ B} {X Y} {g : X ⇒ Y} -> (A≣X : A ≣ X) (B≣Y : B ≣ Y) -> float₂ A≣X B≣Y f ≡ g -> f ∼ g   
+  relaxed ≣-refl ≣-refl f≡g = ≡⇒∼ f≡g 
 
   floatˡ : ∀ {A B B′} → B ≣ B′ → A ⇒ B → A ⇒ B′
   floatˡ {A} = ≣-subst (_⇒_ A)

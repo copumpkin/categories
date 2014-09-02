@@ -146,8 +146,10 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
                  y₃
                ∎)
 
-  module ZZ {e c} = Categories.Support.ZigZag (↝-preorder e c)
-  open ZZ using () renaming (Alternating to _≡′_)
+  module ZZ = Categories.Support.ZigZag
+
+  _≡′_ : ∀ {e c} → _ → _ → _
+  _≡′_ {e} {c} = ZZ.Alternating (↝-preorder e c)
 
   action′ : ∀ {e e′ c c′} → (e′ ⇒ᴱ e) → (c ⇒ᶜ c′) → (e ⇒′ c) → (e′ ⇒′ c′)
   action′ f g (d , x , y) = d , g ᶜ∘ᴳ x , y ᶠ∘ᴱ f
@@ -164,7 +166,7 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
 
   .action′-resp-≡′ : ∀ {e e′ c c′} {f : e′ ⇒ᴱ e} {g : c ⇒ᶜ c′}
                    → {z₁ z₂ : e ⇒′ c} → z₁ ≡′ z₂ → action′ f g z₁ ≡′ action′ f g z₂
-  action′-resp-≡′ = ZZ.minimal ZZ.setoid (action′ _ _) action′-resp-↝-to-≡′ 
+  action′-resp-≡′ = ZZ.minimal (↝-preorder _ _) (ZZ.setoid (↝-preorder _ _)) (action′ _ _) action′-resp-↝-to-≡′ 
 
   .identity′ : ∀ {e c z} → action′ (idᴱ {e}) (idᶜ {c}) z ≣ z
   identity′ {e} {c} {d , x , y} rewrite ≣-app F″.identity y
@@ -180,7 +182,7 @@ _∘_ {o} {a} {h} {o′} {a′} {h′} {o″} {a″} {C} {D} {E} F G = record
 
   abstract
     _⇒_ : Category.Obj E → Category.Obj C → Set (h′ ⊔ o′ ⊔ a′ ⊔ h)
-    e ⇒ c = Quotient (e ⇒′ c) _≡′_ ZZ.is-equivalence
+    e ⇒ c = Quotient (e ⇒′ c) _≡′_ (ZZ.is-equivalence (↝-preorder e c))
 
     ⌞_⌝ : ∀ {e c} → e ⇒′ c → e ⇒ c
     ⌞_⌝ = ⌊_⌉

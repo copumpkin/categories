@@ -5,7 +5,12 @@ module Categories.Opposite where
 -- XXX these should probably go somewhere else, but everywhere i think of
 -- has other problems. ☹
 
+open import Categories.Support.PropositionalEquality
+
 open import Categories.Category
+open import Categories.Functor
+open import Categories.FunctorCategory
+open import Categories.NaturalTransformation
 open import Categories.Morphisms renaming (_≅_ to _[_≅_])
 
 opⁱ : ∀ {o a} {C : Category o a} {A B} → C [ A ≅ B ] → Category.op C [ B ≅ A ]
@@ -16,3 +21,11 @@ opⁱ {C = C} A≅B = record
   }
   where
   module A≅B = _≅_ C A≅B
+
+opF : ∀ {o₁ a₁ o₂ a₂} {A : Category o₁ a₁} {B : Category o₂ a₂} -> 
+    (Functor (Category.op (Functors (Category.op A) (Category.op B))) (Functors A B))
+opF {A = A} {B} = record {
+                    F₀ = Functor.op;
+                    F₁ = NaturalTransformation.op;
+                    identity = ≣-refl;
+                    homomorphism = ≣-refl }

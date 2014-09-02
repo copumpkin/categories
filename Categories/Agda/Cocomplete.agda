@@ -83,9 +83,9 @@ SetsCocomplete {o} {a} {o′} = record { colimit = colimit }
       ↝-trans {i = i₁ , i₂} (f , fi≈j) (g , gj≈k) =
         J [ g ∘ f ] , ≣-trans (≣-trans (≣-app homomorphism i₂) (≣-cong (F₁ g) fi≈j)) gj≈k
  
-    module ZZ = ZigZag ↝-preorder
+    module ZZ = ZigZag
 
-    vertex = Quotient vertex-carrier ZZ.Alternating ZZ.is-equivalence
+    vertex = Quotient vertex-carrier (ZZ.Alternating ↝-preorder) (ZZ.is-equivalence ↝-preorder)
 
     my-initial-cocone-object : Cocone F
     my-initial-cocone-object = record
@@ -98,8 +98,8 @@ SetsCocomplete {o} {a} {o′} = record { colimit = colimit }
     my-!-f A (X , x) = A.ψ X x
       where module A = Cocone A
 
-    .my-!-cong : (A : Cocone F) → ZZ.Alternating =[ my-!-f A ]⇒ _≣_
-    my-!-cong A = ZZ.minimal (≣-setoid A.N) (my-!-f A) my-precong
+    .my-!-cong : (A : Cocone F) → ZZ.Alternating ↝-preorder =[ my-!-f A ]⇒ _≣_
+    my-!-cong A = ZZ.minimal ↝-preorder (≣-setoid A.N) (my-!-f A) my-precong
       where
       module A = Cocone A
 

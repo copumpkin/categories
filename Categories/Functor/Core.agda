@@ -15,11 +15,11 @@ record Functor {o a o′ a′} (C : Category o a) (D : Category o′ a′) : Set
 
   field
     F₀ : C.Obj → D.Obj
-    F₁ : ∀ {A B} → C [ A , B ] → D [ F₀ A , F₀ B ]
+    {F₁} : ∀ {A B} → C [ A , B ] → D [ F₀ A , F₀ B ]
 
-    .identity : ∀ {A} → F₁ (C.id {A}) ≣ D.id
-    .homomorphism : ∀ {X Y Z} {f : C [ X , Y ]} {g : C [ Y , Z ]}
-                  → F₁ (C [ g ∘ f ]) ≣ D [ F₁ g ∘ F₁ f ]
+    .{identity} : ∀ {A} → F₁ (C.id {A}) ≣ D.id
+    .{homomorphism} : ∀ {X Y Z} {f : C [ X , Y ]} {g : C [ Y , Z ]}
+                    → F₁ (C [ g ∘ f ]) ≣ D [ F₁ g ∘ F₁ f ]
 
   F-resp-≡ : ∀ {A B} {F G : C [ A , B ]} → F ≣ G → F₁ F ≣ F₁ G
   F-resp-≡ ≣-refl = ≣-refl

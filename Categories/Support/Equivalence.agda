@@ -95,3 +95,40 @@ _×-setoid_ : ∀ {s₁ s₂ s₃ s₄} → Setoid s₁ s₂ → Setoid s₃ s�
 S₁ ×-setoid S₂ = record
   { isEquivalence = isEquivalence S₁ ×-isEquivalence isEquivalence S₂
   } where open Setoid
+
+Lift-setoid : ∀ {c ℓ a b} -> Setoid c ℓ -> Setoid (c ⊔ a) (ℓ ⊔ b)
+Lift-setoid {c} {ℓ} {a} {b} s = record {
+    Carrier = Lift {c} {a} Carrier;
+    _≈_ = λ x₁ x₂ → Lift {ℓ} {b} (lower x₁ ≈ lower x₂);
+    isEquivalence = record {
+        refl = lift refl;
+        sym = λ x₁ → lift (sym (lower x₁));
+        trans = λ x₁ x₂ → lift (trans (lower x₁) (lower x₂))}}
+ where
+   open Setoid s
+
+∀[_]-setoid_ : ∀ {ℓ s₁ s₂} → (A : Set ℓ) → (A → Setoid s₁ s₂) → Setoid _ _
+∀[ A ]-setoid B = record 
+   { Carrier = ∀ a → B.Carrier a
+   ; _≈_ = λ f g → ∀ a → B._≈_ a (f a) (g a)
+   ; isEquivalence = record 
+       { refl = λ a → B.refl a
+       ; sym = λ f≈g a → B.sym a (f≈g a)
+       ; trans = λ f≈g g≈h a → B.trans a (f≈g a) (g≈h a)
+       } 
+   }
+  where
+    module B a = Setoid (B a)
+
+Fam-setoid : ∀ {ℓ s₁ s₂} → (A : Set ℓ) → (B : Setoid s₁ s₂) → (A → Setoid.Carrier B) → Setoid _ _
+Fam-setoid A B p = record 
+  { Carrier = A
+  ; _≈_ = λ a₁ a₂ → p a₁ ≈ p a₂
+  ; isEquivalence = record 
+    { refl = refl
+    ; sym = sym
+    ; trans = trans
+    } 
+  }
+ where
+   open Setoid B

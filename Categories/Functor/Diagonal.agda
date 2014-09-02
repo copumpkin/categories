@@ -3,9 +3,13 @@ module Categories.Functor.Diagonal where
 
 open import Data.Product
 
+open import Categories.Support.PropositionalEquality
+
 open import Categories.Category
 open import Categories.Functor
 open import Categories.Product
+open import Categories.FunctorCategory
+open import Categories.Functor.Constant
 
 import Categories.Power as Power
 
@@ -31,3 +35,15 @@ import Categories.Power as Power
   open Power C
   open Category C
   open Equiv
+
+ΔF : ∀ {o a o₁ a₁} {C : Category o a} (I : Category o₁ a₁) → Functor C (Functors I C)
+ΔF {C = C} I = record 
+  { F₀ = λ c → Constant c
+  ; F₁ = λ f → record { η = λ X → f; commute = λ g → trans C.identityʳ (sym C.identityˡ) }
+  ; identity = ≣-refl
+  ; homomorphism = ≣-refl
+  }
+ where
+   module C = Category C
+   open C.Equiv
+   module I = Category I

@@ -31,7 +31,7 @@ private
                   → x ≡ x′ → y ≡ y′ → eq ≅ eq′
   heterrelevance′ refl refl refl refl = refl
 
-  heterrelevance : ∀ {a b c d} {A : Set a} {B : Set b} {C : Set c} {D : Set d}
+  heterrelevance : ∀ {ℓ} {A : Set ℓ} {B : Set ℓ} {C : Set ℓ} {D : Set ℓ}
                  → {x : A} {y : B} {x′ : C} {y′ : D}
                  → (eq : x ≅ y) (eq′ : x′ ≅ y′)
                  → x ≅ x′ → y ≅ y′ → eq ≅ eq′

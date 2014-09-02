@@ -26,15 +26,15 @@ record WeakInverse {o a o′ a′} {C : Category o a} {D : Category o′ a′} (
   .F∘G-iso : _
   F∘G-iso = NaturalIsomorphism.iso F∘G≅id
   .F∘G-isoˡ : _
-  F∘G-isoˡ = λ x → Iso.isoˡ D (F∘G-iso x)
+  F∘G-isoˡ = λ x → Iso.isoˡ {C = D} (F∘G-iso x)
   .F∘G-isoʳ : _
-  F∘G-isoʳ = λ x → Iso.isoʳ D (F∘G-iso x)
+  F∘G-isoʳ = λ x → Iso.isoʳ {C = D} (F∘G-iso x)
   .G∘F-iso : _
   G∘F-iso = NaturalIsomorphism.iso G∘F≅id
   .G∘F-isoˡ : _
-  G∘F-isoˡ = λ x → Iso.isoˡ C (G∘F-iso x)
+  G∘F-isoˡ = λ x → Iso.isoˡ {C = C} (G∘F-iso x)
   .G∘F-isoʳ : _
-  G∘F-isoʳ = λ x → Iso.isoʳ C (G∘F-iso x)
+  G∘F-isoʳ = λ x → Iso.isoʳ {C = C} (G∘F-iso x)
 
 record StrongEquivalence {o a o′ a′} (C : Category o a) (D : Category o′ a′) : Set (o ⊔ a ⊔ o′ ⊔ a′) where
   field

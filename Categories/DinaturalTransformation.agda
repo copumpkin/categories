@@ -7,7 +7,9 @@ open import Data.Product
 open import Categories.Category
 import Categories.NaturalTransformation 
 module NT = Categories.NaturalTransformation
+open import Categories.Functor using (Functor) renaming (_∘_ to _∘F_)
 open import Categories.Bifunctor using (Bifunctor; module Functor)
+open import Categories.Product
 open import Categories.Square
 
 record DinaturalTransformation {o a o′ a′}
@@ -66,3 +68,30 @@ alpha ∘> eta = DinaturalTransformation.op (eta.op <∘ alpha.op)
   where
     module eta = NT.NaturalTransformation eta
     module alpha = DinaturalTransformation alpha
+
+_∘ʳ_ : ∀ {o₀ a₀ o₁ a₁ o₂ a₂}
+     → {C : Category o₀ a₀} {D : Category o₁ a₁} {E : Category o₂ a₂}
+     → {F G : Bifunctor (Category.op C) C D} 
+     → (η : DinaturalTransformation {C = C} F G) → (K : Functor E C) → DinaturalTransformation {C = E} (F ∘F ((Functor.op K) ⁂ K)) (G ∘F ((Functor.op K) ⁂ K))
+_∘ʳ_ {C = C} {D = D} {E} {F} {G} η K = record 
+  { α = λ c → DinaturalTransformation.α η (K.F₀ c)
+  ; commute = λ {c} {c′} f → begin
+      G.F₁ (K.F₁ f , K.F₁ E.id) D.∘ η.α (K.F₀ c′) D.∘ F.F₁ (K.F₁ E.id , K.F₁ f)
+        ↓⟨ G.F-resp-≡ (P.promote _ _ (C.Equiv.refl , K.identity)) ⟩∘⟨ D.Equiv.refl ⟩∘⟨ F.F-resp-≡ (P.promote _ _ (K.identity , C.Equiv.refl)) ⟩
+      G.F₁ (K.F₁ f , C.id) D.∘ η.α (K.F₀ c′) D.∘ F.F₁ (C.id , K.F₁ f)
+        ↓⟨ DinaturalTransformation.commute η (K.F₁ f) ⟩ 
+      G.F₁ (C.id , K.F₁ f) D.∘ η.α (K.F₀ c) D.∘ F.F₁ (K.F₁ f , C.id)
+        ↑⟨ G.F-resp-≡ (P.promote _ _ (K.identity , C.Equiv.refl)) ⟩∘⟨ D.Equiv.refl ⟩∘⟨ F.F-resp-≡ (P.promote _ _ (C.Equiv.refl , K.identity)) ⟩ 
+      G.F₁ (K.F₁ E.id , K.F₁ f) D.∘ η.α (K.F₀ c) D.∘ F.F₁ (K.F₁ f , K.F₁ E.id) 
+        ∎
+  }
+  where
+    module K = Functor K
+    module C = Category C
+    module D = Category D
+    module E = Category E
+    module F = Functor F
+    module G = Functor G
+    module η = DinaturalTransformation η
+    open D.HomReasoning
+    module P = EasyCategory (Productᵉ C.op C)

@@ -13,6 +13,13 @@ record Monad {o a} (C : Category o a) : Set (o ⊔ a) where
     η : NaturalTransformation id F
     μ : NaturalTransformation (F ∘ F) F
 
+  module F = Functor F
+  module η = NaturalTransformation η
+  module μ = NaturalTransformation μ
+
+  open η public using () renaming (η to η[_])
+  open μ public using () renaming (η to μ[_])
+
   open Functor F
 
   field

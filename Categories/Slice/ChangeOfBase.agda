@@ -1,10 +1,9 @@
 open import Categories.Category
 
-module Categories.Slice.ChangeOfBase {o a} (C : Category o a) where
+module Categories.Slice.ChangeOfBase {o a} where
 
-open Category C
-open import Categories.Pullback C
-open import Categories.Slice C
+import Categories.Pullback as PB
+import Categories.Slice
 
 open import Categories.Support.PropositionalEquality
 
@@ -12,9 +11,13 @@ open import Categories.Functor using (Functor; EasyFunctor; module EasyFunctor)
 open import Categories.Square
 import Categories.Adjunction as Adj
 open Adj using (_⊣_)
-open GlueSquares C
 
-module BC1 {X Y} (f : X ⇒ Y) where
+module BC1 (C : Category o a) {X Y} (f : C [ X , Y ]) where
+  open Category C
+  open PB C
+  open Categories.Slice C
+  open GlueSquares C
+
   Σ[_] : Functor (slice X) (slice Y)
   Σ[_] = record
     { F₀ = λ g → sliceobj (f ∘ SliceObj.arr g)
@@ -105,7 +108,7 @@ module BC1 {X Y} (f : X ⇒ Y) where
                             ↓⟨ pullˡ (p₂∘universal≡q₂ (f ∘ b)) ⟩
                               (g ∘ p₂ (f ∘ a)) ∘ universal (f ∘ a) a id _
                             ↓⟨ cancelRight (p₂∘universal≡q₂ (f ∘ a)) ⟩
-                              g 
+                              g
                             ∎) ⟩
                         universal (f ∘ b) (p₁ (f ∘ a)) (g ∘ p₂ (f ∘ a)) _
                           ∘ universal (f ∘ a) a id _
@@ -153,3 +156,18 @@ module BC1 {X Y} (f : X ⇒ Y) where
     where
     module pb {Z} g = Pullback (pb {Z} g)
     open pb
+
+module BC2 {C : Category o a} (LC : PB.LocallyCartesian C) {X Y} (f : C [ X , Y ]) where
+  open Categories.Slice C
+  open PB.LocallyCartesian C LC
+  module bc1 = BC1 C f
+  open bc1 public using (Σ[_])
+
+  Δ[_] : Functor (slice Y) (slice X) 
+  Δ[_] = bc1.Δ[_][_] (pullback f)
+
+  -- Π[_] : Functor (slice X) (slice Y)
+  -- Π[_] = {!!}
+
+  Σ⊣Δ[_] : Σ[_] ⊣ Δ[_]
+  Σ⊣Δ[_] = bc1.Σ⊣Δ[_][_] (pullback f)

@@ -140,7 +140,7 @@ module GlueSquares {o ℓ e} (C : Category o ℓ e) where
 
   -- essentially composition in the arrow category
   .glue : {X Y Y′ Z Z′ W : Obj} {a : Z ⇒ W} {a′ : Y′ ⇒ Z′} {b : Y ⇒ Z} {b′ : X ⇒ Y′} {c : X ⇒ Y} {c′ : Y′ ⇒ Z} {c″ : Z′ ⇒ W} → CommutativeSquare c′ a′ a c″ → CommutativeSquare c b′ b c′ → CommutativeSquare c (a′ ∘ b′) (a ∘ b) c″
-  glue {a = a} {a′} {b} {b′} {c} {c′} {c″} sq-a sq-b = 
+  glue {a = a} {a′} {b} {b′} {c} {c′} {c″} sq-a sq-b =
     begin
       (a ∘ b) ∘ c
     ↓⟨ pullʳ sq-b ⟩
@@ -166,7 +166,7 @@ module GlueSquares {o ℓ e} (C : Category o ℓ e) where
     open HomReasoning
 
   -- essentially composition in the over category
-  .glueTrianglesʳ : ∀ {X X′ X″ Y} {a : X ⇒ Y} {b : X′ ⇒ X} {a′ : X′ ⇒ Y} {b′ : X″ ⇒ X′} {a″ : X″ ⇒ Y} 
+  .glueTrianglesʳ : ∀ {X X′ X″ Y} {a : X ⇒ Y} {b : X′ ⇒ X} {a′ : X′ ⇒ Y} {b′ : X″ ⇒ X′} {a″ : X″ ⇒ Y}
     → a ∘ b ≡ a′ → a′ ∘ b′ ≡ a″ → a ∘ (b ∘ b′) ≡ a″
   glueTrianglesʳ {a = a} {b} {a′} {b′} {a″} a∘b≡a′ a′∘b′≡a″ =
     begin
@@ -222,7 +222,7 @@ module GlueSquares {o ℓ e} (C : Category o ℓ e) where
         f ∘ g
       ∎
       where open HomReasoning
-  
+
   open Cancellers public
 
   module Switch {X Y} (i : X ≅ Y) where
@@ -505,11 +505,12 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
   record ClimbBuilder (X Y : Obj) {t} (T : Set t) : Set (o ⊔ ℓ ⊔ t) where
     field build : T → Climb X Y
 
-  leafBuilder : ∀ {X Y} → ClimbBuilder X Y (X ⇒ Y)
-  leafBuilder = record { build = leaf }
+  instance
+    leafBuilder : ∀ {X Y} → ClimbBuilder X Y (X ⇒ Y)
+    leafBuilder = record { build = leaf }
 
-  idBuilder : ∀ {X Y} → ClimbBuilder X Y (Climb X Y)
-  idBuilder = record { build = idᶠ }
+    idBuilder : ∀ {X Y} → ClimbBuilder X Y (Climb X Y)
+    idBuilder = record { build = idᶠ }
 
   _∙_ : ∀ {X Y Z} {s} {S : Set s} {{Sb : ClimbBuilder Y Z S}} (f : S) {t} {T : Set t} {{Tb : ClimbBuilder X Y T}} (g : T) → Climb X Z
   _∙_ {{Sb}} f {{Tb}} g = ClimbBuilder.build Sb f branch ClimbBuilder.build Tb g

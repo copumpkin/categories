@@ -82,18 +82,6 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifu
   [z⊗x]⊗y : Powerendo 3
   [z⊗x]⊗y = (select 2 ⊗₂ select 0) ⊗₂ select 1
   
-
-
-
-
-
-
-
-
-
-
-
-
   [x⊗id]⊗y : Powerendo 2
   [x⊗id]⊗y = x⊗id ⊗ x
 

@@ -57,8 +57,8 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0↑ = widenˡ 1 h⊎.id↑
 
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
-  {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} {S⊎ : Symmetric B⊎}
-   {B× : Braided M×} : Set (o ⊔ ℓ ⊔ e) where
+  {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
+   (B× : Braided M×) : Set (o ⊔ ℓ ⊔ e) where
 
 
   open BimonoidalHelperFunctors S⊎ B×

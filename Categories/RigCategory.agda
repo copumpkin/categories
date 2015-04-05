@@ -26,7 +26,7 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     module B× = Braided B×
 
   module h⊎ = MonoidalHelperFunctors C M⊎.⊗ M⊎.id
-  module h× = MonoidalHelperFunctors C M⊎.⊗ M×.id
+  module h× = MonoidalHelperFunctors C M×.⊗ M×.id
   module b⊎ = BraidedHelperFunctors C M⊎.⊗ M⊎.id
   module b× = BraidedHelperFunctors C M×.⊗ M×.id
 

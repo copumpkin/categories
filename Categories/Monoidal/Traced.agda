@@ -4,6 +4,7 @@ module Categories.Monoidal.Traced where
 open import Level
 
 open import Data.Product
+open import Data.Fin
 
 open import Categories.Category
 open import Categories.Power hiding (module C)
@@ -16,7 +17,8 @@ open import Categories.Monoidal.Braided.Helpers
 open import Categories.Monoidal.Symmetric
 open import Categories.NaturalIsomorphism
 open import Categories.NaturalTransformation 
-
+open import Categories.Power.NaturalTransformation hiding (module C)
+  
 record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
   (S : Symmetric B) : Set (o ⊔ ℓ ⊔ e) where
 
@@ -25,6 +27,8 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
 
   private module M = Monoidal M
   open M using (⊗; identityʳ; assoc) renaming (id to 𝟙)
+
+  module H = MonoidalHelperFunctors C ⊗ 𝟙
 
   private module F = Functor ⊗
   open F using () renaming (F₀ to ⊗ₒ)
@@ -37,6 +41,12 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
   open NaturalTransformation NIassoc.F⇒G renaming (η to ηassoc⇒)
   open NaturalTransformation NIassoc.F⇐G renaming (η to ηassoc⇐)
 
+  private module PowC = Categories.Power C
+  open PowC 
+
+  private module PowNat = Categories.Power.NaturalTransformation C
+  open PowNat hiding (module C)
+
   field
     trace : ∀ {X A B} → C [ ⊗ₒ (A , X)  , ⊗ₒ (B , X) ] → C [ A , B ]
 
@@ -47,31 +57,21 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
                     (ηidr⇒ (λ _ → B) ∘ f ∘ ηidr⇐ (λ _ → A))
                   ]
                   
-    vanish_⊗ : ∀ {X Y A B f} →
+    vanish_⊗ : let g : ∀ {A X Y} → Fin 3 → Obj
+                   g = λ {A} {X} {Y} → 
+                       λ { zero → A ;
+                           (suc zero) → X ;
+                           (suc (suc zero)) → Y ;
+                           (suc (suc (suc ()))) } 
+               in
+               ∀ {X Y A B f} →
                C [
                     trace {⊗ₒ (X , Y)} {A} {B} f
                   ≡
                     trace {X} {A} {B}
                       (trace {Y} {⊗ₒ (A , X)} {⊗ₒ (B , X)}
-                        ((ηassoc⇐ {!!} ∘ f ∘ ηassoc⇒ {!!})))
+                        ((ηassoc⇐ ((g {B} {X} {Y}))) ∘ f ∘ (ηassoc⇒ (g {A} {X} {Y}))))
                  ]
-
-{--
-We have:
-
-  f : C [ ⊗ₒ (A , ⊗ₒ (X , Y)) , ⊗ₒ (B , ⊗ₒ (X , Y)) ]
-
-We want:
-
-    C [ ⊗ₒ (⊗ₒ (A , X) , Y) , ⊗ₒ (⊗ₒ (B , X) , Y) ]
-
-We have an ηassoc⇒ that maps between [x⊗y]⊗z and x⊗[y⊗z] 
-but it works in (Exp (Fin 3)) 
-
-Need to construct an object in Exp (Fin 3) C that would correspond to
-⊗ₒ (⊗ₒ (A , X) , Y)
-
---}
 
 ------------------------------------------------------------------------------
 

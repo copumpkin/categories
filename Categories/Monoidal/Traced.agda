@@ -25,7 +25,8 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
   private module H = MonoidalHelperFunctors C M.⊗ M.id
   private module NIʳ = NaturalIsomorphism M.identityʳ
   
-  private module NTʳ = NaturalTransformation NIʳ.F⇒G
+  private module NTʳ⇒ = NaturalTransformation NIʳ.F⇒G
+  private module NTʳ⇐ = NaturalTransformation NIʳ.F⇐G
 
   private module F = Functor M.⊗
   open F using () renaming (F₀ to ⊗)
@@ -34,20 +35,7 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
     trace : {X A B : Obj} → C [ ⊗ (A , X)  , ⊗ (B , X) ] → C [ A , B ]
 
     vanish_id : {A B : Obj} {f : C [ ⊗ (A , M.id) , ⊗ (B , M.id) ]} →
-                C [ trace {M.id} {A} {B} f ≡ {!!} ]
-
-
-
-
-
-
-    -- superposing: let f : a ⊗ x → b ⊗ x
-    --   trace(x,c⊗a,c⊗b)(id⊗f) = id ⊗ trace(x,a,b)(f)
-
-    -- yanking
-    --   trace(x,x,x)(symmetry_x,x) = id
-
-
+                C [ trace {M.id} {A} {B} f ≡ (NTʳ⇒.η (λ i → B) ∘ f ∘ NTʳ⇐.η (λ i → A)) ]
 
 
 {--

@@ -8,13 +8,13 @@ open import Data.Fin
 
 open import Categories.Category
 open import Categories.Monoidal
-open import Categories.Functor hiding (_∘_; identityʳ; assoc)
+open import Categories.Functor hiding (id; _∘_; identityʳ; assoc)
 open import Categories.Monoidal.Braided
 open import Categories.Monoidal.Helpers
 open import Categories.Monoidal.Braided.Helpers
 open import Categories.Monoidal.Symmetric
 open import Categories.NaturalIsomorphism
-open import Categories.NaturalTransformation 
+open import Categories.NaturalTransformation hiding (id)
   
 ------------------------------------------------------------------------------
 -- Helpers
@@ -51,13 +51,13 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
   (S : Symmetric B) : Set (o ⊔ ℓ ⊔ e) where
 
   private module C = Category C
-  open C using (Obj; _∘_)
+  open C using (Obj; id; _∘_)
 
   private module M = Monoidal M
   open M using (⊗; identityʳ; assoc) renaming (id to 𝟙)
 
   private module F = Functor ⊗
-  open F using () renaming (F₀ to ⊗ₒ)
+  open F using () renaming (F₀ to ⊗ₒ; F₁ to ⊗ₘ)
 
   private module NIʳ = NaturalIsomorphism identityʳ
   open NaturalTransformation NIʳ.F⇒G renaming (η to ηidr⇒)
@@ -66,6 +66,9 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
   private module NIassoc = NaturalIsomorphism assoc
   open NaturalTransformation NIassoc.F⇒G renaming (η to ηassoc⇒)
   open NaturalTransformation NIassoc.F⇐G renaming (η to ηassoc⇐)
+
+  private module S = Symmetric S
+  open S using (symmetry)
 
   field
     trace : ∀ {X A B} → C [ ⊗ₒ (A , X)  , ⊗ₒ (B , X) ] → C [ A , B ]
@@ -85,6 +88,21 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
                       (trace {Y} {⊗ₒ (A , X)} {⊗ₒ (B , X)}
                         ((ηassoc⇐ (ternary C B X Y)) ∘ f ∘ (ηassoc⇒ (ternary C A X Y))))
                  ]
+
+    superpose : ∀ {X Y A B} {f : C [ ⊗ₒ (A , X) , ⊗ₒ (B , X) ]} → 
+                C [
+                    trace {X} {⊗ₒ (Y , A)} {⊗ₒ (Y , B)}
+                      (ηassoc⇐ (ternary C Y B X) ∘ ⊗ₘ (id , f) ∘ ηassoc⇒ (ternary C Y A X))
+                   ≡
+                    ⊗ₘ (id , (trace {X} {A} {B} f))
+                  ]
+
+    yank : ∀ {X} →
+           C [
+               trace {X} {X} {X} {!!} -- use symmetry
+              ≡
+               id
+             ]
 
 ------------------------------------------------------------------------------
 

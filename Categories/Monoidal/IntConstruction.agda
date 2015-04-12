@@ -50,7 +50,10 @@ IntC {o} {ℓ} {e} {C} {M} {B} {S} T = record {
   ; assoc = λ { {(± A+ A-)} {(± B+ B-)} {(± C+ C-)} {(± D+ D-)} {f} {g} {h} →
             {!!} }
   ; identityˡ = λ { {(± A+ A-)} {(± B+ B-)} {f} →
-                {!!} }
+                (begin
+                  {!!}
+                ↓⟨ {!!} ⟩ 
+                  f ∎) }
   ; identityʳ = λ { {(± A+ A-)} {(± B+ B-)} {f} →
                 {!!} }
   ; equiv = C.equiv
@@ -59,6 +62,7 @@ IntC {o} {ℓ} {e} {C} {M} {B} {S} T = record {
   }
   where
     module C = Category C
+    open C.HomReasoning
     module M = Monoidal M renaming (id to 𝟙)
     module F = Functor M.⊗ renaming (F₀ to ⊗ₒ; F₁ to ⊗ₘ)
     module B = Braided B

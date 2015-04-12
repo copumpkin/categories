@@ -24,6 +24,12 @@ unary : ∀ {o ℓ e} → (C : Category o ℓ e) → (A : Category.Obj C) →
 unary C A zero = A
 unary C A (suc ())
 
+binary : ∀ {o ℓ e} → (C : Category o ℓ e) → (A B : Category.Obj C) →
+          Fin 2 → Category.Obj C
+binary C A B zero = A
+binary C A B (suc zero) = B
+binary C A B (suc (suc ()))
+
 ternary : ∀ {o ℓ e} → (C : Category o ℓ e) → (A X Y : Category.Obj C) →
           Fin 3 → Category.Obj C
 ternary C A X Y zero = A
@@ -67,8 +73,11 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
   open NaturalTransformation NIassoc.F⇒G renaming (η to ηassoc⇒)
   open NaturalTransformation NIassoc.F⇐G renaming (η to ηassoc⇐)
 
-  private module S = Symmetric S
-  open S using (symmetry)
+  private module B = Braided B
+  open B using (braid)
+
+  private module NIbraid = NaturalIsomorphism braid
+  open NaturalTransformation NIbraid.F⇒G renaming (η to ηbraid⇒)
 
   field
     trace : ∀ {X A B} → C [ ⊗ₒ (A , X)  , ⊗ₒ (B , X) ] → C [ A , B ]
@@ -99,10 +108,9 @@ record Traced {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} {B : Braided M}
 
     yank : ∀ {X} →
            C [
-               trace {X} {X} {X} {!!} -- use symmetry
+               trace {X} {X} {X} (ηbraid⇒ (binary C X X)) 
               ≡
                id
              ]
 
 ------------------------------------------------------------------------------
-

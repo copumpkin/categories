@@ -30,6 +30,8 @@ record Exponentiating Σ : Set (o ⊔ ℓ ⊔ e) where
         exponential : ∀{A} → Exponential A Σ
     module Σ↑ (X : Obj) = Exponential (exponential {X})
     
+    infixr 6 Σ↑_ Σ²_
+
     Σ↑_ : Obj → Obj
     Σ↑_ X = Σ↑.B^A X
     

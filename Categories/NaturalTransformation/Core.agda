@@ -52,6 +52,8 @@ id {C = C} {D} {F} = record
     where 
     open D.HomReasoning
 
+infixr 9 _∘₁_ _∘₀_
+
 -- "Vertical composition"
 _∘₁_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁}
         {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁}

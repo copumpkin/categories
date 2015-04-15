@@ -14,8 +14,9 @@ postulate
   .irr : ∀ {a} {A : Set a} → .A → A
 
 record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where 
+
+  infix  4 _≡_ _⇒_
   infixr 9 _∘_
-  infix  4 _≡_
 
   field
     Obj : Set o
@@ -105,6 +106,8 @@ record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where
   .id-comm : ∀ {a b} {f : a ⇒ b} → f ∘ id ≡ id ∘ f
   id-comm = trans identityʳ (sym identityˡ)
 
+infix 10  _[_,_] _[_≡_] _[_∘_]
+
 _[_,_] : ∀ {o ℓ e} → (C : Category o ℓ e) → (X : Category.Obj C) → (Y : Category.Obj C) → Set ℓ
 _[_,_] = Category._⇒_
 
@@ -118,6 +121,8 @@ _[_∘_] = Category._∘_
 module Heterogeneous {o ℓ e} (C : Category o ℓ e) where
   open Category C
   open Equiv renaming (refl to refl′; sym to sym′; trans to trans′; reflexive to reflexive′)
+
+  infix 4 _∼_
 
   data _∼_ {A B} (f : A ⇒ B) : ∀ {X Y} → (X ⇒ Y) → Set (ℓ ⊔ e) where
     ≡⇒∼ : {g : A ⇒ B} → .(f ≡ g) → f ∼ g

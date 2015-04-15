@@ -17,6 +17,8 @@ open Product C
 open ProductMorphisms C
 
 record BinaryProducts : Set (o ⊔ ℓ ⊔ e) where
+
+  infixr 2 _×_
   infix 10 _⁂_
 
   field

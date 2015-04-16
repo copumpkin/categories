@@ -21,6 +21,8 @@ data GlobeHom : (m n : ℕ) → Set where
   σ : {m n : ℕ} (n<m : n < m) → GlobeHom n m
   τ : {m n : ℕ} (n<m : n < m) → GlobeHom n m
 
+infixl 7 _⊚_
+
 _⊚_ : ∀ {l m n} → GlobeHom m n → GlobeHom l m → GlobeHom l n
 I ⊚ y = y
 x ⊚ I = x
@@ -110,6 +112,8 @@ GlobeEquiv = record { refl = refl; sym = sym; trans = trans }
   trans both-I y∼z = y∼z
   trans both-σ both-σ = both-σ
   trans both-τ both-τ = both-τ
+
+infixl 7 _⊚′_
 
 _⊚′_ : ∀ {l m n} → GlobeHom′ m n → GlobeHom′ l m → GlobeHom′ l n
 x ⊚′ I = x

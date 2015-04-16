@@ -14,6 +14,8 @@ open HomReasoning
 open import Function using (flip)
 open import Level
 
+infix 10 [_]⟨_,_⟩ [_⇒_]_⁂_
+
 [[_]] : ∀{A B} → Product A B → Obj
 [[ p ]] = Product.A×B p
 

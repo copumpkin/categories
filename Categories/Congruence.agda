@@ -138,6 +138,8 @@ module Heterogeneous {o ℓ e} {C : Category o ℓ e} {q} (Q : Congruence C q) w
   open Equiv renaming (refl to refl′; sym to sym′; trans to trans′; reflexive to reflexive′)
   open Equiv₀ renaming (refl to refl₀; sym to sym₀; trans to trans₀; reflexive to reflexive₀)
 
+  infix 4 _∼_
+
   data _∼_ {A B} (f : A ⇒ B) {X Y} (g : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e ⊔ q) where
     ≡⇒∼ : (ax : A ≡₀ X) (by : B ≡₀ Y) → .(coerce ax by f ≡ g) → f ∼ g
 
@@ -234,7 +236,7 @@ module Heterogeneous {o ℓ e} {C : Category o ℓ e} {q} (Q : Congruence C q) w
   -- floatʳ-resp-∼ : ∀ {A A′ B} (A≣A′ : A ≣ A′) {f : C [ A , B ]} → f ∼ floatʳ A≣A′ f
   -- floatʳ-resp-∼ ≣-refl = refl
 
-  infix 3 ▹_
+  infixr 4 ▹_
 
   record -⇒- : Set (o ⊔ ℓ) where
     constructor ▹_

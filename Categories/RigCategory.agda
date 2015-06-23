@@ -86,6 +86,29 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0↑ : Powerendo 1
   0↑ = widenˡ 1 h⊎.id↑
 
+  -- like Laplaza, use concatenation for ⊗ to make things easier to read
+  -- also ⊗ binds more tightly, so skip those parens
+  [x⊕[y⊕z]]w : Powerendo 4
+  [x⊕[y⊕z]]w = h⊎.x⊗[y⊗z] h×.⊗ h⊎.x
+
+  xw⊕[y⊕z]w : Powerendo 4
+  xw⊕[y⊕z]w = (select 0 h×.⊗₂ select 3) h⊎.⊗₂ ((select 1 h⊎.⊗₂ select 2) h×.⊗₂ select 3)
+
+  xw⊕[yw⊕zw] : Powerendo 4
+  xw⊕[yw⊕zw] = (select 0 h×.⊗₂ select 3) h⊎.⊗₂
+                 ((select 1 h×.⊗₂ select 3) h⊎.⊗₂ (select 2 h×.⊗₂ select 3))
+
+  [xw⊕yw]⊕zw : Powerendo 4
+  [xw⊕yw]⊕zw = ((select 0 h×.⊗₂ select 3) h⊎.⊗₂ (select 1 h×.⊗₂ select 3)) h⊎.⊗₂
+                 (select 2 h×.⊗₂ select 3)
+
+  [[x⊕y]⊕z]w : Powerendo 4
+  [[x⊕y]⊕z]w = h⊎.[x⊗y]⊗z h×.⊗ h⊎.x
+
+  [x⊕y]w⊕zw : Powerendo 4
+  [x⊕y]w⊕zw = ((select 0 h⊎.⊗₂ select 1) h×.⊗₂ select 3) h⊎.⊗₂
+                (select 2 h×.⊗₂ select 3)
+
   module SRig (S⊎ : Symmetric B⊎) (S× : Symmetric B×)
     (distribₗ : NaturalIsomorphism x⊗[y⊕z] [x⊗y]⊕[x⊗z])
     (distribᵣ : NaturalIsomorphism [x⊕y]⊗z [x⊗z]⊕[y⊗z])
@@ -130,6 +153,48 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     B[x⊗y][x⊗z] : NaturalTransformation [x⊗y]⊕[x⊗z] [x⊗z]⊕[x⊗y]
     B[x⊗y][x⊗z] = br⊎.B-over (widenʳ 1 h×.x⊗y) x⊗z
+
+    dᵣA[B⊕C]D : NaturalTransformation [x⊕[y⊕z]]w xw⊕[y⊕z]w
+    dᵣA[B⊕C]D = dᵣ-over (select 0) (widenʳ 1 (widenˡ 1 h⊎.x⊗y)) (select 3)
+
+    dᵣBCD : NaturalTransformation (widenˡ 1 [x⊕y]⊗z) (widenˡ 1 [x⊗z]⊕[y⊗z])
+    dᵣBCD = dᵣ-over (select 1) (select 2) (select 3)
+
+    x⊗w : Powerendo 4
+    x⊗w = select 0 h×.⊗₂ select 3
+
+    y⊗w : Powerendo 4
+    y⊗w = select 1 h×.⊗₂ select 3
+
+    z⊗w : Powerendo 4
+    z⊗w = select 2 h×.⊗₂ select 3
+    
+    id03 : NaturalTransformation x⊗w x⊗w
+    id03 = idⁿ
+
+    id23 : NaturalTransformation z⊗w z⊗w
+    id23 = idⁿ
+
+    w : Powerendo 4
+    w = select 3
+    
+    idw : NaturalTransformation w w
+    idw = idⁿ
+    
+    1⊗dᵣBCD : NaturalTransformation xw⊕[y⊕z]w xw⊕[yw⊕zw]
+    1⊗dᵣBCD = overlapN M⊎.⊗ id03 dᵣBCD
+
+    assocˡAD-BD-CD : NaturalTransformation xw⊕[yw⊕zw] [xw⊕yw]⊕zw
+    assocˡAD-BD-CD = br⊎.α₂-over x⊗w y⊗w z⊗w
+
+    αˡABC⊗1 : NaturalTransformation [x⊕[y⊕z]]w [[x⊕y]⊕z]w
+    αˡABC⊗1 = overlapN M×.⊗ (br⊎.α₂-over (select 0) (select 1) (select 2)) idw
+
+    dᵣ[A⊕B]CD : NaturalTransformation [[x⊕y]⊕z]w [x⊕y]w⊕zw
+    dᵣ[A⊕B]CD = dᵣ-over (widenʳ 2 h⊎.x⊗y) (select 2) (select 3)
+
+    dᵣABD⊗1 : NaturalTransformation [x⊕y]w⊕zw [xw⊕yw]⊕zw
+    dᵣABD⊗1 = overlapN M⊎.⊗ (dᵣ-over (select 0) (select 1) (select 3)) id23
     
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
@@ -150,4 +215,4 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
   field
     laplazaI : dₗACB ∘₁ 1⊗Byz ≡ⁿ B[x⊗y][x⊗z] ∘₁ dₗABC
     laplazaII : Bxz⊕Byz ∘₁ dᵣABC ≡ⁿ dₗCAB ∘₁ B[x⊕y]z
-  
+    laplazaIV : dᵣABD⊗1 ∘₁ (dᵣ[A⊕B]CD ∘₁ αˡABC⊗1) ≡ⁿ assocˡAD-BD-CD ∘₁ (1⊗dᵣBCD ∘₁ dᵣA[B⊕C]D)

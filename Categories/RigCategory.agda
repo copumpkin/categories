@@ -40,7 +40,8 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   private module PowNat = Categories.Power.NaturalTransformation C
   open PowNat hiding (module C)
 
-  -- these could be defined in Helpers, but seem not to be
+  -- for convenience of multiple of the larger equations, define
+  -- shorthands for 3 and 4 variables
   x⊗z : Powerendo 3
   x⊗z = select 0 h×.⊗₂ select 2
   
@@ -52,7 +53,23 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
   y⊗z : Powerendo 3
   y⊗z = select 1 h×.⊗₂ select 2
+
+  x : Powerendo 4
+  x = select 0
+
+  y : Powerendo 4
+  y = select 1
+
+  z : Powerendo 4
+  z = select 2
+
+  w : Powerendo 4
+  w = select 3
+
+  yz : Powerendo 4
+  yz = select 1 h×.⊗₂ select 2
   
+  -- combinations of 3 variables
   x⊗[y⊕z] : Powerendo 3
   x⊗[y⊕z] = h×.x h×.⊗ (h⊎.x⊗y)
 
@@ -86,29 +103,43 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0↑ : Powerendo 1
   0↑ = widenˡ 1 h⊎.id↑
 
+  x⊗w : Powerendo 4
+  x⊗w = select 0 h×.⊗₂ select 3
+
+  y⊗w : Powerendo 4
+  y⊗w = select 1 h×.⊗₂ select 3
+
+  z⊗w : Powerendo 4
+  z⊗w = select 2 h×.⊗₂ select 3
+    
   -- like Laplaza, use concatenation for ⊗ to make things easier to read
   -- also ⊗ binds more tightly, so skip those parens
+
+  -- combinations of 4 variables
   [x⊕[y⊕z]]w : Powerendo 4
   [x⊕[y⊕z]]w = h⊎.x⊗[y⊗z] h×.⊗ h⊎.x
 
   xw⊕[y⊕z]w : Powerendo 4
-  xw⊕[y⊕z]w = (select 0 h×.⊗₂ select 3) h⊎.⊗₂ ((select 1 h⊎.⊗₂ select 2) h×.⊗₂ select 3)
+  xw⊕[y⊕z]w = (x h×.⊗₂ w) h⊎.⊗₂ ((y h⊎.⊗₂ z) h×.⊗₂ w)
 
   xw⊕[yw⊕zw] : Powerendo 4
-  xw⊕[yw⊕zw] = (select 0 h×.⊗₂ select 3) h⊎.⊗₂
-                 ((select 1 h×.⊗₂ select 3) h⊎.⊗₂ (select 2 h×.⊗₂ select 3))
+  xw⊕[yw⊕zw] = (x h×.⊗₂ w) h⊎.⊗₂ ((y h×.⊗₂ w) h⊎.⊗₂ (z h×.⊗₂ w))
 
   [xw⊕yw]⊕zw : Powerendo 4
-  [xw⊕yw]⊕zw = ((select 0 h×.⊗₂ select 3) h⊎.⊗₂ (select 1 h×.⊗₂ select 3)) h⊎.⊗₂
-                 (select 2 h×.⊗₂ select 3)
+  [xw⊕yw]⊕zw = ((x h×.⊗₂ w) h⊎.⊗₂ (y h×.⊗₂ w)) h⊎.⊗₂ (z h×.⊗₂ w)
 
   [[x⊕y]⊕z]w : Powerendo 4
   [[x⊕y]⊕z]w = h⊎.[x⊗y]⊗z h×.⊗ h⊎.x
 
   [x⊕y]w⊕zw : Powerendo 4
-  [x⊕y]w⊕zw = ((select 0 h⊎.⊗₂ select 1) h×.⊗₂ select 3) h⊎.⊗₂
-                (select 2 h×.⊗₂ select 3)
+  [x⊕y]w⊕zw = ((x h⊎.⊗₂ y) h×.⊗₂ w) h⊎.⊗₂ (z h×.⊗₂ w)
 
+  x[y[z⊕w]] : Powerendo 4
+  x[y[z⊕w]] = x h×.⊗₂ (y h×.⊗₂ (z h⊎.⊗₂ w))
+
+  x[yz⊕yw] : Powerendo 4
+  x[yz⊕yw] = x h×.⊗₂ ((y h×.⊗₂ z) h⊎.⊗₂ (y h×.⊗₂ w))
+  
   module SRig (S⊎ : Symmetric B⊎) (S× : Symmetric B×)
     (distribₗ : NaturalIsomorphism x⊗[y⊕z] [x⊗y]⊕[x⊗z])
     (distribᵣ : NaturalIsomorphism [x⊕y]⊗z [x⊗z]⊕[y⊗z])
@@ -160,24 +191,12 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     dᵣBCD : NaturalTransformation (widenˡ 1 [x⊕y]⊗z) (widenˡ 1 [x⊗z]⊕[y⊗z])
     dᵣBCD = dᵣ-over (select 1) (select 2) (select 3)
 
-    x⊗w : Powerendo 4
-    x⊗w = select 0 h×.⊗₂ select 3
-
-    y⊗w : Powerendo 4
-    y⊗w = select 1 h×.⊗₂ select 3
-
-    z⊗w : Powerendo 4
-    z⊗w = select 2 h×.⊗₂ select 3
-    
     id03 : NaturalTransformation x⊗w x⊗w
     id03 = idⁿ
 
     id23 : NaturalTransformation z⊗w z⊗w
     id23 = idⁿ
 
-    w : Powerendo 4
-    w = select 3
-    
     idw : NaturalTransformation w w
     idw = idⁿ
     

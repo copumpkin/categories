@@ -139,6 +139,15 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
   x[yz⊕yw] : Powerendo 4
   x[yz⊕yw] = x h×.⊗₂ ((y h×.⊗₂ z) h⊎.⊗₂ (y h×.⊗₂ w))
+
+  x[yz]⊕x[yw] : Powerendo 4
+  x[yz]⊕x[yw] = (x h×.⊗₂ (y h×.⊗₂ z)) h⊎.⊗₂ (x h×.⊗₂ (y h×.⊗₂ w))
+
+  [xy][z⊕w] : Powerendo 4
+  [xy][z⊕w] = (x h×.⊗₂ y) h×.⊗₂ (z h⊎.⊗₂ w)
+
+  [xy]z⊕[xy]w : Powerendo 4
+  [xy]z⊕[xy]w = let xy = (x h×.⊗₂ y) in (xy h×.⊗₂ z) h⊎.⊗₂ (xy h×.⊗₂ w)
   
   module SRig (S⊎ : Symmetric B⊎) (S× : Symmetric B×)
     (distribₗ : NaturalIsomorphism x⊗[y⊕z] [x⊗y]⊕[x⊗z])

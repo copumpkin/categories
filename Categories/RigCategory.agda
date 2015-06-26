@@ -66,9 +66,6 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   w : Powerendo 4
   w = select 3
 
-  yz : Powerendo 4
-  yz = select 1 h×.⊗₂ select 2
-  
   -- combinations of 3 variables
   x⊗[y⊕z] : Powerendo 3
   x⊗[y⊕z] = h×.x h×.⊗ (h⊎.x⊗y)
@@ -103,15 +100,24 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0↑ : Powerendo 1
   0↑ = widenˡ 1 h⊎.id↑
 
-  x⊗w : Powerendo 4
-  x⊗w = select 0 h×.⊗₂ select 3
+  xy : Powerendo 4
+  xy = widenʳ 2 h×.x⊗y
+  
+  yz : Powerendo 4
+  yz = select 1 h×.⊗₂ select 2
+  
+  xw : Powerendo 4
+  xw = select 0 h×.⊗₂ select 3
 
-  y⊗w : Powerendo 4
-  y⊗w = select 1 h×.⊗₂ select 3
+  yw : Powerendo 4
+  yw = select 1 h×.⊗₂ select 3
 
-  z⊗w : Powerendo 4
-  z⊗w = select 2 h×.⊗₂ select 3
-    
+  zw : Powerendo 4
+  zw = select 2 h×.⊗₂ select 3
+
+  z⊕w : Powerendo 4
+  z⊕w = widenˡ 2 h⊎.x⊗y
+  
   -- like Laplaza, use concatenation for ⊗ to make things easier to read
   -- also ⊗ binds more tightly, so skip those parens
 
@@ -163,7 +169,8 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     
     dᵣ-over : ∀ {n} (F₁ F₂ F₃ : Powerendo n) → NaturalTransformation ((F₁ h⊎.⊗₂ F₂) h×.⊗₂ F₃) ((F₁ h×.⊗₂ F₃) h⊎.⊗₂ (F₂ h×.⊗₂ F₃))
     dᵣ-over F₁ F₂ F₃ = dᵣ ∘ʳ plex {3} F₁ F₂ F₃
-    
+
+    -- these are all for 3 variables
     Bxz : NaturalTransformation x⊗z z⊗x
     Bxz = br×.B-over (select 0) (select 2)
 
@@ -194,18 +201,22 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     B[x⊗y][x⊗z] : NaturalTransformation [x⊗y]⊕[x⊗z] [x⊗z]⊕[x⊗y]
     B[x⊗y][x⊗z] = br⊎.B-over (widenʳ 1 h×.x⊗y) x⊗z
 
+    -- these are all for 4 variables
     dᵣA[B⊕C]D : NaturalTransformation [x⊕[y⊕z]]w xw⊕[y⊕z]w
     dᵣA[B⊕C]D = dᵣ-over (select 0) (widenʳ 1 (widenˡ 1 h⊎.x⊗y)) (select 3)
 
     dᵣBCD : NaturalTransformation (widenˡ 1 [x⊕y]⊗z) (widenˡ 1 [x⊗z]⊕[y⊗z])
     dᵣBCD = dᵣ-over (select 1) (select 2) (select 3)
 
-    id03 : NaturalTransformation x⊗w x⊗w
+    id03 : NaturalTransformation xw xw
     id03 = idⁿ
 
-    id23 : NaturalTransformation z⊗w z⊗w
+    id23 : NaturalTransformation zw zw
     id23 = idⁿ
 
+    idx : NaturalTransformation x x
+    idx = idⁿ
+    
     idw : NaturalTransformation w w
     idw = idⁿ
     
@@ -213,7 +224,7 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     1⊗dᵣBCD = overlapN M⊎.⊗ id03 dᵣBCD
 
     assocˡAD-BD-CD : NaturalTransformation xw⊕[yw⊕zw] [xw⊕yw]⊕zw
-    assocˡAD-BD-CD = br⊎.α₂-over x⊗w y⊗w z⊗w
+    assocˡAD-BD-CD = br⊎.α₂-over xw yw zw
 
     αˡABC⊗1 : NaturalTransformation [x⊕[y⊕z]]w [[x⊕y]⊕z]w
     αˡABC⊗1 = overlapN M×.⊗ (br⊎.α₂-over (select 0) (select 1) (select 2)) idw
@@ -223,6 +234,21 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     dᵣABD⊗1 : NaturalTransformation [x⊕y]w⊕zw [xw⊕yw]⊕zw
     dᵣABD⊗1 = overlapN M⊎.⊗ (dᵣ-over (select 0) (select 1) (select 3)) id23
+
+    1A⊗dₗBCD : NaturalTransformation x[y[z⊕w]] x[yz⊕yw]
+    1A⊗dₗBCD = overlapN M×.⊗ idx (dₗ-over y z w)
+
+    dₗA[BC][BD] : NaturalTransformation x[yz⊕yw] x[yz]⊕x[yw]
+    dₗA[BC][BD] = dₗ-over x yz yw
+
+    αABC⊕αABD : NaturalTransformation x[yz]⊕x[yw] [xy]z⊕[xy]w
+    αABC⊕αABD = overlapN M⊎.⊗ (br×.α₂-over x y z) (br×.α₂-over x y w)
+
+    αAB[C⊕D] : NaturalTransformation x[y[z⊕w]] [xy][z⊕w]
+    αAB[C⊕D] = br×.α₂-over x y z⊕w
+
+    dₗ[AB]CD : NaturalTransformation [xy][z⊕w] [xy]z⊕[xy]w
+    dₗ[AB]CD = dₗ-over xy z w
     
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
@@ -244,3 +270,4 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaI : dₗACB ∘₁ 1⊗Byz ≡ⁿ B[x⊗y][x⊗z] ∘₁ dₗABC
     laplazaII : Bxz⊕Byz ∘₁ dᵣABC ≡ⁿ dₗCAB ∘₁ B[x⊕y]z
     laplazaIV : dᵣABD⊗1 ∘₁ (dᵣ[A⊕B]CD ∘₁ αˡABC⊗1) ≡ⁿ assocˡAD-BD-CD ∘₁ (1⊗dᵣBCD ∘₁ dᵣA[B⊕C]D)
+    laplazaVI : dₗ[AB]CD ∘₁ αAB[C⊕D] ≡ⁿ αABC⊕αABD ∘₁ (dₗA[BC][BD] ∘₁ 1A⊗dₗBCD)

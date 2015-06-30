@@ -117,7 +117,14 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
   z⊕w : Powerendo 4
   z⊕w = widenˡ 2 h⊎.x⊗y
+
+  -- 0 variables!
+  0₀ : Powerendo 0
+  0₀ = h⊎.id↑
   
+  0⊗0 : Powerendo 0
+  0⊗0 = 0₀ h×.⊗ 0₀
+
   -- like Laplaza, use concatenation for ⊗ to make things easier to read
   -- also ⊗ binds more tightly, so skip those parens
 
@@ -158,17 +165,25 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   module SRig (S⊎ : Symmetric B⊎) (S× : Symmetric B×)
     (distribₗ : NaturalIsomorphism x⊗[y⊕z] [x⊗y]⊕[x⊗z])
     (distribᵣ : NaturalIsomorphism [x⊕y]⊗z [x⊗z]⊕[y⊗z])
-    (annₗ : NaturalIsomorphism x⊗0 0↑)
-    (annᵣ : NaturalIsomorphism 0⊗x 0↑) where
+    (annₗ : NaturalIsomorphism 0⊗x 0↑)
+    (annᵣ : NaturalIsomorphism x⊗0 0↑) where
 
     open NaturalIsomorphism distribₗ using () renaming (F⇒G to dₗ)
     open NaturalIsomorphism distribᵣ using () renaming (F⇒G to dᵣ)
+    open NaturalIsomorphism annₗ using () renaming (F⇒G to aₗ)
+    open NaturalIsomorphism annᵣ using () renaming (F⇒G to aᵣ)
 
     dₗ-over : ∀ {n} (F₁ F₂ F₃ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ (F₂ h⊎.⊗₂ F₃)) ((F₁ h×.⊗₂ F₂) h⊎.⊗₂ (F₁ h×.⊗₂ F₃))
     dₗ-over F₁ F₂ F₃ = dₗ ∘ʳ plex {3} F₁ F₂ F₃
     
     dᵣ-over : ∀ {n} (F₁ F₂ F₃ : Powerendo n) → NaturalTransformation ((F₁ h⊎.⊗₂ F₂) h×.⊗₂ F₃) ((F₁ h×.⊗₂ F₃) h⊎.⊗₂ (F₂ h×.⊗₂ F₃))
     dᵣ-over F₁ F₂ F₃ = dᵣ ∘ʳ plex {3} F₁ F₂ F₃
+
+    aₗ-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation ((widenʳ n 0₀) h×.⊗₂ F₁) (widenʳ n 0₀)
+    aₗ-over F₁ = aₗ ∘ʳ plex {1} F₁ 
+
+    aᵣ-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ (widenʳ n 0₀)) (widenʳ n 0₀)
+    aᵣ-over F₁ = aᵣ ∘ʳ plex {1} F₁ 
 
     -- these are all for 3 variables
     Bxz : NaturalTransformation x⊗z z⊗x
@@ -259,8 +274,8 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
   field
     distribₗ : NaturalIsomorphism x⊗[y⊕z] [x⊗y]⊕[x⊗z]
     distribᵣ : NaturalIsomorphism [x⊕y]⊗z [x⊗z]⊕[y⊗z]
-    annₗ : NaturalIsomorphism x⊗0 0↑
-    annᵣ : NaturalIsomorphism 0⊗x 0↑
+    annₗ : NaturalIsomorphism 0⊗x 0↑
+    annᵣ : NaturalIsomorphism x⊗0 0↑
 
   open SRig S⊎ S× distribₗ distribᵣ annₗ annᵣ
 
@@ -271,3 +286,13 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaII : Bxz⊕Byz ∘₁ dᵣABC ≡ⁿ dₗCAB ∘₁ B[x⊕y]z
     laplazaIV : dᵣABD⊗1 ∘₁ (dᵣ[A⊕B]CD ∘₁ αˡABC⊗1) ≡ⁿ assocˡAD-BD-CD ∘₁ (1⊗dᵣBCD ∘₁ dᵣA[B⊕C]D)
     laplazaVI : dₗ[AB]CD ∘₁ αAB[C⊕D] ≡ⁿ αABC⊕αABD ∘₁ (dₗA[BC][BD] ∘₁ 1A⊗dₗBCD)
+    -- laplazaIX
+    laplazaX : aₗ-over 0₀ ≡ⁿ aᵣ-over 0₀
+    -- laplazaXI
+    -- laplazaXII
+   -- laplazaXIII : 
+    -- laplazaXV
+    -- laplazaXVI
+    -- laplazaXVII
+    -- laplazaXVIX
+

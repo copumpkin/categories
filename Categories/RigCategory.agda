@@ -131,6 +131,13 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   1₀ : Powerendo 0
   1₀ = h×.id↑
 
+  -- 1 variable + 0
+  A0 : Powerendo 1
+  A0 = h×.x h×.⊗ 0₀
+
+  0A : Powerendo 1
+  0A = 0₀ h×.⊗ h×.x
+
   -- 2 variables + 0
   0[A⊕B] : Powerendo 2
   0[A⊕B] = (widenʳ 2 0₀) h×.⊗₂ h⊎.x⊗y
@@ -203,6 +210,9 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     uᵣ⊗-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ (widenʳ n 1₀)) F₁
     uᵣ⊗-over F₁ = (NaturalIsomorphism.F⇒G M×.identityʳ) ∘ʳ plex {1} F₁
+
+    s⊗-over : ∀ {n} (F₁ F₂ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ F₂) (F₂ h×.⊗₂ F₁)
+    s⊗-over F₁ F₂ = (NaturalIsomorphism.F⇒G B×.braid) ∘ʳ plex {2} F₁ F₂
 
     -- these are all for 3 variables
     Bxz : NaturalTransformation x⊗z z⊗x
@@ -293,7 +303,16 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     -- a bit weird, but the widening is needed
     uˡ0 : NaturalTransformation (widenʳ 2 0⊕0) (widenʳ 2 0₀) 
     uˡ0 = uₗ⊕-over (widenʳ 2 0₀)
-   
+
+    aᵣA : NaturalTransformation A0 0↑
+    aᵣA = aᵣ-over (select 0)
+ 
+    aₗA : NaturalTransformation 0A (widenʳ 1 0₀)
+    aₗA = aₗ-over (select 0)
+
+    s⊗A0 : NaturalTransformation A0 0A
+    s⊗A0 = s⊗-over (select 0) 0↑
+
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
    {B× : Braided M×} (S× : Symmetric B×) : Set (o ⊔ ℓ ⊔ e) where
@@ -319,7 +338,7 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaX : aₗ-over 0₀ ≡ⁿ aᵣ-over 0₀
     laplazaXI : aₗ-over (h⊎.x⊗y) ≡ⁿ uˡ0 ∘₁ (aₗA⊕aₗB ∘₁ dₗ0AB)
     laplazaXIII : uᵣ⊗-over 0₀ ≡ⁿ aₗ-over 1₀
-    -- laplazaXV
+    laplazaXV : aᵣA ≡ⁿ aₗA ∘₁ s⊗A0
     -- laplazaXVI
     -- laplazaXVII
     -- laplazaXVIX

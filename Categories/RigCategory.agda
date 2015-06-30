@@ -303,7 +303,7 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
   open SRig S⊎ S× distribₗ distribᵣ annₗ annᵣ
 
   -- need II, IX, X, XV
-  -- choose I, IV, VI, XI, XIII, XIX, and (XVI, XVII)
+  -- choose I, IV, VI, XI, XIII, XIX, XXIII and (XVI, XVII)
   field
     laplazaI : dₗACB ∘₁ 1⊗Byz ≡ⁿ B[x⊗y][x⊗z] ∘₁ dₗABC
     laplazaII : Bxz⊕Byz ∘₁ dᵣABC ≡ⁿ dₗCAB ∘₁ B[x⊕y]z
@@ -312,10 +312,10 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     -- laplazaIX
     laplazaX : aₗ-over 0₀ ≡ⁿ aᵣ-over 0₀
     laplazaXI : aₗ-over (h⊎.x⊗y) ≡ⁿ uˡ0 ∘₁ (aₗA⊕aₗB ∘₁ dₗ0AB)
-    -- laplazaXII
-   -- laplazaXIII : 
+    -- laplazaXIII
     -- laplazaXV
     -- laplazaXVI
     -- laplazaXVII
     -- laplazaXVIX
+    -- laplazaXXIII
 

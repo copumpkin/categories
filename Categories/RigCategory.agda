@@ -125,6 +125,16 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0⊗0 : Powerendo 0
   0⊗0 = 0₀ h×.⊗ 0₀
 
+  0⊕0 : Powerendo 0
+  0⊕0 = 0₀ h⊎.⊗ 0₀
+
+  -- 2 variables + 0
+  0[A⊕B] : Powerendo 2
+  0[A⊕B] = (widenʳ 2 0₀) h×.⊗₂ h⊎.x⊗y
+
+  0A⊕0B : Powerendo 2
+  0A⊕0B = ( (widenʳ 2 0₀ h×.⊗₂ select 0) h⊎.⊗₂ (widenʳ 2 0₀ h×.⊗₂ select 1) )
+
   -- like Laplaza, use concatenation for ⊗ to make things easier to read
   -- also ⊗ binds more tightly, so skip those parens
 
@@ -184,6 +194,9 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     aᵣ-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ (widenʳ n 0₀)) (widenʳ n 0₀)
     aᵣ-over F₁ = aᵣ ∘ʳ plex {1} F₁ 
+
+    uₗ-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation ((widenʳ n 0₀) h⊎.⊗₂ F₁) F₁
+    uₗ-over F₁ = (NaturalIsomorphism.F⇒G M⊎.identityˡ) ∘ʳ plex {1} F₁
 
     -- these are all for 3 variables
     Bxz : NaturalTransformation x⊗z z⊗x
@@ -264,7 +277,17 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     dₗ[AB]CD : NaturalTransformation [xy][z⊕w] [xy]z⊕[xy]w
     dₗ[AB]CD = dₗ-over xy z w
-    
+ 
+    dₗ0AB : NaturalTransformation 0[A⊕B] 0A⊕0B
+    dₗ0AB = dₗ-over (widenʳ 2 0₀) (select 0) (select 1)
+
+    aₗA⊕aₗB : NaturalTransformation 0A⊕0B (widenʳ 2 0⊕0)
+    aₗA⊕aₗB = overlapN M⊎.⊗ (aₗ-over (select 0)) (aₗ-over (select 1))
+
+    -- a bit weird, but the widening is needed
+    uˡ0 : NaturalTransformation (widenʳ 2 0⊕0) (widenʳ 2 0₀) 
+    uˡ0 = uₗ-over (widenʳ 2 0₀)
+   
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
    {B× : Braided M×} (S× : Symmetric B×) : Set (o ⊔ ℓ ⊔ e) where
@@ -288,7 +311,7 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaVI : dₗ[AB]CD ∘₁ αAB[C⊕D] ≡ⁿ αABC⊕αABD ∘₁ (dₗA[BC][BD] ∘₁ 1A⊗dₗBCD)
     -- laplazaIX
     laplazaX : aₗ-over 0₀ ≡ⁿ aᵣ-over 0₀
-    -- laplazaXI
+    laplazaXI : aₗ-over (h⊎.x⊗y) ≡ⁿ uˡ0 ∘₁ (aₗA⊕aₗB ∘₁ dₗ0AB)
     -- laplazaXII
    -- laplazaXIII : 
     -- laplazaXV

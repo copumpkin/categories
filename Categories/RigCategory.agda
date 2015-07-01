@@ -115,6 +115,9 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   zw : Powerendo 4
   zw = select 2 h×.⊗₂ select 3
 
+  xz : Powerendo 4
+  xz = select 0 h×.⊗₂ select 3
+
   z⊕w : Powerendo 4
   z⊕w = widenˡ 2 h⊎.x⊗y
 
@@ -237,7 +240,61 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
   [xy]z⊕[xy]w : Powerendo 4
   [xy]z⊕[xy]w = let xy = (x h×.⊗₂ y) in (xy h×.⊗₂ z) h⊎.⊗₂ (xy h×.⊗₂ w)
-  
+
+  x⊕y : Powerendo 4
+  x⊕y = widenʳ 2 h⊎.x⊗y
+
+  x[z⊕w] : Powerendo 4
+  x[z⊕w] = x h×.⊗₂ z⊕w
+
+  y[z⊕w] : Powerendo 4
+  y[z⊕w] = y h×.⊗₂ z⊕w
+
+  xz⊕xw : Powerendo 4
+  xz⊕xw = xz h⊎.⊗₂ xw
+
+  yz⊕yw : Powerendo 4
+  yz⊕yw = yz h⊎.⊗₂ yw
+
+  xz⊕yz : Powerendo 4
+  xz⊕yz = xz h⊎.⊗₂ yz
+
+  xw⊕yw : Powerendo 4
+  xw⊕yw = xw h⊎.⊗₂ yw
+
+  [x⊕y]z : Powerendo 4
+  [x⊕y]z = x⊕y h×.⊗₂ z
+
+  [x⊕y]w : Powerendo 4
+  [x⊕y]w = x⊕y h×.⊗₂ w
+
+  [x⊕y][z⊕w] : Powerendo 4
+  [x⊕y][z⊕w] = x⊕y h×.⊗₂ z⊕w
+
+  [x⊕y]z⊕[x⊕y]w : Powerendo 4
+  [x⊕y]z⊕[x⊕y]w = [x⊕y]z h⊎.⊗₂ [x⊕y]w
+
+  [xz⊕yz]⊕[xw⊕yw] : Powerendo 4
+  [xz⊕yz]⊕[xw⊕yw] = xz⊕yz h⊎.⊗₂ xw⊕yw
+
+  [[xz⊕yz]⊕xw]⊕yw : Powerendo 4
+  [[xz⊕yz]⊕xw]⊕yw = (xz⊕yz h⊎.⊗₂ xw) h⊎.⊗₂ yw
+
+  x[z⊕w]⊕y[z⊕w] : Powerendo 4
+  x[z⊕w]⊕y[z⊕w] = x[z⊕w] h⊎.⊗₂ y[z⊕w]
+
+  [xz⊕xw]⊕[yz⊕yw] : Powerendo 4
+  [xz⊕xw]⊕[yz⊕yw] = xz⊕xw h⊎.⊗₂ yz⊕yw
+
+  [[xz⊕xw]⊕yz]⊕yw : Powerendo 4
+  [[xz⊕xw]⊕yz]⊕yw = (xz⊕xw h⊎.⊗₂ yz) h⊎.⊗₂ yw
+
+  [xz⊕[xw⊕yz]]⊗yw : Powerendo 4
+  [xz⊕[xw⊕yz]]⊗yw = (xz h⊎.⊗₂ (xw h⊎.⊗₂ yz)) h⊎.⊗₂ yw
+
+  [xz⊕[yz⊕xw]]⊕yw : Powerendo 4
+  [xz⊕[yz⊕xw]]⊕yw = (xz h⊎.⊗₂ (yz h⊎.⊗₂ xw)) h⊎.⊗₂ yw
+
   module SRig (S⊎ : Symmetric B⊎) (S× : Symmetric B×)
     (distribₗ : NaturalIsomorphism x⊗[y⊕z] [x⊗y]⊕[x⊗z])
     (distribᵣ : NaturalIsomorphism [x⊕y]⊗z [x⊗z]⊕[y⊗z])

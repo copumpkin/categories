@@ -152,23 +152,41 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0[A⊕B] : Powerendo 2
   0[A⊕B] = 0₂ h×.⊗₂ h⊎.x⊗y
 
-  0A⊕0B : Powerendo 2
-  0A⊕0B = ( (0₂ h×.⊗₂ select 0) h⊎.⊗₂ (0₂ h×.⊗₂ select 1) )
-
   0[AB] : Powerendo 2
   0[AB] = 0₀ h×.⊗ (h×.x⊗y)
 
   [0A]B : Powerendo 2
   [0A]B = 0A h×.⊗ h×.x
 
+  0A₂ : Powerendo 2
+  0A₂ = 0₂ h×.⊗₂ select 0
+
   0B : Powerendo 2
   0B = 0₂ h×.⊗₂ (select 1)
+
+  A0₂ : Powerendo 2
+  A0₂ = select 0 h×.⊗₂ 0₂
+
+  AB : Powerendo 2
+  AB = h×.x⊗y
+
+  0A⊕0B : Powerendo 2
+  0A⊕0B = 0A₂ h⊎.⊗₂ 0B
 
   A[0B] : Powerendo 2
   A[0B] = (widenʳ 1 h×.x) h×.⊗₂ 0B
 
   [A0]B : Powerendo 2
   [A0]B = A0 h×.⊗ h×.x
+
+  A[0⊕B] : Powerendo 2
+  A[0⊕B] = h×.x h×.⊗ h⊎.id⊗x
+
+  A0⊕AB : Powerendo 2
+  A0⊕AB = A0₂ h⊎.⊗₂ AB
+
+  0⊕AB : Powerendo 2
+  0⊕AB = 0₂ h⊎.⊗₂ AB
 
   -- like Laplaza, use concatenation for ⊗ to make things easier to read
   -- also ⊗ binds more tightly, so skip those parens
@@ -245,6 +263,9 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     idy₂ : NaturalTransformation y₂ y₂
     idy₂ = idⁿ 
+
+    idxy : NaturalTransformation AB AB
+    idxy = idⁿ
 
     -- these are all for 3 variables
     Bxz : NaturalTransformation x⊗z z⊗x
@@ -369,6 +390,18 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     aᵣA₂ : NaturalTransformation (widenʳ 1 A0) 0₂
     aᵣA₂ = aᵣ-over (select 0)
 
+    1A⊗uₗB : NaturalTransformation A[0⊕B] AB
+    1A⊗uₗB = overlapN M×.⊗ idx₂ (uₗ⊕-over y₂)
+
+    dₗA0B : NaturalTransformation A[0⊕B] A0⊕AB
+    dₗA0B = dₗ-over x₂ 0₂ y₂
+
+    aᵣA⊕1AB : NaturalTransformation A0⊕AB 0⊕AB
+    aᵣA⊕1AB = overlapN M⊎.⊗ (aᵣ-over x₂) idxy
+
+    uₗAB : NaturalTransformation 0⊕AB AB
+    uₗAB = uₗ⊕-over AB
+
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
    {B× : Braided M×} (S× : Symmetric B×) : Set (o ⊔ ℓ ⊔ e) where
@@ -397,6 +430,6 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaXV : aᵣA ≡ⁿ aₗA ∘₁ s⊗A0
     laplazaXVI : aₗAB ≡ⁿ aₗB ∘₁ (aₗA⊗1B ∘₁ α0AB)
     laplazaXVII : aᵣA₂ ∘₁ 1A⊗aₗB ≡ⁿ aₗB ∘₁ (aᵣA⊗1B ∘₁ αA0B)
-    -- laplazaXIX
+    laplazaXIX : 1A⊗uₗB ≡ⁿ uₗAB ∘₁ (aᵣA⊕1AB ∘₁ dₗA0B)
     -- laplazaXXIII
 

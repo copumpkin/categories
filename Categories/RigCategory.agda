@@ -188,6 +188,19 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0⊕AB : Powerendo 2
   0⊕AB = 0₂ h⊎.⊗₂ AB
 
+  -- 2 variables + 1
+  1₂ : Powerendo 2
+  1₂ = widenʳ 2 1₀
+
+  A⊕B : Powerendo 2
+  A⊕B = h⊎.x⊗y
+
+  1[A⊕B] : Powerendo 2
+  1[A⊕B] = 1₀ h×.⊗ A⊕B
+
+  1A⊕1B : Powerendo 2
+  1A⊕1B = h×.id⊗x h⊎.⊗ h×.id⊗x
+
   -- like Laplaza, use concatenation for ⊗ to make things easier to read
   -- also ⊗ binds more tightly, so skip those parens
 
@@ -250,6 +263,9 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     uₗ⊕-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation ((widenʳ n 0₀) h⊎.⊗₂ F₁) F₁
     uₗ⊕-over F₁ = (NaturalIsomorphism.F⇒G M⊎.identityˡ) ∘ʳ plex {1} F₁
+
+    uₗ⊗-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation ((widenʳ n 1₀) h×.⊗₂ F₁) F₁
+    uₗ⊗-over F₁ = (NaturalIsomorphism.F⇒G M×.identityˡ) ∘ʳ plex {1} F₁
 
     uᵣ⊗-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ (widenʳ n 1₀)) F₁
     uᵣ⊗-over F₁ = (NaturalIsomorphism.F⇒G M×.identityʳ) ∘ʳ plex {1} F₁
@@ -402,6 +418,15 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     uₗAB : NaturalTransformation 0⊕AB AB
     uₗAB = uₗ⊕-over AB
 
+    dₗ1AB : NaturalTransformation 1[A⊕B] 1A⊕1B
+    dₗ1AB = dₗ-over 1₂ x₂ y₂
+
+    uₗA⊕B : NaturalTransformation 1[A⊕B] A⊕B
+    uₗA⊕B = uₗ⊗-over h⊎.x⊗y
+
+    uₗA⊕uₗB : NaturalTransformation 1A⊕1B A⊕B
+    uₗA⊕uₗB = overlapN M⊎.⊗ (uₗ⊗-over x₂) (uₗ⊗-over y₂)
+
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
    {B× : Braided M×} (S× : Symmetric B×) : Set (o ⊔ ℓ ⊔ e) where
@@ -431,5 +456,5 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaXVI : aₗAB ≡ⁿ aₗB ∘₁ (aₗA⊗1B ∘₁ α0AB)
     laplazaXVII : aᵣA₂ ∘₁ 1A⊗aₗB ≡ⁿ aₗB ∘₁ (aᵣA⊗1B ∘₁ αA0B)
     laplazaXIX : 1A⊗uₗB ≡ⁿ uₗAB ∘₁ (aᵣA⊕1AB ∘₁ dₗA0B)
-    -- laplazaXXIII
+    laplazaXXIII : uₗA⊕B ≡ⁿ uₗA⊕uₗB ∘₁ dₗ1AB
 

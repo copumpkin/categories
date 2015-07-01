@@ -542,7 +542,9 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaII : Bxz⊕Byz ∘₁ dᵣABC ≡ⁿ dₗCAB ∘₁ B[x⊕y]z
     laplazaIV : dᵣABD⊗1 ∘₁ (dᵣ[A⊕B]CD ∘₁ αˡABC⊗1) ≡ⁿ assocˡAD-BD-CD ∘₁ (1⊗dᵣBCD ∘₁ dᵣA[B⊕C]D)
     laplazaVI : dₗ[AB]CD ∘₁ αAB[C⊕D] ≡ⁿ αABC⊕αABD ∘₁ (dₗA[BC][BD] ∘₁ 1A⊗dₗBCD)
-    -- laplazaIX
+    laplazaIX : α[AC⊕BC][AD][BD] ∘₁ (dᵣABC⊕dᵣABD ∘₁ dₗ[A⊕B]CD) ≡ⁿ
+        α[AC][BC][AD]⊕1BD ∘₁ ([1AC⊕s[AD][BC]]⊕1BD ∘₁ (α′[AC][AD][BC]⊕1BD ∘₁
+           (α[AC⊕AD][BC][BD] ∘₁ (dₗACD⊕dₗBCD ∘₁ dᵣAB[C⊕D]))))
     laplazaX : aₗ-over 0₀ ≡ⁿ aᵣ-over 0₀
     laplazaXI : aₗ-over (h⊎.x⊗y) ≡ⁿ uˡ0 ∘₁ (aₗA⊕aₗB ∘₁ dₗ0AB)
     laplazaXIII : uᵣ⊗-over 0₀ ≡ⁿ aₗ-over 1₀

@@ -118,6 +118,9 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   z⊕w : Powerendo 4
   z⊕w = widenˡ 2 h⊎.x⊗y
 
+  y₂ : Powerendo 2
+  y₂ = widenˡ 1 h×.x
+
   -- 0 variables!
   0₀ : Powerendo 0
   0₀ = h⊎.id↑
@@ -139,11 +142,23 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   0A = 0₀ h×.⊗ h×.x
 
   -- 2 variables + 0
+  0₂ : Powerendo 2
+  0₂ = widenʳ 2 0₀
+
   0[A⊕B] : Powerendo 2
-  0[A⊕B] = (widenʳ 2 0₀) h×.⊗₂ h⊎.x⊗y
+  0[A⊕B] = 0₂ h×.⊗₂ h⊎.x⊗y
 
   0A⊕0B : Powerendo 2
-  0A⊕0B = ( (widenʳ 2 0₀ h×.⊗₂ select 0) h⊎.⊗₂ (widenʳ 2 0₀ h×.⊗₂ select 1) )
+  0A⊕0B = ( (0₂ h×.⊗₂ select 0) h⊎.⊗₂ (0₂ h×.⊗₂ select 1) )
+
+  0[AB] : Powerendo 2
+  0[AB] = 0₀ h×.⊗ (h×.x⊗y)
+
+  [0A]B : Powerendo 2
+  [0A]B = 0A h×.⊗ h×.x
+
+  0B : Powerendo 2
+  0B = 0₂ h×.⊗₂ (select 1)
 
   -- like Laplaza, use concatenation for ⊗ to make things easier to read
   -- also ⊗ binds more tightly, so skip those parens
@@ -213,6 +228,10 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     s⊗-over : ∀ {n} (F₁ F₂ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ F₂) (F₂ h×.⊗₂ F₁)
     s⊗-over F₁ F₂ = (NaturalIsomorphism.F⇒G B×.braid) ∘ʳ plex {2} F₁ F₂
+
+    -- for 2 variables
+    idy₂ : NaturalTransformation y₂ y₂
+    idy₂ = idⁿ 
 
     -- these are all for 3 variables
     Bxz : NaturalTransformation x⊗z z⊗x
@@ -313,6 +332,18 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     s⊗A0 : NaturalTransformation A0 0A
     s⊗A0 = s⊗-over (select 0) 0↑
 
+    α0AB : NaturalTransformation 0[AB] [0A]B
+    α0AB = br×.α₂-over 0₂ (select 0) (select 1)
+
+    aₗA⊗1B : NaturalTransformation [0A]B 0B
+    aₗA⊗1B = overlapN M×.⊗ (aₗ-over (select 0)) idy₂
+
+    aₗAB : NaturalTransformation 0[AB] 0₂
+    aₗAB = aₗ-over h×.x⊗y
+
+    aₗB : NaturalTransformation 0B 0₂
+    aₗB = aₗ-over y₂
+
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)
    {B× : Braided M×} (S× : Symmetric B×) : Set (o ⊔ ℓ ⊔ e) where
@@ -339,7 +370,7 @@ record RigCategory {o ℓ e} {C : Category o ℓ e}
     laplazaXI : aₗ-over (h⊎.x⊗y) ≡ⁿ uˡ0 ∘₁ (aₗA⊕aₗB ∘₁ dₗ0AB)
     laplazaXIII : uᵣ⊗-over 0₀ ≡ⁿ aₗ-over 1₀
     laplazaXV : aᵣA ≡ⁿ aₗA ∘₁ s⊗A0
-    -- laplazaXVI
+    laplazaXVI : aₗAB ≡ⁿ aₗB ∘₁ (aₗA⊗1B ∘₁ α0AB)
     -- laplazaXVII
     -- laplazaXVIX
     -- laplazaXXIII

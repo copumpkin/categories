@@ -116,7 +116,7 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   zw = select 2 h×.⊗₂ select 3
 
   xz : Powerendo 4
-  xz = select 0 h×.⊗₂ select 3
+  xz = select 0 h×.⊗₂ select 2
 
   z⊕w : Powerendo 4
   z⊕w = widenˡ 2 h⊎.x⊗y
@@ -289,8 +289,8 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
   [[xz⊕xw]⊕yz]⊕yw : Powerendo 4
   [[xz⊕xw]⊕yz]⊕yw = (xz⊕xw h⊎.⊗₂ yz) h⊎.⊗₂ yw
 
-  [xz⊕[xw⊕yz]]⊗yw : Powerendo 4
-  [xz⊕[xw⊕yz]]⊗yw = (xz h⊎.⊗₂ (xw h⊎.⊗₂ yz)) h⊎.⊗₂ yw
+  [xz⊕[xw⊕yz]]⊕yw : Powerendo 4
+  [xz⊕[xw⊕yz]]⊕yw = (xz h⊎.⊗₂ (xw h⊎.⊗₂ yz)) h⊎.⊗₂ yw
 
   [xz⊕[yz⊕xw]]⊕yw : Powerendo 4
   [xz⊕[yz⊕xw]]⊕yw = (xz h⊎.⊗₂ (yz h⊎.⊗₂ xw)) h⊎.⊗₂ yw
@@ -326,6 +326,9 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     uᵣ⊗-over : ∀ {n} (F₁ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ (widenʳ n 1₀)) F₁
     uᵣ⊗-over F₁ = (NaturalIsomorphism.F⇒G M×.identityʳ) ∘ʳ plex {1} F₁
+
+    s⊕-over : ∀ {n} (F₁ F₂ : Powerendo n) → NaturalTransformation (F₁ h⊎.⊗₂ F₂) (F₂ h⊎.⊗₂ F₁)
+    s⊕-over F₁ F₂ = (NaturalIsomorphism.F⇒G B⊎.braid) ∘ʳ plex {2} F₁ F₂
 
     s⊗-over : ∀ {n} (F₁ F₂ : Powerendo n) → NaturalTransformation (F₁ h×.⊗₂ F₂) (F₂ h×.⊗₂ F₁)
     s⊗-over F₁ F₂ = (NaturalIsomorphism.F⇒G B×.braid) ∘ʳ plex {2} F₁ F₂
@@ -389,6 +392,12 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
     
     idw : NaturalTransformation w w
     idw = idⁿ
+
+    idyw : NaturalTransformation yw yw
+    idyw = idⁿ
+
+    idxz : NaturalTransformation xz xz
+    idxz = idⁿ
     
     1⊗dᵣBCD : NaturalTransformation xw⊕[y⊕z]w xw⊕[yw⊕zw]
     1⊗dᵣBCD = overlapN M⊎.⊗ id03 dᵣBCD
@@ -483,6 +492,34 @@ module BimonoidalHelperFunctors {o ℓ e} {C : Category o ℓ e}
 
     uₗA⊕uₗB : NaturalTransformation 1A⊕1B A⊕B
     uₗA⊕uₗB = overlapN M⊎.⊗ (uₗ⊗-over x₂) (uₗ⊗-over y₂)
+
+    -- the monster, aka diagram IX
+    dₗ[A⊕B]CD : NaturalTransformation [x⊕y][z⊕w] [x⊕y]z⊕[x⊕y]w
+    dₗ[A⊕B]CD = dₗ-over x⊕y z w
+
+    dᵣABC⊕dᵣABD : NaturalTransformation [x⊕y]z⊕[x⊕y]w [xz⊕yz]⊕[xw⊕yw]
+    dᵣABC⊕dᵣABD = overlapN M⊎.⊗ ( dᵣ-over x y z ) (dᵣ-over x y w)
+
+    α[AC⊕BC][AD][BD] : NaturalTransformation [xz⊕yz]⊕[xw⊕yw] [[xz⊕yz]⊕xw]⊕yw
+    α[AC⊕BC][AD][BD] = br⊎.α₂-over xz⊕yz xw yw
+
+    dᵣAB[C⊕D] : NaturalTransformation [x⊕y][z⊕w] x[z⊕w]⊕y[z⊕w]
+    dᵣAB[C⊕D] = dᵣ-over x y z⊕w
+
+    dₗACD⊕dₗBCD : NaturalTransformation x[z⊕w]⊕y[z⊕w] [xz⊕xw]⊕[yz⊕yw]
+    dₗACD⊕dₗBCD = overlapN M⊎.⊗ (dₗ-over x z w) (dₗ-over y z w)
+
+    α[AC⊕AD][BC][BD] : NaturalTransformation [xz⊕xw]⊕[yz⊕yw] [[xz⊕xw]⊕yz]⊕yw
+    α[AC⊕AD][BC][BD] = br⊎.α₂-over xz⊕xw yz yw
+
+    α′[AC][AD][BC]⊕1BD : NaturalTransformation [[xz⊕xw]⊕yz]⊕yw [xz⊕[xw⊕yz]]⊕yw
+    α′[AC][AD][BC]⊕1BD = overlapN M⊎.⊗ (br⊎.α-over xz xw yz) idyw
+
+    [1AC⊕s[AD][BC]]⊕1BD : NaturalTransformation [xz⊕[xw⊕yz]]⊕yw [xz⊕[yz⊕xw]]⊕yw
+    [1AC⊕s[AD][BC]]⊕1BD = overlapN M⊎.⊗ (overlapN M⊎.⊗ idxz (s⊕-over xw yz)) idyw
+
+    α[AC][BC][AD]⊕1BD : NaturalTransformation [xz⊕[yz⊕xw]]⊕yw [[xz⊕yz]⊕xw]⊕yw
+    α[AC][BC][AD]⊕1BD = overlapN M⊎.⊗ (br⊎.α₂-over xz yz xw) idyw
 
 record RigCategory {o ℓ e} {C : Category o ℓ e} 
   {M⊎ M× : Monoidal C} {B⊎ : Braided M⊎} (S⊎ : Symmetric B⊎)

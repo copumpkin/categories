@@ -31,5 +31,8 @@ record Braided {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) : Set (o ⊔ �
 
   field
     -- NB: Triangle is redundant, proof coming soon...
+    -- But until it does
+    .unit-coh : BTriangleLeft ≡ⁿ (BTriangleRight ∘₁ BTriangleTop)
+
     .hexagon₁ : (Hexagon1SideB ∘₁ (Hexagon1TopB ∘₁ Hexagon1TopA)) ≡ⁿ (Hexagon1BottomB ∘₁ (Hexagon1BottomA ∘₁ Hexagon1SideA))
     .hexagon₂ : (Hexagon2SideB ∘₁ (Hexagon2TopB ∘₁ Hexagon2TopA)) ≡ⁿ (Hexagon2BottomB ∘₁ (Hexagon2BottomA ∘₁ Hexagon2SideA))

@@ -172,15 +172,15 @@ private
     open _≡ⁱ_
 
 -- fake record
-module _∼ⁱ_ {A B} {i : A ≅ B} {A′ B′} {j : A′ ≅ B′} (eq : i ∼ⁱ j) where
-  open _≅_
-  open Heterogeneous C
+-- module _∼ⁱ_ {A B} {i : A ≅ B} {A′ B′} {j : A′ ≅ B′} (eq : i ∼ⁱ j) where
+--   open _≅_
+--   open Heterogeneous C
 
-  f-∼ : f i ∼ f j
-  f-∼ = f-∼′ eq
+--   f-∼ : f i ∼ f j
+--   f-∼ = f-∼′ eq
 
-  g-∼ : g i ∼ g j
-  g-∼ = g-∼′ eq
+--   g-∼ : g i ∼ g j
+--   g-∼ = g-∼′ eq
 
 
 heqⁱ : ∀ {A B} (i : A ≅ B) {A′ B′} (j : A′ ≅ B′) → let open _≅_ in let open Heterogeneous C in f i ∼ f j → g i ∼ g j → i ∼ⁱ j

@@ -8,7 +8,7 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   open Setoid S
 
   infix  4 _IsRelatedTo_
-  infix  2 _∎
+  infix  3 _∎
   infixr 2 _≈⟨_⟩_
   infixr 2 _↓⟨_⟩_
   infixr 2 _↑⟨_⟩_
@@ -53,7 +53,7 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
 
 module ≣-reasoning {ℓ} (S : Set ℓ) where
   infix  4 _IsRelatedTo_
-  infix  2 _∎
+  infix  3 _∎
   infixr 2 _≈⟨_⟩_
   infixr 2 _↓⟨_⟩_
   infixr 2 _↑⟨_⟩_

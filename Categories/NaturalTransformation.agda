@@ -5,6 +5,8 @@ open import Categories.Category
 open import Categories.Functor hiding (equiv) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Categories.NaturalTransformation.Core public
 
+infixr 9 _∘ˡ_ _∘ʳ_
+
 _∘ˡ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
      → {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
      → {F G : Functor C D} 

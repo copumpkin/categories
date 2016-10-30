@@ -74,7 +74,7 @@ zip′ : ∀ {a b c p q r}
       (_∙_ : A → B → C) →
       (∀ {x y} → P x → Q y → R (x ∙ y)) →
       Σ′ A P → Σ′ B Q → Σ′ C R
-zip′ _∙_ _∘_ (a , p) (b , q) = (a ∙ b , p ∘ q)
+zip′ _∙_ _∘_ (a , p) (b , q) = (a ∙ b) , (p ∘ q)
 
 _-×′-_ : ∀ {a b i j} {A : Set a} {B : Set b} →
         (A → B → Set i) → (A → B → Set j) → (A → B → Set _)

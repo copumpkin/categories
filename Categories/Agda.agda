@@ -61,7 +61,7 @@ Setoids c ℓ = record
   where
   infix  4 _≡′_
   open Function.Equality using (_⟨$⟩_; cong; _⟶_) renaming (_∘_ to _∘′_; id to id′)
-  open Relation.Binary using (Setoid; Rel)
+  open Relation.Binary using (Setoid; module Setoid; Rel)
 
   _≡′_ : ∀ {X Y} → Rel (X ⟶ Y) _
   _≡′_ {X} {Y} f g = ∀ {x} → Setoid._≈_ Y (f ⟨$⟩ x) (g ⟨$⟩ x)

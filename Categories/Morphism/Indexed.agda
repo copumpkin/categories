@@ -108,7 +108,7 @@ f ◽ g = record { _⟨$⟩_ = λ x → (f ‼ x) ∘ (g ‼ x)
                ; cong = λ x≈y → ∘-resp-∼ (cong₁ f x≈y) (cong₁ g x≈y) }
 
 .assoc-◽⋉ : ∀ {X Ys Zs Ws} {f : Zs ∗⇒∗ Ws} {g : Ys ∗⇒∗ Zs} {h : X ⇒∗ Ys}
-          → X ⇨∗ Ws [ _⋉_ {Ys = Ys} {Ws} (_◽_ {Ys} {Zs} {Ws} f g) h ≈ _⋉_ {Ys = Zs} {Ws} f (_⋉_ {Ys = Ys} {Zs} g h) ]
+          → (X ⇨∗ Ws) [ _⋉_ {Ys = Ys} {Ws} (_◽_ {Ys} {Zs} {Ws} f g) h ≈ _⋉_ {Ys = Zs} {Ws} f (_⋉_ {Ys = Ys} {Zs} g h) ]
 assoc-◽⋉ {Ys = Ys} {Zs} {Ws} {f = f} {g} {h} {i} {j} i≈j with Ys ! j | cong₀ Ys i≈j | Zs ! j | cong₀ Zs i≈j | Ws ! j | cong₀ Ws i≈j | f ‼ j | cong₁ f i≈j | g ‼ j | cong₁ g i≈j | h ‼ j | cong₁ h i≈j
 assoc-◽⋉ {f = f} {g} {h} {i} i≈j | ._ | ≣-refl | ._ | ≣-refl | ._ | ≣-refl | fj | ≡⇒∼ fi≡fj | gj | ≡⇒∼ gi≡gj | hj | ≡⇒∼ hi≡hj = 
   ≡⇒∼ (begin

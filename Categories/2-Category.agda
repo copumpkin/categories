@@ -17,6 +17,10 @@ open import Categories.Product using (assocʳ; πˡ; πʳ)
 
 record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
   open Terminal (Categories ℓ t e) (One {ℓ} {t} {e})
+
+  infix  4 _⇒_
+  infixr 9 _∘_
+
   field
     Obj : Set o
     _⇒_ : (A B : Obj) → Category ℓ t e
@@ -25,7 +29,7 @@ record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
   _∘_ : {A B C : Obj} {L R : Category ℓ t e} → Functor L (B ⇒ C) → Functor R (A ⇒ B) → Bifunctor L R (A ⇒ C)
   _∘_ {A} {B} {C} F G = reduce-× {D₁ = B ⇒ C} {D₂ = A ⇒ B} —∘— F G
   field
-    .assoc : ∀ {A B C D : Obj} → ((—∘— ∘ idF) ∘F assocʳ (C ⇒ D) (B ⇒ C) (A ⇒ B)) ≡F idF ∘ —∘—
+    .assoc : ∀ {A B C D : Obj} → ((—∘— ∘ idF) ∘F assocʳ (C ⇒ D) (B ⇒ C) (A ⇒ B)) ≡F (idF ∘ —∘—)
     .identityˡ : {A B : Obj} → (id {B} ∘ idF {C = A ⇒ B}) ≡F πʳ {C = ⊤} {A ⇒ B}
     .identityʳ : {A B : Obj} → (idF {C = A ⇒ B} ∘ id {A}) ≡F πˡ {C = A ⇒ B} {⊤}
 

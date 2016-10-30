@@ -398,14 +398,9 @@ record NormReasoning {o ℓ e} (C : Category o ℓ e) (o′ ℓ′ : _) : Set (s
   open C
 
   infix  4 _IsRelatedTo_
-  infix  2 _∎
-  infixr 2 _≈⟨_⟩_
-  infixr 2 _↓⟨_⟩_
-  infixr 2 _↑⟨_⟩_
-  infixr 2 _↓≡⟨_⟩_
-  infixr 2 _↑≡⟨_⟩_
-  infixr 2 _↕_
   infix  1 begin_
+  infixr 2 _≈⟨_⟩_ _↓⟨_⟩_ _↑⟨_⟩_ _↓≡⟨_⟩_ _↑≡⟨_⟩_ _↕_
+  infix  3 _∎ 
 
   data _IsRelatedTo_ {X Y} (f g : _#⇒_ X Y) : Set e where
     relTo : (f∼g : norm f ≡ norm g) → f IsRelatedTo g

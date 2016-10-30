@@ -16,6 +16,9 @@ open GlueSquares C
 
 -- Borrowed from Dan Doel's definition of products
 record Product (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
+
+  infix 10 ⟨_,_⟩
+
   field
     A×B : Obj
     π₁ : A×B ⇒ A

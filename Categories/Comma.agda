@@ -46,6 +46,7 @@ Comma {o₁}{ℓ₁}{e₁}
 
     infixr 9 _∘′_
     infix  4 _≡′_
+    infix 10 _,_,_ _,_[_]    
 
     record Obj : Set (o₁ ⊔ o₂ ⊔ ℓ₃) where
         constructor _,_,_

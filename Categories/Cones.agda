@@ -115,7 +115,7 @@ module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o
     }
     where
     open ConeMorphism κ
-    open ConeOver._≜_ F
+    open ConeOver._≜_
 
   floatˡ : ∀ {A B B′} → F [ B ≜ B′ ] → Cones F [ A , B ] → Cones F [ A , B′ ]
   floatˡ {A = A} B≜B′ κ = record 
@@ -125,7 +125,7 @@ module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o
     where
     module A = Cone A
     open ConeMorphism κ
-    open ConeOver._≜_ F B≜B′
+    open ConeOver._≜_ B≜B′
 
   floatˡ-resp-refl : ∀ {A B} (κ : Cones F [ A , B ]) → floatˡ {A} {B} (ConeOver.≜-refl F) κ ≣ κ
   floatˡ-resp-refl f = ≣-refl
@@ -134,7 +134,7 @@ module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o
   floatˡ-resp-trans {A} {B} {B′} {B″} B≜B′ B′≜B″ κ = morphism-determines-cone-morphism-≣ {A} {B″} {floatˡ {A} {B} {B″} (ConeOver.≜-trans F B≜B′ B′≜B″) κ} {floatˡ {A} {B′} {B″} B′≜B″ (floatˡ {A} {B} {B′} B≜B′ κ)} (H.floatˡ-resp-trans (N-≣ B≜B′) (N-≣ B′≜B″) f)
     where
     module A = Cone A
-    open ConeOver._≜_ F
+    open ConeOver._≜_
     open ConeMorphism κ
 
   floatʳ : ∀ {A A′ B} → F [ A ≜ A′ ] → Cones F [ A , B ] → Cones F [ A′ , B ]
@@ -145,12 +145,12 @@ module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o
     where
     module B = Cone B
     open ConeMorphism κ
-    open ConeOver._≜_ F A≜A′
+    open ConeOver._≜_ A≜A′
 
   float₂-breakdown-lr : ∀ {A A′ B B′ : Cone F} (A≜A′ : F [ A ≜ A′ ]) (B≜B′ : F [ B ≜ B′ ]) (κ : Cones F [ A , B ]) → float₂ A≜A′ B≜B′ κ ≣ floatˡ B≜B′ (floatʳ A≜A′ κ)
   float₂-breakdown-lr {A′ = A′} {B′ = B′} A≜A′ B≜B′ κ = morphism-determines-cone-morphism-≣ {A = A′} {B′} {float₂ A≜A′ B≜B′ κ} {floatˡ B≜B′ (floatʳ A≜A′ κ)} (H.float₂-breakdown-lr (N-≣ A≜A′) (N-≣ B≜B′) (ConeMorphism.f κ))
-    where open ConeOver._≜_ F
+    where open ConeOver._≜_
 
   float₂-breakdown-rl : ∀ {A A′ B B′ : Cone F} (A≜A′ : F [ A ≜ A′ ]) (B≜B′ : F [ B ≜ B′ ]) (κ : Cones F [ A , B ]) → float₂ A≜A′ B≜B′ κ ≣ floatʳ A≜A′ (floatˡ B≜B′ κ)
   float₂-breakdown-rl {A′ = A′} {B′ = B′} A≜A′ B≜B′ κ = morphism-determines-cone-morphism-≣ {A = A′} {B′} {float₂ A≜A′ B≜B′ κ} {floatʳ A≜A′ (floatˡ B≜B′ κ)} (H.float₂-breakdown-rl (N-≣ A≜A′) (N-≣ B≜B′) (ConeMorphism.f κ))
-    where open ConeOver._≜_ F
+    where open ConeOver._≜_

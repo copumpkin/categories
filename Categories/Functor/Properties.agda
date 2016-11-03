@@ -35,7 +35,7 @@ module FunctorsAlways {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Cat
              ∎
     }
     where
-    module I = Morphisms.Iso C I
+    module I = Morphisms.Iso I
     open D.HomReasoning
 
   resp-≅ : F₀ Preserves Morphisms._≅_ C ⟶ Morphisms._≅_ D
@@ -45,4 +45,4 @@ module FunctorsAlways {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Cat
     ; iso = resp-Iso I.iso
     }
     where
-    module I = Morphisms._≅_ C I
+    module I = Morphisms._≅_ I

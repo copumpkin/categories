@@ -47,7 +47,7 @@ equiv {C = C} {D} = record
       ; isoʳ = D.identityˡ
       }
     }
-  ; sym = λ X → let module X Z = Morphisms.Iso D (NaturalIsomorphism.iso X Z) in record
+  ; sym = λ X → let module X Z = Morphisms.Iso (NaturalIsomorphism.iso X Z) in record
     { F⇒G = NaturalIsomorphism.F⇐G X
     ; F⇐G = NaturalIsomorphism.F⇒G X
     ; iso = λ Y → record 
@@ -80,8 +80,8 @@ equiv {C = C} {D} = record
       where
       open NaturalIsomorphism
       open NaturalTransformation
-      module Y Z = Morphisms.Iso D (iso Y Z)
-      module X Z = Morphisms.Iso D (iso X Z)
+      module Y Z = Morphisms.Iso (iso Y Z)
+      module X Z = Morphisms.Iso (iso X Z)
 
       isoˡ′ : (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ≡ D.id
       isoˡ′ = begin

@@ -16,7 +16,7 @@ open import Categories.Bifunctor using (Bifunctor; reduce-×)
 open import Categories.Product using (assocʳ; πˡ; πʳ)
 
 record 2-Category (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
-  open Terminal (Categories ℓ t e) (One {ℓ} {t} {e})
+  open Terminal (One {ℓ} {t} {e})
 
   infix  4 _⇒_
   infixr 9 _∘_

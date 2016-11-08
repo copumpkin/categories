@@ -149,6 +149,7 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
   module η = NaturalIsomorphism η
   module K = Functor K
 
+{- -- comment this out for now, as it is not crucial for other ongoing work
 ≡→iso : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → F ≡F G → NaturalIsomorphism F G
 ≡→iso {C = C} {D} F G F≡G =
   record
@@ -209,3 +210,4 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
     module F = Functor F
     module G = Functor G
   my-iso F G F≡G G≡F x | _ | ._ | _ | _ | ≡⇒∼ _ | ≡⇒∼ _ = D.identityʳ
+-}

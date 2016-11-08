@@ -20,7 +20,7 @@ record ConeMorphism {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Cat
     .commute : ∀ {X} → c₁.ψ X ≡ c₂.ψ X ∘ f
 
 Cones : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) → Category (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′) (ℓ ⊔ e ⊔ o′ ⊔ ℓ′) e
-Cones {C = C} F = record 
+Cones {C = C} F = record
   { Obj = Obj′
   ; _⇒_ = Hom′
   ; _≡_ = _≡′_
@@ -29,7 +29,7 @@ Cones {C = C} F = record
   ; assoc = assoc
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
-  ; equiv = record 
+  ; equiv = record
     { refl = Equiv.refl
     ; sym = Equiv.sym
     ; trans = Equiv.trans
@@ -54,13 +54,13 @@ Cones {C = C} F = record
   F ≡′ G = f F ≡ f G
 
   _∘′_ : ∀ {A B C} → Hom′ B C → Hom′ A B → Hom′ A C
-  _∘′_ {A} {B} {C} F G = record 
+  _∘′_ {A} {B} {C} F G = record
     { f = f F ∘ f G
     ; commute = commute′
     }
     where
     .commute′ : ∀ {X} → ψ A X ≡ ψ C X ∘ (f F ∘ f G)
-    commute′ {X} = 
+    commute′ {X} =
         begin
           ψ A X
         ↓⟨ ConeMorphism.commute G ⟩
@@ -109,7 +109,7 @@ module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o
   morphism-determines-cone-morphism-≣ {A} {B} {m} {m′} pf = lemma₁ A B pf (ConeMorphism.commute m) (ConeMorphism.commute m′)
 
   float₂ : ∀ {A A′ B B′} → F [ A ≜ A′ ] → F [ B ≜ B′ ] → Cones F [ A , B ] → Cones F [ A′ , B′ ]
-  float₂ A≜A′ B≜B′ κ = record 
+  float₂ A≜A′ B≜B′ κ = record
     { f = H.float₂ (N-≣ A≜A′) (N-≣ B≜B′) f
     ; commute = λ {j} → ∼⇒≡ (trans (sym (ψ-≡ A≜A′ j)) (trans (≡⇒∼ commute) (∘-resp-∼ (ψ-≡ B≜B′ j) (float₂-resp-∼ (N-≣ A≜A′) (N-≣ B≜B′)))))
     }
@@ -118,7 +118,7 @@ module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o
     open ConeOver._≜_
 
   floatˡ : ∀ {A B B′} → F [ B ≜ B′ ] → Cones F [ A , B ] → Cones F [ A , B′ ]
-  floatˡ {A = A} B≜B′ κ = record 
+  floatˡ {A = A} B≜B′ κ = record
     { f = H.floatˡ N-≣ f
     ; commute = λ {j} → C.Equiv.trans commute (∼⇒≡ (∘-resp-∼ (ψ-≡ j) (floatˡ-resp-∼ N-≣)))
     }
@@ -138,7 +138,7 @@ module Float {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o
     open ConeMorphism κ
 
   floatʳ : ∀ {A A′ B} → F [ A ≜ A′ ] → Cones F [ A , B ] → Cones F [ A′ , B ]
-  floatʳ {B = B} A≜A′ κ = record 
+  floatʳ {B = B} A≜A′ κ = record
     { f = ≣-subst (λ X → C [ X , B.N ]) N-≣ f
     ; commute = λ {j} → ∼⇒≡ (trans (sym (ψ-≡ j)) (trans (≡⇒∼ commute) (∘-resp-∼ʳ (floatʳ-resp-∼ N-≣))))
     }

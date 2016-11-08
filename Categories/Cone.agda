@@ -35,7 +35,7 @@ module ConeOver {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
       { N-≣ = ≣-sym X≜Y.N-≣
       ; ψ-≡ = λ j → sym (X≜Y.ψ-≡ j)
       }
-    ; trans = λ X≜Y Y≜Z → 
+    ; trans = λ X≜Y Y≜Z →
       let module X≜Y = _≜_ X≜Y in
       let module Y≜Z = _≜_ Y≜Z in
       record
@@ -79,7 +79,7 @@ module ConeOver {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
     ; sym = λ X≜′Y → let module X≜′Y = _≜′_ X≜′Y in record
       { ψ′-≡ = λ j → Equiv.sym (X≜′Y.ψ′-≡ j)
       }
-    ; trans = λ X≜′Y Y≜′Z → 
+    ; trans = λ X≜′Y Y≜′Z →
       let module X≜′Y = _≜′_ X≜′Y in
       let module Y≜′Z = _≜′_ Y≜′Z in
       record { ψ′-≡ = λ j → Equiv.trans (X≜′Y.ψ′-≡ j) (Y≜′Z.ψ′-≡ j) }

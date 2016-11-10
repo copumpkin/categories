@@ -47,7 +47,7 @@ equiv {C = C} {D} = record
       ; isoʳ = D.identityˡ
       }
     }
-  ; sym = λ X → let module X Z = Morphisms.Iso D (NaturalIsomorphism.iso X Z) in record
+  ; sym = λ X → let module X Z = Morphisms.Iso (NaturalIsomorphism.iso X Z) in record
     { F⇒G = NaturalIsomorphism.F⇐G X
     ; F⇐G = NaturalIsomorphism.F⇒G X
     ; iso = λ Y → record 
@@ -80,8 +80,8 @@ equiv {C = C} {D} = record
       where
       open NaturalIsomorphism
       open NaturalTransformation
-      module Y Z = Morphisms.Iso D (iso Y Z)
-      module X Z = Morphisms.Iso D (iso X Z)
+      module Y Z = Morphisms.Iso (iso Y Z)
+      module X Z = Morphisms.Iso (iso X Z)
 
       isoˡ′ : (η (F⇐G X) Z ∘ η (F⇐G Y) Z) ∘ (η (F⇒G Y) Z ∘ η (F⇒G X) Z) ≡ D.id
       isoˡ′ = begin
@@ -149,6 +149,7 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
   module η = NaturalIsomorphism η
   module K = Functor K
 
+{- -- comment this out for now, as it is not crucial for other ongoing work
 ≡→iso : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → F ≡F G → NaturalIsomorphism F G
 ≡→iso {C = C} {D} F G F≡G =
   record
@@ -209,3 +210,4 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
     module F = Functor F
     module G = Functor G
   my-iso F G F≡G G≡F x | _ | ._ | _ | _ | ≡⇒∼ _ | ≡⇒∼ _ = D.identityʳ
+-}

@@ -69,8 +69,8 @@ record Exponential (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     where
     open HomReasoning
     open Equiv
-    p₁ = product
     subst-commutes =
+      let p₁ = product in
       begin
           eval ∘ [ p₂ ⇒ p₁ ]first (λg p₃ f ∘ g)
         ↑⟨ refl ⟩∘⟨ [ p₂ ⇒ p₃ ⇒ p₁ ]first∘first ⟩
@@ -134,10 +134,10 @@ open Morphisms C
   open Equiv
   module e₁ = Exponential e₁
   module e₂ = Exponential e₂
-  p₁ = e₁.product
-  p₂ = e₂.product
   
   eval∘second∘first =
+    let p₁ = e₁.product in
+    let p₂ = e₂.product in
     begin
       ([ e₂ ]eval ∘ [ p₅ ⇒ Exponential.product e₂ ]second f) ∘ [ p₃ ⇒ p₅ ]first ([ e₂ ]λ p₄ g)
     ↓⟨ assoc ⟩
@@ -165,7 +165,9 @@ repack e₁ e₂ = e₂.λg e₁.product e₁.eval
 repack≡id e = Exponential.η-id e
 
 .repack∘ : ∀{A B} (e₁ e₂ e₃ : Exponential A B) → repack e₂ e₃ ∘ repack e₁ e₂ ≡ repack e₁ e₃
-repack∘ {A} {B} e₁ e₂ e₃ = 
+repack∘ {A} {B} e₁ e₂ e₃ =
+  let p₁ = product e₁ in
+  let p₂ = product e₂ in
   begin
       [ e₃ ]λ p₂ [ e₂ ]eval
     ∘ [ e₂ ]λ p₁ [ e₁ ]eval
@@ -182,8 +184,6 @@ repack∘ {A} {B} e₁ e₂ e₃ =
     open Exponential
     open HomReasoning
     open GlueSquares C
-    p₁ = product e₁
-    p₂ = product e₂
 
 .repack-cancel : ∀{A B} (e₁ e₂ : Exponential A B) → repack e₁ e₂ ∘ repack e₂ e₁ ≡ id
 repack-cancel e₁ e₂ = Equiv.trans (repack∘ e₂ e₁ e₂) (repack≡id e₂)

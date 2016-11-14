@@ -19,7 +19,7 @@ C [ P ][ O ×-] = record
   open Category C
   open Equiv
   open Product C
-  open BinaryProducts.BinaryProducts C P
+  open BinaryProducts.BinaryProducts P
 
   .identity′ : {A : Obj} → ⟨ π₁ , id ∘ π₂ ⟩ ≡ id
   identity′ = 
@@ -59,7 +59,7 @@ C [ P ][-× O ] = record
   open Category C
   open Equiv
   open Product C
-  open BinaryProducts.BinaryProducts C P
+  open BinaryProducts.BinaryProducts P
 
   .identity′ : {A : Obj} → ⟨ id ∘ π₁ , π₂ ⟩ ≡ id
   identity′ = 

@@ -18,7 +18,7 @@ opⁱ {C = C} A≅B = record
   ; iso = record { isoˡ = A≅B.isoʳ; isoʳ = A≅B.isoˡ }
   }
   where
-  module A≅B = _≅_ C A≅B
+  module A≅B = Categories.Morphisms._≅_ A≅B
 
 opF : ∀ {o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} {A : Category o₁ ℓ₁ e₁} {B : Category o₂ ℓ₂ e₂} -> 
     (Functor (Category.op (Functors (Category.op A) (Category.op B))) (Functors A B))

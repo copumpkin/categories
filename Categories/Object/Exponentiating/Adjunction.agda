@@ -10,8 +10,8 @@ module Categories.Object.Exponentiating.Adjunction {o ℓ e}
     (exponentiating : Exponentiating C binary Σ) where
 
 open Category C
-open BinaryProducts C binary
-open Exponentiating C binary exponentiating
+open BinaryProducts binary
+open Exponentiating exponentiating
 
 import Categories.Object.Product
 open Categories.Object.Product C

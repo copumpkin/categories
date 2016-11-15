@@ -18,7 +18,7 @@ record SubobjectClassifier : Set (o ⊔ ℓ ⊔ e) where
     χ : ∀ {U X} → (j : U ⇒ X) → (X ⇒ Ω)
     terminal : Terminal C
 
-  open Terminal C terminal
+  open Terminal terminal
 
   field
     ⊤⇒Ω : ⊤ ⇒ Ω

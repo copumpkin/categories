@@ -155,7 +155,7 @@ yoneda-iso C c d = record { f = ⇒.η X; g = ⇐.η X;
                             iso = iso X } 
   where
     open NaturalIsomorphism (yoneda C)
-    module iso F,c = Mor.Iso (ISetoids _ _) (iso F,c)
+    module iso F,c = Mor.Iso (iso F,c)
     X = ((Embed.F₀ C d) , c)
 
 
@@ -172,7 +172,7 @@ yoneda-inj C c d ηiso = record { f = ⇒.η c ⟨$⟩ C.id; g = ⇐.η d ⟨$�
     open C.HomReasoning
     module Lemma (c d : C.Obj) (ηiso : NaturalIsomorphism (Embed.F₀ C c) (Embed.F₀ C d)) where
       open NaturalIsomorphism ηiso 
-      module iso c = Mor.Iso _ (iso c)
+      module iso c = Mor.Iso (iso c)
       .lemma : (⇐.η d ⟨$⟩ C.id) C.∘ (⇒.η c ⟨$⟩ C.id) C.≡ C.id
       lemma = begin
                 (⇐.η d ⟨$⟩ C.id) C.∘ (⇒.η c ⟨$⟩ C.id) 

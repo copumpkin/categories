@@ -64,6 +64,16 @@ Dom {C = C} F = record {
   where
    open Category C
 
+-- because we want the following function to reduce all the time, define it globally
+private
+  module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} (F : Functor C (Categories o′ ℓ′ e′)) where
+    private
+      module C = Category C
+      module F = Functor F
+      module Cat = Category (Categories o′ ℓ′ e′)
+    
+    ∘-eq : ∀ {cx xx cy cz} -> (f : cy C.⇒ cz) (g : cx C.⇒ cy) -> Functor.F₀ (F.F₁ f Cat.∘ F.F₁ g) xx ≣ Functor.F₀ (F.F₁ (f C.∘ g)) xx
+    ∘-eq {cx} {xx} {cy} {cz} f g = ≣-relevant (≣-sym (≡⇒≣ (F.F₁ (f C.∘ g)) (F.F₁ f Cat.∘ F.F₁ g) (F.homomorphism {f = g} {g = f}) xx))
 
 Grothendieck : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} → Functor C (Categories o′ ℓ′ e′) → Category _ _ _
 Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record 
@@ -107,11 +117,8 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
   _≡′_ : ∀ {X Y} → Rel (Hom′ X Y) _
   _≡′_ {c₁ , x₁} {c₂ , x₂} (f , α) (g , β) = f ≡ g × α Het.∼ β
 
-  ∘-eq : ∀ {cx xx cy cz} -> (f : cy ⇒ cz) (g : cx ⇒ cy) -> Functor.F₀ (F₁ f Cat.∘ F₁ g) xx ≣ Functor.F₀ (F₁ (f ∘ g)) xx
-  ∘-eq {cx} {xx} {cy} {cz} f g = ≣-relevant (≣-sym (≡⇒≣ (F₁ (f ∘ g)) (F₁ f Cat.∘ F₁ g) (homomorphism {f = g} {g = f}) xx))
-
   _∘′_ : ∀ {X Y Z} → Hom′ Y Z → Hom′ X Y → Hom′ X Z
-  _∘′_ {cx , xx} {Y} {cz , xz} (f , α) (g , β) = (f ∘ g) , α Fc.∘ Cong.coerce (∘-eq f g) ≣-refl (Functor.F₁ (F₁ f) β)
+  _∘′_ {cx , xx} {Y} {cz , xz} (f , α) (g , β) = (f ∘ g) , α Fc.∘ Cong.coerce (∘-eq F f g) ≣-refl (Functor.F₁ (F₁ f) β)
 
   id-eq : ∀ {c x} -> Functor.F₀ (Cat.id {F₀ c}) x ≣ Functor.F₀ (F₁ id) x
   id-eq {c} {x} = ≣-relevant (≣-sym (≡⇒≣ (F₁ id) Cat.id (identity {c}) x))
@@ -125,7 +132,7 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
 
   .identityˡ′ : {A B : Obj′} {f : Hom′ A B} → (id′ ∘′ f) ≡′ f
   identityˡ′ {ca , xa} {cb , xb} {f , α} = identityˡ , (begin
-    ▹ coe id-eq ≣-refl Fc.id Fc.∘ coe (∘-eq id f) ≣-refl (Functor.F₁ (F₁ id) α)
+    ▹ coe id-eq ≣-refl Fc.id Fc.∘ coe (∘-eq F id f) ≣-refl (Functor.F₁ (F₁ id) α)
       ↓⟨ Het.∘-resp-∼ (Het.sym (Het.coerce-resp-∼ id-eq ≣-refl)) F₁id[α]~α ⟩
     ▹ Fc.id Fc.∘ α 
       ↓⟨ Het.≡⇒∼ ≣-refl ≣-refl Fc.identityˡ ⟩
@@ -133,10 +140,10 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
       ∎)
    where
     open Het.HetReasoning
-    F₁id[α]~α : coe (∘-eq id f) ≣-refl (Functor.F₁ (F₁ id) α) Het.∼ α
+    F₁id[α]~α : coe (∘-eq F id f) ≣-refl (Functor.F₁ (F₁ id) α) Het.∼ α
     F₁id[α]~α = begin 
-      ▹ coe (∘-eq id f) ≣-refl (Functor.F₁ (F₁ id) α) 
-        ↑⟨ Het.coerce-resp-∼ (∘-eq id f) ≣-refl ⟩ 
+      ▹ coe (∘-eq F id f) ≣-refl (Functor.F₁ (F₁ id) α) 
+        ↑⟨ Het.coerce-resp-∼ (∘-eq F id f) ≣-refl ⟩ 
       ▹ Functor.F₁ (F₁ id) α 
         ↓⟨ OHet.ohet⇒het (identity α) ⟩ 
       ▹ α 
@@ -144,7 +151,7 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
 
   .identityʳ′ : {A B : Obj′} {f : Hom′ A B} → (f ∘′ id′) ≡′ f
   identityʳ′ {ca , xa} {cb , xb} {f , α} = identityʳ , (begin 
-    ▹ α Fc.∘ coe (∘-eq f id) ≣-refl (Functor.F₁ (F₁ f) (coe id-eq ≣-refl Fc.id))
+    ▹ α Fc.∘ coe (∘-eq F f id) ≣-refl (Functor.F₁ (F₁ f) (coe id-eq ≣-refl Fc.id))
        ↓⟨ Het.∘-resp-∼ʳ F₁f[id]~id ⟩ 
     ▹ α Fc.∘ Fc.id
        ↓⟨ Het.≡⇒∼ ≣-refl ≣-refl Fc.identityʳ ⟩ 
@@ -152,10 +159,10 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
        ∎)
    where
     open Het.HetReasoning
-    F₁f[id]~id : coe (∘-eq f id) ≣-refl (Functor.F₁ (F₁ f) (coe id-eq ≣-refl Fc.id)) Het.∼ Fc.id
+    F₁f[id]~id : coe (∘-eq F f id) ≣-refl (Functor.F₁ (F₁ f) (coe id-eq ≣-refl Fc.id)) Het.∼ Fc.id
     F₁f[id]~id = begin 
-      ▹ coe (∘-eq f id) ≣-refl (Functor.F₁ (F₁ f) (coe id-eq ≣-refl Fc.id))
-        ↑⟨ Het.coerce-resp-∼ (∘-eq f id) ≣-refl ⟩ 
+      ▹ coe (∘-eq F f id) ≣-refl (Functor.F₁ (F₁ f) (coe id-eq ≣-refl Fc.id))
+        ↑⟨ Het.coerce-resp-∼ (∘-eq F f id) ≣-refl ⟩ 
       ▹ Functor.F₁ (F₁ f) (coe id-eq ≣-refl Fc.id)
         ↓⟨ F-resp-∼ (F₁ f) (Het.sym (Het.coerce-resp-∼ id-eq ≣-refl)) ⟩
       ▹ Functor.F₁ (F₁ f) (Category.id (F₀ ca)) 
@@ -171,42 +178,39 @@ Grothendieck {o′ = o′} {ℓ′} {e′} {C = C} F = record
     open Het.HetReasoning
     eq : Functor.F₀ (F₁ ((h ∘ g) ∘ f)) xa ≣ Functor.F₀ (F₁ (h ∘ g ∘ f)) xa
     eq = ≡⇒≣ (F₁ ((h ∘ g) ∘ f)) (F₁ (h ∘ g ∘ f)) (F-resp-≡ (assoc {f = f})) xa
-    eq0 = ∘-eq h g
-    eq1 = ∘-eq (h ∘ g) f
-    eq2 = ∘-eq h (g ∘ f)
-    eq3 = ∘-eq g f
-    F₁h[β]∘F₁h∘g[α]~F₁h[β∘F₁g[α]] : (coe eq0 ≣-refl (Functor.F₁ (F₁ h) β) Fc.∘ coe eq1 ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α))
-                                     Het.∼ (coe eq2 ≣-refl (Functor.F₁ (F₁ h) (proj₂ ((g , β) ∘′ (f , α)))))
+
+    F₁h[β]∘F₁h∘g[α]~F₁h[β∘F₁g[α]] : (coe (∘-eq F h g) ≣-refl (Functor.F₁ (F₁ h) β) Fc.∘ coe (∘-eq F (h ∘ g) f) ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α))
+                                     Het.∼ (coe (∘-eq F h (g ∘ f)) ≣-refl (Functor.F₁ (F₁ h) (proj₂ ((g , β) ∘′ (f , α)))))
     F₁h[β]∘F₁h∘g[α]~F₁h[β∘F₁g[α]] = Het.sym (begin 
-      ▹ coe eq2 ≣-refl (Functor.F₁ (F₁ h) (β Fc.∘ coe(∘-eq g f) ≣-refl (Functor.F₁ (F₁ g) α)))
-        ↑⟨ Het.coerce-resp-∼ eq2 ≣-refl ⟩
-      ▹ Functor.F₁ (F₁ h) (β Fc.∘ coe (∘-eq g f) ≣-refl (Functor.F₁ (F₁ g) α))
+      ▹ coe (∘-eq F h (g ∘ f)) ≣-refl (Functor.F₁ (F₁ h) (β Fc.∘ coe(∘-eq F g f) ≣-refl (Functor.F₁ (F₁ g) α)))
+        ↑⟨ Het.coerce-resp-∼ (∘-eq F h (g ∘ f)) ≣-refl ⟩
+      ▹ Functor.F₁ (F₁ h) (β Fc.∘ coe (∘-eq F g f) ≣-refl (Functor.F₁ (F₁ g) α))
         ↓⟨ Het.≡⇒∼ ≣-refl ≣-refl (Functor.homomorphism (F₁ h)) ⟩
-      ▹ Functor.F₁ (F₁ h) β Fc.∘ (Functor.F₁ (F₁ h) (coe (∘-eq g f) ≣-refl (Functor.F₁ (F₁ g) α)))
-        ↓⟨ Het.∘-resp-∼ (Het.coerce-resp-∼ eq0 ≣-refl) F₁h[β]~F₁h∘g[α] ⟩
-      ▹ coe eq0 ≣-refl (Functor.F₁ (F₁ h) β) Fc.∘ coe eq1 ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α)
+      ▹ Functor.F₁ (F₁ h) β Fc.∘ (Functor.F₁ (F₁ h) (coe (∘-eq F g f) ≣-refl (Functor.F₁ (F₁ g) α)))
+        ↓⟨ Het.∘-resp-∼ (Het.coerce-resp-∼ (∘-eq F h g) ≣-refl) F₁h[β]~F₁h∘g[α] ⟩
+      ▹ coe (∘-eq F h g) ≣-refl (Functor.F₁ (F₁ h) β) Fc.∘ coe (∘-eq F (h ∘ g) f) ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α)
         ∎)
      where
-      F₁h[β]~F₁h∘g[α] : (Functor.F₁ (F₁ h) (coe (∘-eq g f) ≣-refl (Functor.F₁ (F₁ g) α))) Het.∼ coe eq1 ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α)
+      F₁h[β]~F₁h∘g[α] : (Functor.F₁ (F₁ h) (coe (∘-eq F g f) ≣-refl (Functor.F₁ (F₁ g) α))) Het.∼ coe (∘-eq F (h ∘ g) f) ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α)
       F₁h[β]~F₁h∘g[α] = begin
-        ▹ Functor.F₁ (F₁ h) (coe (∘-eq g f) ≣-refl (Functor.F₁ (F₁ g) α))
-          ↓⟨ F-resp-∼ (F₁ h) (Het.sym (Het.coerce-resp-∼ eq3 ≣-refl)) ⟩ 
+        ▹ Functor.F₁ (F₁ h) (coe (∘-eq F g f) ≣-refl (Functor.F₁ (F₁ g) α))
+          ↓⟨ F-resp-∼ (F₁ h) (Het.sym (Het.coerce-resp-∼ (∘-eq F g f) ≣-refl)) ⟩ 
         ▹ Functor.F₁ (F₁ h) (Functor.F₁ (F₁ g) α)
           ↑⟨ OHet.ohet⇒het (homomorphism α) ⟩ 
         ▹ Functor.F₁ (F₁ (h ∘ g)) α 
-          ↓⟨ Het.coerce-resp-∼ eq1 ≣-refl ⟩ 
-        ▹ coe eq1 ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α) 
+          ↓⟨ Het.coerce-resp-∼ (∘-eq F (h ∘ g) f) ≣-refl ⟩ 
+        ▹ coe (∘-eq F (h ∘ g) f) ≣-refl (Functor.F₁ (F₁ (h ∘ g)) α) 
           ∎
 
   .∘-resp-≡′ : {A B C₁ : Obj′} {f h : Hom′ B C₁} {g i : Hom′ A B} →
                      f ≡′ h → g ≡′ i → (f ∘′ g) ≡′ (h ∘′ i)
   ∘-resp-≡′ {a , ax} {b , bx} {c , cx} {f = f , α} {h , η} {g , γ} {i , ι} (f≡h , α~η) (g≡i , γ~ι) = ∘-resp-≡ f≡h g≡i , Het.∘-resp-∼ α~η 
     (begin 
-     ▹ coe (∘-eq f g) ≣-refl (Functor.F₁ (F₁ f) γ) ↑⟨ Het.coerce-resp-∼ (∘-eq f g) ≣-refl ⟩
-     ▹ Functor.F₁ (F₁ f) γ                         ↓⟨ OHet.ohet⇒het (F-resp-≡ f≡h γ) ⟩
-     ▹ Functor.F₁ (F₁ h) γ                         ↓⟨ F-resp-∼ (F₁ h) γ~ι ⟩
-     ▹ Functor.F₁ (F₁ h) ι                         ↓⟨ Het.coerce-resp-∼ (∘-eq h i) ≣-refl ⟩
-     ▹ coe (∘-eq h i) ≣-refl (Functor.F₁ (F₁ h) ι) ∎)
+     ▹ coe (∘-eq F f g) ≣-refl (Functor.F₁ (F₁ f) γ) ↑⟨ Het.coerce-resp-∼ (∘-eq F f g) ≣-refl ⟩
+     ▹ Functor.F₁ (F₁ f) γ                           ↓⟨ OHet.ohet⇒het (F-resp-≡ f≡h γ) ⟩
+     ▹ Functor.F₁ (F₁ h) γ                           ↓⟨ F-resp-∼ (F₁ h) γ~ι ⟩
+     ▹ Functor.F₁ (F₁ h) ι                           ↓⟨ Het.coerce-resp-∼ (∘-eq F h i) ≣-refl ⟩
+     ▹ coe (∘-eq F h i) ≣-refl (Functor.F₁ (F₁ h) ι) ∎)
    where
     open Het.HetReasoning
 
@@ -232,7 +236,7 @@ inGr {C = C} F c = record {
                                                                  (Het.trans
                                                                   (Het.trans (Het.coerce-resp-∼ GrF.id-eq ≣-refl)
                                                                    (Het.sym (GrF.OHet.ohet⇒het (F.identity _))))
-                                                                  (Het.coerce-resp-∼ (GrF.∘-eq C.id C.id) ≣-refl)));
+                                                                  (Het.coerce-resp-∼ (∘-eq F C.id C.id) ≣-refl)));
                      F-resp-≡ = λ x → C.Equiv.refl , (Het.trans (Het.trans (Het.sym (Het.coerce-resp-∼ GrF.id-eq ≣-refl)) 
                               (Heterogeneous.≡⇒∼ ≣-refl ≣-refl x)) (Het.coerce-resp-∼ GrF.id-eq ≣-refl)) }
   where

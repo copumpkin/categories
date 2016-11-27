@@ -8,7 +8,7 @@ open import Relation.Binary using (IsEquivalence)
 open import Categories.Support.PropositionalEquality
 open import Categories.Support.Equivalence
 open import Categories.Category
-open import Categories.Functor hiding (id; equiv) renaming (_∘_ to _∘F_; _≡_ to _≡F_)
+open import Categories.Functor hiding (id) renaming (_∘_ to _∘F_; _≡_ to _≡F_; equiv to equivF)
 open import Categories.NaturalTransformation.Core hiding (_≡_; equiv; setoid)
 open import Categories.NaturalTransformation using (_∘ˡ_; _∘ʳ_)
 import Categories.Morphisms as Morphisms
@@ -149,44 +149,33 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
   module η = NaturalIsomorphism η
   module K = Functor K
 
-{- -- comment this out for now, as it is not crucial for other ongoing work
-≡→iso : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → F ≡F G → NaturalIsomorphism F G
-≡→iso {C = C} {D} F G F≡G =
-  record
-  { F⇒G = oneway F G F≡G
-  ; F⇐G = oneway G F (my-sym F G F≡G)
-  ; iso = λ X → record
-    { isoˡ = my-iso G F (my-sym F G F≡G) F≡G X
-    ; isoʳ = my-iso F G F≡G (my-sym F G F≡G) X
-    }
-  }
-  where
-  module C = Category C
-  module D = Category D
-  _©_ : ∀ {F G : Functor C D} → NaturalTransformation F G → (x : C.Obj) → D [ Functor.F₀ F x , Functor.F₀ G x ]
+-- try ≡→iso again, but via first de-embedding some helpers, as that seems to make things
+-- go 'weird' in combination with irrelevance
+private
+  _©_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} →
+       NaturalTransformation F G → (x : Category.Obj C) → D [ Functor.F₀ F x , Functor.F₀ G x ]
   _©_ = NaturalTransformation.η
+  
+  my-sym : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → F ≡F G → G ≡F F
+  my-sym {D = D} _ _ F≡G X = Heterogeneous.sym D (F≡G X)
 
-  my-sym : (F G : Functor C D) → F ≡F G → G ≡F F
-  my-sym _ _ F≡G X = Heterogeneous.sym D (F≡G X)
-
-  oneway : (F G : Functor C D) → F ≡F G → NaturalTransformation F G
-  oneway F G F≡G =
+  oneway : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) →
+    F ≡F G → NaturalTransformation F G
+  oneway {C = C} {D} F G F≡G =
     record
     { η = my-η
     ; commute = my-commute
     }
     where
+    module C = Category C
+    module D = Category D
     module F = Functor F
     module G = Functor G
     open Heterogeneous D
     same-Objs : ∀ A → F.F₀ A ≣ G.F₀ A
-    same-Objs A = helper (F≡G (C.id {A}))
-      where
-      helper : ∀ {A B} {f : D [ A , A ]} {g : D [ B , B ]} → f ∼ g → A ≣ B
-      helper (Heterogeneous.≡⇒∼ _) = ≣-refl
+    same-Objs A = domain-≣ (F≡G (C.id {A}))
     my-η : ∀ X → D [ F.F₀ X , G.F₀ X ]
-    my-η X with F.F₀ X | G.F₀ X | same-Objs X
-    my-η X | _ | ._ | ≣-refl = D.id
+    my-η X = ≣-subst (λ x → D [ F.F₀ X , x ]) (same-Objs X) D.id
 
     .my-commute : ∀ {X Y} (f : C [ X , Y ]) → D [ D [ my-η Y ∘ F.F₁ f ] ≡ D [ G.F₁ f ∘ my-η X ] ]
     my-commute {X} {Y} f with helper₃
@@ -200,14 +189,28 @@ _ⓘʳ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
       helper₃ : D [ my-η Y ∘ F.F₁ f ] ∼ D [ G.F₁ f ∘ my-η X ]
       helper₃ = trans helper₁ (trans (F≡G f) helper₂)
     my-commute f | Heterogeneous.≡⇒∼ pf = irr pf
-
+    
+≡→iso : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} (F G : Functor C D) → F ≡F G → NaturalIsomorphism F G
+≡→iso {C = C} {D} F G F≡G =
+  record
+  { F⇒G = oneway F G F≡G
+  ; F⇐G = oneway G F (my-sym F G F≡G)
+  ; iso = λ X → record
+    { isoˡ = my-iso G F (my-sym F G F≡G) F≡G X
+    ; isoʳ = my-iso F G F≡G (my-sym F G F≡G) X
+    }
+  }
+  where
+  module C = Category C
+  module D = Category D
   open Heterogeneous D
 
   .my-iso : (F G : Functor C D) (F≡G : F ≡F G) (G≡F : G ≡F F) (x : C.Obj) → D [ D [ oneway F G F≡G © x ∘ oneway G F G≡F © x ] ≡ D.id ]
-  my-iso F G F≡G G≡F x with F.F₀ x | G.F₀ x | F.F₁ k | G.F₁ k | F≡G k | G≡F k
+  my-iso F G F≡G G≡F x = func (F.F₀ x) (G.F₀ x) (domain-≣ (F≡G (C.id {x}))) (domain-≣ (G≡F (C.id {x})))
     where
-    k = C.id {x}
     module F = Functor F
     module G = Functor G
-  my-iso F G F≡G G≡F x | _ | ._ | _ | _ | ≡⇒∼ _ | ≡⇒∼ _ = D.identityʳ
--}
+    -- hand-written function that "with" cannot properly abstract on its own, it gets itself all confused.
+    func : (w z : D.Obj) (zz : w ≣ z ) (ww : z ≣ w) →
+        ≣-subst (D._⇒_ w) zz (D.id {w}) D.∘ ≣-subst (D._⇒_ z) ww (D.id {z}) D.≡ D.id
+    func w .w ≣-refl ≣-refl = D.identityʳ

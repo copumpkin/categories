@@ -62,11 +62,11 @@ Cartesian C Ps = record
   where
   open Categories.Morphisms C
   open Category C
-  open Products C Ps renaming (terminal to T₀; binary to P₀)
+  open Products Ps renaming (terminal to T₀; binary to P₀)
   open ProductProperties C Ps
-  open Terminal C T₀ using (⊤; !; !-unique; !-unique₂)
+  open Terminal T₀ using (⊤; !; !-unique; !-unique₂)
 
-  open BinaryProducts C P₀
+  open BinaryProducts P₀
   open Pentagon.Law C P₀ using (pentagon)
 
   ⊗ : Bifunctor C C C

@@ -10,8 +10,8 @@ module Categories.Object.Terminal.Exponentiating {o ℓ e : Level}
     (P : Products C) where
 
 open Category C
-open Products C P
-open Terminal C terminal
+open Products P
+open Terminal terminal
 
 open import Categories.Object.Exponentiating
 import Categories.Object.Terminal.Exponentials

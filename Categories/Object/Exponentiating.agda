@@ -7,7 +7,7 @@ module Categories.Object.Exponentiating {o ℓ e}
     (binary : BinaryProducts C)  where
 
 open Category C
-open BinaryProducts C binary
+open BinaryProducts binary
 
 import Categories.Object.Product
 open Categories.Object.Product C

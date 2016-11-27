@@ -171,7 +171,3 @@ Bin→Binary bc = record { coproduct = λ {A} {B} → record {
   where
     open CP.BinCoproducts bc
 
-module BinCoproducts (coprod : BinCoproducts) where
-  open CP.BinCoproducts coprod public
-  open BinaryCoproducts (Bin→Binary coprod) public hiding ([_,_]; i₁; i₂; commute₁; commute₂; universal)
-

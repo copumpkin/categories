@@ -34,7 +34,26 @@ record DinaturalTransformation {o ℓ e o′ ℓ′ e′}
 
 _<∘_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G H : Bifunctor (Category.op C) C D}
       → NT.NaturalTransformation G H → DinaturalTransformation {C = C} F G → DinaturalTransformation {C = C} F H
-_<∘_ {C = C} {D} {F} {G} {H} eta alpha = record { α = λ c → η (c , c) ∘ α c; commute = λ {c} {c′} f →
+_<∘_ {C = C} {D} {F} {G} {H} eta alpha = record { α = λ c → η (c , c) ∘ α c; commute = λ {c} {c′} f → 
+     begin
+       H.F₁ (f , C.id) ∘ ((η (c′ , c′) ∘ α c′) ∘ F.F₁ (C.id , f))
+     ↓⟨ ∘-resp-≡ʳ assoc ⟩
+       H.F₁ (f , C.id) ∘ (η (c′ , c′) ∘ (α c′ ∘ F.F₁ (C.id , f)))
+     ↑⟨ assoc ⟩
+       (H.F₁ (f , C.id) ∘ η (c′ , c′)) ∘ (α c′ ∘ F.F₁ (C.id , f))
+     ↑⟨ ∘-resp-≡ˡ (eta.commute (f , C.id)) ⟩
+       (η (c , c′) ∘ G.F₁ (f , C.id)) ∘ (α c′ ∘ F.F₁ (C.id , f))
+     ↓⟨ pullʳ (commute f) ⟩
+       η (c , c′) ∘ G.F₁ (C.id , f) ∘ (α c ∘ F.F₁ (f , C.id))
+     ↓⟨ pullˡ (eta.commute (C.id , f)) ⟩
+       (H.F₁ (C.id , f) ∘ η (c , c)) ∘ (α c ∘ F.F₁ (f , C.id))
+     ↓⟨ assoc ⟩
+       H.F₁ (C.id , f) ∘ (η (c , c) ∘ (α c ∘ F.F₁ (f , C.id)))
+     ↑⟨ ∘-resp-≡ʳ assoc ⟩
+       H.F₁ (C.id , f) ∘ ((η (c , c) ∘ α c) ∘ F.F₁ (f , C.id))
+     ∎
+{-  This uses 'associative-unital reasoning, which is now broken.  Above uses
+    direct reasoning, which is heavier, but works.  JC.
      begin
        H.F₁ (f , C.id) ∙ ((η (c′ , c′) ∙ α c′) ∙ F.F₁ (C.id , f))
      ↑⟨ refl ⟩
@@ -47,7 +66,7 @@ _<∘_ {C = C} {D} {F} {G} {H} eta alpha = record { α = λ c → η (c , c) ∘
        (H.F₁ (C.id , f) ∙ η (c , c)) ∙ α c ∙ F.F₁ (f , C.id)
      ↓⟨ refl ⟩
        H.F₁ (C.id , f) ∙ (η (c , c) ∙ α c) ∙ F.F₁ (f , C.id)
-     ∎ }
+     ∎ -} }
   where
     module C = Category C
     module D = Category D
@@ -59,7 +78,8 @@ _<∘_ {C = C} {D} {F} {G} {H} eta alpha = record { α = λ c → η (c , c) ∘
     module eta = NT.NaturalTransformation eta
     open eta using (η)
     open DinaturalTransformation alpha
-    open AUReasoning D
+    -- open AUReasoning D
+    open HomReasoning
     open GlueSquares D
 
 _∘>_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G H : Bifunctor (Category.op C) C D}

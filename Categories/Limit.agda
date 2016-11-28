@@ -15,7 +15,7 @@ open import Categories.Cone using (module Cone; module ConeOver)
 
 module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category o′ ℓ′ e′} (F : Functor J C) where
 
-  private module L = Terminal (Cones F)
+  private module L = Terminal
 
   open Category C
   open Category J using () renaming (Obj to Dot)
@@ -31,7 +31,7 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
     field
       terminal : Terminal (Cones F)
 
-    private module terminal = Terminal (Cones F) terminal
+    private module terminal = Terminal terminal
     module Fl = Float F
 
     {-
@@ -156,7 +156,7 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
       ; iso = record { isoˡ = isoˡ; isoʳ = isoʳ }
       }
     where
-    open Mor._≅_ C κ≅v
+    open Mor._≅_ κ≅v
     open GlueSquares C
 
   isos-lower-from-cones : ∀ {κ₁ κ₂ : Cone} → κ₁ ⇿ κ₂ → Cone.N κ₁ ≅ Cone.N κ₂
@@ -166,12 +166,12 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
     ; iso = record { isoˡ = isoˡ; isoʳ = isoʳ }
     }
     where
-    open Mor._≅_ (Cones F) κ₁⇿κ₂
+    open Mor._≅_ κ₁⇿κ₂
 
   ≜ⁱ⇒≡ⁱ : ∀ {κ₁ κ₂} {i₁ i₂ : κ₁ ⇿ κ₂} → i₁ ≜ⁱ i₂
         → isos-lower-from-cones i₁ ≡ⁱ isos-lower-from-cones i₂
   ≜ⁱ⇒≡ⁱ pf = record { f-≡ = f-≡; g-≡ = g-≡ }
-    where open Mor._≡ⁱ_ (Cones F) pf
+    where open Mor._≡ⁱ_ pf
 
   up-to-iso-cone : (L₁ L₂ : Limit) → proj-cone L₁ ⇿ proj-cone L₂
   up-to-iso-cone L₁ L₂ = T.up-to-iso (Cones F) (terminal L₁) (terminal L₂)
@@ -199,8 +199,7 @@ module LimitsOf {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Categor
   up-to-iso-cone-invˡ {L} {i = i} = up-to-iso-cone-unique L (transport-by-iso-cone L i) i
 
   .up-to-iso-invˡ : ∀ {L X} {i : vertex L ≅ X} → up-to-iso L (transport-by-iso L i) ≡ⁱ i
-  up-to-iso-invˡ {L} {i = i} = ≜ⁱ⇒≡ⁱ (up-to-iso-cone-invˡ {L} {i = proj₂ p})
-    where p = isos-lift-to-cones (proj-cone L) i
+  up-to-iso-invˡ {L₁} {i = i} = ≜ⁱ⇒≡ⁱ (up-to-iso-cone-invˡ {L₁} {i = proj₂ (isos-lift-to-cones (proj-cone L₁) i)})
 
   up-to-iso-cone-invʳ : ∀ {L L′} → proj-cone (transport-by-iso-cone L (up-to-iso-cone L L′)) ≜ proj-cone L′
   up-to-iso-cone-invʳ {L} {L′} = ≜-refl

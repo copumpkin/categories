@@ -8,7 +8,7 @@ open import Categories.Square
 
 module Law {o ℓ e} (C : Category o ℓ e) (P : BinaryProducts C) where
   open Category C
-  open BinaryProducts C P
+  open BinaryProducts P
 
   shave3ˡ : ∀ {A B C} → ((A × B) × C) ⇒ (B × C)
   shave3ˡ = ⟨ π₂ ∘ π₁ , π₂ ⟩ -- in real life, 'first π₂'

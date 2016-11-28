@@ -8,7 +8,7 @@ module Categories.Object.BinaryProducts.N-ary {o ℓ e}
   where
 
 open Category C
-open BinaryProducts C BP
+open BinaryProducts BP
 open Equiv
 
 import Categories.Object.Product

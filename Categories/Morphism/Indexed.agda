@@ -23,11 +23,10 @@ open Setoid B using () renaming (Carrier to Bc; _≈_ to _≈B_)
 
 open Setoid using () renaming (_≈_ to _[_≈_])
 
-DSetoid = IndexedSetoid Bc _≈B_
-
-ihom-setoid : {S : Set o} → (S → (Obj × Obj)) → (B ⟶ (set→setoid S)) → DSetoid _ _
+ihom-setoid : {S : Set o} → (S → (Obj × Obj)) → (B ⟶ (set→setoid S)) → IndexedSetoid Bc _≈B_ _ _
 ihom-setoid {S} F Xs = record
-  { Carrier = my-Carrier
+      -- ok, this is massively ugly, but it gets around some weird problems introduced in 2.5.1.1 (JC)
+  { Carrier = λ i → (P.proj₁ (F (_⟶_._⟨$⟩_ Xs i)) ⇒ P.proj₂ (F (_⟶_._⟨$⟩_ Xs i)))
   ; _≈_ = λ f g → f ∼ g
   ; isEquivalence = record
     { refl = refl
@@ -37,12 +36,11 @@ ihom-setoid {S} F Xs = record
   ; resp = λ {i} {j} i≈j → SΠ.resp-per′ (at′ i) (at′ j) (resp₁ i≈j) (resp₂ i≈j)
   }
   where
-  my-Carrier = P.uncurry _⇒_ ⋆′ F ⋆ _!_ Xs
-
+  
   -- fake 'at' for resp
   at′ : Bc → Setoid _ _
   at′ i = record
-    { Carrier = my-Carrier i
+    { Carrier = (P.proj₁ (F (_⟶_._⟨$⟩_ Xs i)) ⇒ P.proj₂ (F (_⟶_._⟨$⟩_ Xs i)))
     ; _≈_ = λ f g → f ∼ g
     ; isEquivalence = record { refl = refl; sym = sym; trans = trans }
     }
@@ -50,7 +48,7 @@ ihom-setoid {S} F Xs = record
   at-≈ : (X : S) → B.Rel ((P.uncurry _⇒_ ⋆′ F) X) (ℓ ⊔ e)
   at-≈ X = λ f g → f ∼ g
 
-  .resp₁ : ∀ {i j} → (i ≈B j) → my-Carrier i ≣ my-Carrier j
+  .resp₁ : ∀ {i j} → (i ≈B j) → (P.proj₁ (F (_⟶_._⟨$⟩_ Xs i)) ⇒ P.proj₂ (F (_⟶_._⟨$⟩_ Xs i))) ≣ (P.proj₁ (F (_⟶_._⟨$⟩_ Xs j)) ⇒ P.proj₂ (F (_⟶_._⟨$⟩_ Xs j)))
   resp₁ i≈j = ≣-cong (P.uncurry _⇒_ ⋆′ F) (cong₀ Xs i≈j)
 
   .resp₂ : ∀ {i j} → (i ≈B j) → Setoid._≈_ (at′ i) ≅ Setoid._≈_ (at′ j)
@@ -109,7 +107,7 @@ f ◽ g = record { _⟨$⟩_ = λ x → (f ‼ x) ∘ (g ‼ x)
 
 .assoc-◽⋉ : ∀ {X Ys Zs Ws} {f : Zs ∗⇒∗ Ws} {g : Ys ∗⇒∗ Zs} {h : X ⇒∗ Ys}
           → (X ⇨∗ Ws) [ _⋉_ {Ys = Ys} {Ws} (_◽_ {Ys} {Zs} {Ws} f g) h ≈ _⋉_ {Ys = Zs} {Ws} f (_⋉_ {Ys = Ys} {Zs} g h) ]
-assoc-◽⋉ {Ys = Ys} {Zs} {Ws} {f = f} {g} {h} {i} {j} i≈j with Ys ! j | cong₀ Ys i≈j | Zs ! j | cong₀ Zs i≈j | Ws ! j | cong₀ Ws i≈j | f ‼ j | cong₁ f i≈j | g ‼ j | cong₁ g i≈j | h ‼ j | cong₁ h i≈j
+assoc-◽⋉ {Ys = Ys} {Zs} {Ws} {f = f} {g} {h} {i} {j} i≈j with Ys _⟶_.⟨$⟩ j | cong₀ Ys i≈j | Zs _⟶_.⟨$⟩ j | cong₀ Zs i≈j | Ws _⟶_.⟨$⟩ j | cong₀ Ws i≈j | f ‼ j | cong₁ f i≈j | g ‼ j | cong₁ g i≈j | h ‼ j | cong₁ h i≈j
 assoc-◽⋉ {f = f} {g} {h} {i} i≈j | ._ | ≣-refl | ._ | ≣-refl | ._ | ≣-refl | fj | ≡⇒∼ fi≡fj | gj | ≡⇒∼ gi≡gj | hj | ≡⇒∼ hi≡hj = 
   ≡⇒∼ (begin
     ((f ‼ i) ∘ (g ‼ i)) ∘ (h ‼ i)

@@ -12,7 +12,6 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
   infixr 2 _≈⟨_⟩_ _↓⟨_⟩_ _↑⟨_⟩_ _↓≣⟨_⟩_ _↑≣⟨_⟩_ _↕_
   infix  3 _∎
   
-  
   -- This seemingly unnecessary type is used to make it possible to
   -- infer arguments even if the underlying equality evaluates.
 
@@ -49,7 +48,7 @@ module SetoidReasoning {s₁ s₂} (S : Setoid s₁ s₂) where
 
 module ≣-reasoning {ℓ} (S : Set ℓ) where
   infix  4 _IsRelatedTo_
-  infix  2 _∎
+  infix  3 _∎
   infixr 2 _≈⟨_⟩_
   infixr 2 _↓⟨_⟩_
   infixr 2 _↑⟨_⟩_

@@ -9,7 +9,7 @@ module Categories.Object.Terminal.Exponentials {o ℓ e : Level}
     (T : Terminal C) where
 
 open Category C
-open Terminal C T
+open Terminal T
 
 import Categories.Object.Exponential
 import Categories.Object.Product

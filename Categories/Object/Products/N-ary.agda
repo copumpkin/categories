@@ -8,7 +8,7 @@ module Categories.Object.Products.N-ary {o ℓ e}
   where
 
 open Category C
-open Products C P
+open Products P
 open Equiv
 
 import Categories.Object.Product

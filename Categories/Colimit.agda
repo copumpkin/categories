@@ -16,7 +16,7 @@ record Colimit {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {J : Category
   field
     initial : Initial (Cocones F)
   
-  module I = Initial (Cocones F) initial
+  module I = Initial initial
   module Ic = Cocone I.⊥
   private module C = Category C
 

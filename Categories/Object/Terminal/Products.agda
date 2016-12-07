@@ -11,7 +11,7 @@ module Categories.Object.Terminal.Products {o ℓ e : Level}
 open import Categories.Object.Product
 
 open Category C
-open Terminal C T
+open Terminal T
 
 [⊤×⊤] : Obj
 [⊤×⊤] = ⊤

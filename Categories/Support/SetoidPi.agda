@@ -158,7 +158,7 @@ asIndexed ct ℓt {From} To = record
   .resp-helper₂ : ∀ {i j} → From [ i ≈ j ] → _≈⋆_ {i} {i} ≅ _≈⋆_ {j} {j}
   resp-helper₂ {i} {j} i∼j = resp-helper₃ (To$ i) (To$ j) (cong₀ To i∼j)
 
-  .fake-at : ∀ i → Setoid ct (suc (ct ⊔ ℓt))
+  fake-at : ∀ i → Setoid ct (suc (ct ⊔ ℓt))
   fake-at i = record
     { Carrier = To$C i
     ; _≈_ = _≈⋆_ {i} {i}

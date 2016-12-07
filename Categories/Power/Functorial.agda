@@ -165,7 +165,13 @@ exp≅functor ext id-propositionally-unique {I} =
   η-under-substʳ α ≣-refl c = ≣-refl
 
   .lemma : (A B : Obj FDIC) (f : FDIC [ A , B ]) (i : I) → C [ η (≣-subst (λ X → FDIC [ X , B ]) (squash-does-nothing A) (≣-subst (λ Y → FDIC [ squash A , Y ]) (squash-does-nothing B) (map₁ f∘g f))) i ≡ η f i ]
-  lemma A B f i = C.Equiv.reflexive (
+  lemma A B f i =
+    let loc X = map₀ X i in
+    let sqdnA = squash-does-nothing A in
+    let sqdnB = squash-does-nothing B in
+    let MESS = ≣-subst (λ Y → FDIC [ squash A , Y ]) sqdnB (map₁ f∘g f) in
+
+    C.Equiv.reflexive (
       begin
         η (≣-subst (λ X → FDIC [ X , B ]) sqdnA MESS) i
       ≣⟨ η-under-substˡ MESS sqdnA i ⟩
@@ -179,13 +185,6 @@ exp≅functor ext id-propositionally-unique {I} =
       ∎)
     where
     open ≣-reasoning
-
-    loc : Obj FDIC → Obj C
-    loc X = map₀ X i
-
-    sqdnA = squash-does-nothing A
-    sqdnB = squash-does-nothing B
-    MESS = ≣-subst (λ Y → FDIC [ squash A , Y ]) sqdnB (map₁ f∘g f)
 
   ir : (A B : Obj FDIC) (f : FDIC [ A , B ]) → FDIC [ map₁ f∘g f ∼ f ]
   ir A B f = ∼-subst {C = FDIC} f (map₁ f∘g f) (squash-does-nothing A) (squash-does-nothing B) (λ {x} → lemma A B f x)

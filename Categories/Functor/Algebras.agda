@@ -101,7 +101,7 @@ module Lambek {o ℓ e} {C : Category o ℓ e} {F : Endofunctor C} (I : Initial 
   open Functor F
   import Categories.Morphisms as Morphisms
   open Morphisms C
-  open Initial (F-Algebras F) I
+  open Initial I
   open F-Algebra ⊥
 
   lambek : A ≅ F₀ A

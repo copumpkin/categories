@@ -19,7 +19,7 @@ open import Categories.NaturalIsomorphism
 open import Categories.Bicategory.Helpers using (module BicategoryHelperFunctors)
 
 record Bicategory (o ℓ t e : Level) : Set (suc (o ⊔ ℓ ⊔ t ⊔ e)) where
-  open Terminal (Categories ℓ t e) (One {ℓ} {t} {e})
+  open Terminal (One {ℓ} {t} {e})
   field
     Obj : Set o
     _⇒_ : (A B : Obj) → Category ℓ t e

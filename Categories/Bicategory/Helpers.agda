@@ -20,7 +20,7 @@ module BicategoryHelperFunctors {o ℓ t e} (Obj : Set o) (_⇒_ : (A B : Obj) �
     (—⊗— : {A B C : Obj} → Bifunctor (B ⇒ C) (A ⇒ B) (A ⇒ C)) 
     (id : {A : Obj} → Functor {ℓ} {t} {e} OneC (A ⇒ A)) where
 
-  open Terminal (Categories ℓ t e) (One {ℓ} {t} {e})
+  open Terminal (One {ℓ} {t} {e})
 
   _∘_ : {A B C : Obj} {L R : Category ℓ t e} → Functor L (B ⇒ C) → Functor R (A ⇒ B) → Bifunctor L R (A ⇒ C)
   _∘_ {A} {B} {C} F G = reduce-× {D₁ = B ⇒ C} {D₂ = A ⇒ B} —⊗— F G

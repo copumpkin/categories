@@ -12,6 +12,7 @@ open import Categories.Category
 open import Categories.Functor hiding (equiv; assoc; identityˡ; identityʳ; ∘-resp-≡) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Categories.NaturalTransformation hiding (equiv; setoid) renaming (id to idT; _≡_ to _≡T_)
 open import Categories.Monad
+open import Categories.Comonad
 open import Categories.Support.Equivalence
 
 record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Category o₁ ℓ₁ e₁} (F : Functor D C) (G : Functor C D) : Set (o ⊔ ℓ ⊔ e ⊔ o₁ ⊔ ℓ₁ ⊔ e₁) where
@@ -75,6 +76,44 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
 
     .identityʳ′ : ∀ {x} → G₁ (counit.η (F₀ x)) D.∘ unit.η (G₀ (F₀ x)) D.≡ D.id
     identityʳ′ = D.Equiv.sym zag
+
+  comonad : Comonad C
+  comonad = record
+    { F = F ∘F G
+    ; ε = counit
+    ; δ = F ∘ˡ (unit ∘ʳ G)
+    ; assoc = assoc′
+    ; identityˡ = identityˡ′
+    ; identityʳ = identityʳ′
+    }
+    where
+      open C.HomReasoning
+      .assoc′ : ∀ {x} → F₁ (unit.η (G₀ (F₀ (G₀ x)))) C.∘ F₁ (unit.η (G₀ x)) C.≡ F₁ (G₁ (F₁ (unit.η (G₀ x)))) C.∘ F₁ (unit.η (G₀ x))
+      assoc′ {x} = 
+        begin
+          F₁ (unit.η (G₀ (F₀ (G₀ x)))) C.∘ F₁ (unit.η (G₀ x))
+        ↑⟨ F.homomorphism ⟩
+          F₁ (unit.η (G₀ (F₀ (G₀ x))) D.∘ unit.η (G₀ x))
+        ↓⟨ F-resp-≡ (NaturalTransformation.commute unit (unit.η (G₀ x))) ⟩
+          F₁ (G₁ (F₁ (unit.η (G₀ x))) D.∘ unit.η (G₀ x))
+        ↓⟨ F.homomorphism ⟩
+          F₁ (G₁ (F₁ (unit.η (G₀ x)))) C.∘ F₁ (unit.η (G₀ x))
+        ∎
+      
+      .identityˡ′ : ∀ {x} → (F₁ (G₁ (counit.η x))) C.∘ F₁ (unit.η (G₀ x)) C.≡ C.id
+      identityˡ′ {x} = 
+        begin
+          (F₁ (G₁ (counit.η x))) C.∘ F₁ (unit.η (G₀ x))
+        ↑⟨ F.homomorphism ⟩
+          F₁ (G₁ (counit.η x) D.∘ unit.η (G₀ x))
+        ↓⟨ F-resp-≡ (D.Equiv.sym zag) ⟩
+          F₁ D.id
+        ↓⟨ F.identity ⟩
+          C.id
+        ∎
+
+      .identityʳ′ : ∀ {x} → counit.η (F₀ (G₀ x)) C.∘ F₁ (unit.η (G₀ x)) C.≡ C.id
+      identityʳ′ {x} = C.Equiv.sym zig
 
   op : Adjunction {C = D.op} {D = C.op} G.op F.op
   op = record { unit = counit.op; counit = unit.op; zig = zag; zag = zig }

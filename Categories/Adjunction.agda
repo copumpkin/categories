@@ -89,7 +89,7 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
     where
       open C.HomReasoning
       .assoc′ : ∀ {x} → F₁ (unit.η (G₀ (F₀ (G₀ x)))) C.∘ F₁ (unit.η (G₀ x)) C.≡ F₁ (G₁ (F₁ (unit.η (G₀ x)))) C.∘ F₁ (unit.η (G₀ x))
-      assoc′ {x} = 
+      assoc′ {x} =
         begin
           F₁ (unit.η (G₀ (F₀ (G₀ x)))) C.∘ F₁ (unit.η (G₀ x))
         ↑⟨ F.homomorphism ⟩
@@ -99,9 +99,9 @@ record Adjunction {o ℓ e} {o₁ ℓ₁ e₁} {C : Category o ℓ e} {D : Categ
         ↓⟨ F.homomorphism ⟩
           F₁ (G₁ (F₁ (unit.η (G₀ x)))) C.∘ F₁ (unit.η (G₀ x))
         ∎
-      
+
       .identityˡ′ : ∀ {x} → (F₁ (G₁ (counit.η x))) C.∘ F₁ (unit.η (G₀ x)) C.≡ C.id
-      identityˡ′ {x} = 
+      identityˡ′ {x} =
         begin
           (F₁ (G₁ (counit.η x))) C.∘ F₁ (unit.η (G₀ x))
         ↑⟨ F.homomorphism ⟩

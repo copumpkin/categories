@@ -27,7 +27,7 @@ module MonoidalHelperFunctors {o ℓ e} (C : Category o ℓ e) (—⊗— : Bifu
   _⊗_ = reduce —⊗—
 
   _⊗₂_ : ∀ {m} (F G : Powerendo m) → Powerendo m
-  _⊗₂_ = overlap {C} —⊗— -- reduce (flip-bifunctor {C = C} {C} —⊗—)
+  _⊗₂_ = overlaps {C} —⊗— -- reduce (flip-bifunctor {C = C} {C} —⊗—)
 
   id↑ : Powerendo 0
   id↑ = nullary id

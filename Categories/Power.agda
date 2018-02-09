@@ -160,8 +160,8 @@ flattenP-assocʳ {n₁} {n₂} {n₃} F = record
 reduce2ʳ : ∀ (G : Bifunctor C C C) {n₁ n₂ n₃} (F₁ : Powerendo n₁) (F₂ : Powerendo n₂) (F₃ : Powerendo n₃) → Powerendo ((n₁ + n₂) + n₃)
 reduce2ʳ G F₁ F₂ F₃ = flattenP-assocʳ (reduce′ G F₁ (reduce′ G F₂ F₃))
 
-overlap : ∀ {D E} (H : Bifunctor D D E) {I} (F G : Powerfunctor′ D I) → Powerfunctor′ E I
-overlap {D} {E} H {I} F G = record
+overlaps : ∀ {D E} (H : Bifunctor D D E) {I} (F G : Powerfunctor′ D I) → Powerfunctor′ E I
+overlaps {D} {E} H {I} F G = record
   { F₀ = my-F₀
   ; F₁ = my-F₁
   ; identity = λ {As} → my-identity {As}
@@ -204,7 +204,7 @@ overlap {D} {E} H {I} F G = record
     open E.HomReasoning
 
 overlap2ʳ : ∀ (G : Bifunctor C C C) {n} (F₁ F₂ F₃ : Powerendo n) → Powerendo n
-overlap2ʳ G F₁ F₂ F₃ = (overlap {C} G F₁ (overlap {C} G F₂ F₃))
+overlap2ʳ G F₁ F₂ F₃ = (overlaps {C} G F₁ (overlaps {C} G F₂ F₃))
 
 select′ : ∀ {I} (i : I) → Powerendo′ I
 select′ {I} i = record

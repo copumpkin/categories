@@ -95,6 +95,7 @@ identity₀ʳ {C = C} {D} {F} {G} {X} =
   open G
   open D
 
+-- As of 2.5.4, F and G of _∘₀_ below are no longer inferred
 .assoc₀ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃}
             {C₀ : Category o₀ ℓ₀ e₀} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃}
             {F G : Functor C₀ C₁} {H I : Functor C₁ C₂} {J K : Functor C₂ C₃}

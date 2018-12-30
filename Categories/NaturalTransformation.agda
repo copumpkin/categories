@@ -95,11 +95,12 @@ identity₀ʳ {C = C} {D} {F} {G} {X} =
   open G
   open D
 
+open import Categories.Functor.Core using () renaming ( _∘_ to _∘F_)
 .assoc₀ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} 
             {C₀ : Category o₀ ℓ₀ e₀} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃} 
             {F G : Functor C₀ C₁} {H I : Functor C₁ C₂} {J K : Functor C₂ C₃}
         → {X : NaturalTransformation F G} → {Y : NaturalTransformation H I} → {Z : NaturalTransformation J K}
-        → (Z ∘₀ Y) ∘₀ X ≡ Z ∘₀ (Y ∘₀ X) 
+        → (Z ∘₀ Y) ∘₀ X ≡ (_∘₀_   {F = H ∘F F} {I ∘F G} Z  (_∘₀_ {C = C₀} {C₁} {C₂} Y  X))
 assoc₀ {C₀ = C₀} {C₁} {C₂} {C₃} {F} {G} {H} {I} {J} {K} {X} {Y} {Z} = 
     begin
       K₁ (I₁ (X.η _)) ∘C₃ (K₁ (Y.η (F₀ _)) ∘C₃ Z.η (H₀ (F₀ _)))

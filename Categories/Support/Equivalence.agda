@@ -94,8 +94,8 @@ S₁ ×-setoid S₂ = record
 
 Lift-setoid : ∀ {c ℓ a b} -> Setoid c ℓ -> Setoid (c ⊔ a) (ℓ ⊔ b)
 Lift-setoid {c} {ℓ} {a} {b} s = record {
-    Carrier = Lift {c} {a} Carrier;
-    _≈_ = λ x₁ x₂ → Lift {ℓ} {b} (lower x₁ ≈ lower x₂);
+    Carrier = Lift {c} a Carrier;
+    _≈_ = λ x₁ x₂ → Lift {ℓ} b (lower x₁ ≈ lower x₂);
     isEquivalence = record {
         refl = lift refl;
         sym = λ x₁ → lift (sym (lower x₁));

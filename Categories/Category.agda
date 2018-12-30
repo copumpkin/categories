@@ -14,7 +14,7 @@ postulate
   .irr : ∀ {a} {A : Set a} → .A → A
 
 record Category (o ℓ e : Level) : Set (suc (o ⊔ ℓ ⊔ e)) where 
-
+  eta-equality
   infix  4 _≡_ _⇒_
   infixr 9 _∘_
 

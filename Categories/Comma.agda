@@ -49,6 +49,7 @@ Comma {o₁}{ℓ₁}{e₁}
     infix 10 _,_,_ _,_[_]    
 
     record Obj : Set (o₁ ⊔ o₂ ⊔ ℓ₃) where
+        eta-equality   
         constructor _,_,_
         field
             α : A.Obj
@@ -56,6 +57,7 @@ Comma {o₁}{ℓ₁}{e₁}
             f : C [ T₀ α , S₀ β ]
 
     record Hom (X₁ X₂ : Obj) : Set (ℓ₁ ⊔ ℓ₂ ⊔ e₃) where
+        eta-equality
         constructor _,_[_]
         open Obj X₁ renaming (α to α₁; β to β₁; f to f₁)
         open Obj X₂ renaming (α to α₂; β to β₂; f to f₂)

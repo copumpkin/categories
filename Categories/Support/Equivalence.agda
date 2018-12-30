@@ -4,7 +4,7 @@ module Categories.Support.Equivalence where
 open import Level
 open import Relation.Binary using (Rel; IsEquivalence; module IsEquivalence; IsPreorder; Preorder; Reflexive; Transitive; Symmetric; _⇒_) renaming (Setoid to RSetoid; module Setoid to RSetoid)
 open import Data.Product using (_×_; _,_)
-open import Relation.Binary.Product.Pointwise using (_×-isEquivalence_)
+open import Relation.Binary.Product.Pointwise using (×-isEquivalence)
 open import Relation.Binary.PropositionalEquality as PropEq using (_≡_)
 
 ------------------------------------------------------------------------
@@ -89,7 +89,7 @@ set→setoid Base = record
 
 _×-setoid_ : ∀ {s₁ s₂ s₃ s₄} → Setoid s₁ s₂ → Setoid s₃ s₄ → Setoid _ _
 S₁ ×-setoid S₂ = record
-  { isEquivalence = isEquivalence S₁ ×-isEquivalence isEquivalence S₂
+  { isEquivalence = ×-isEquivalence (isEquivalence S₁)  (isEquivalence S₂)
   } where open Setoid
 
 Lift-setoid : ∀ {c ℓ a b} -> Setoid c ℓ -> Setoid (c ⊔ a) (ℓ ⊔ b)

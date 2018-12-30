@@ -3,7 +3,7 @@ open import Level
 open import Categories.Category
 module Categories.Power.Functorial {o ℓ e : Level} (C : Category o ℓ e) where
 
-open import Relation.Binary.PropositionalEquality using (proof-irrelevance)
+open import Relation.Binary.PropositionalEquality using (≡-irrelevance)
 open import Data.Unit using (⊤; tt)
 open import Function using () renaming (_∘_ to _∙_)
 open import Relation.Binary using (module IsEquivalence)
@@ -38,7 +38,7 @@ exp→functor₀ X =
   ; F₁ = my-F₁
   ; identity = Equiv.refl
   ; homomorphism = λ {_ _ _ A≣B B≣C} → my-homomorphism A≣B B≣C
-  ; F-resp-≡ = λ {_ _ e1 e2} _ → Equiv.reflexive (≣-cong my-F₁ (proof-irrelevance e1 e2))
+  ; F-resp-≡ = λ {_ _ e1 e2} _ → Equiv.reflexive (≣-cong my-F₁ (≡-irrelevance e1 e2))
   }
   where
   my-F₁ : ∀ {A B} → (A ≣ B) → (X A ⇒ X B)

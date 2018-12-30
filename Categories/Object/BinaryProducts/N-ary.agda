@@ -15,8 +15,8 @@ import Categories.Object.Product
 open Categories.Object.Product C
 
 open import Data.Nat using (ℕ; zero; suc)
-open import Data.Vec
-open import Data.Product.N-ary
+open import Data.Vec  
+open import Data.Product.N-ary hiding ([])
 
 Prod : {n : ℕ} → Vec Obj (suc n) → Obj
 Prod { zero} (A ∷ []) = A

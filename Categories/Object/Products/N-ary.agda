@@ -25,7 +25,7 @@ open Categories.Object.Terminal C
 open import Data.Nat
 open import Data.Vec
 open import Data.Vec.Properties
-open import Data.Product.N-ary
+open import Data.Product.N-ary hiding ([])
 
 import Level
 

@@ -1,4 +1,4 @@
-{-# OPTIONS --universe-polymorphism #-}
+{-# OPTIONS --universe-polymorphism --irrelevant-projections #-}
 module Categories.Square where
 
 open import Level
@@ -295,7 +295,7 @@ module Yon-Eda {o ℓ e} (C : Category o ℓ e) where
     field
       arr-≡ : Yon.arr f ≡ Yon.arr g
 
-  open _≡′_ public using (arr-≡) 
+  open _≡′_ public using (arr-≡)
 
   module _ {X Y} where
     .Yon-refl : Reflexive (_≡′_ {X} {Y})
@@ -387,20 +387,20 @@ module Yon-Eda {o ℓ e} (C : Category o ℓ e) where
 record NormReasoning {o ℓ e} (C : Category o ℓ e) (o′ ℓ′ : _) : Set (suc o′ ⊔ o ⊔ ℓ ⊔ e ⊔ suc ℓ′) where
   private module C = Category C
   field
-    U : Set o′ 
+    U : Set o′
     T : U -> C.Obj
     _#⇒_ : U -> U -> Set ℓ′
     eval : ∀ {A B} -> A #⇒ B -> T A C.⇒ T B
     norm : ∀ {A B} -> A #⇒ B -> T A C.⇒ T B
     .norm≡eval : ∀ {A B} (f : A #⇒ B) -> norm f C.≡ eval f
- 
+
   open C.Equiv
   open C
 
   infix  4 _IsRelatedTo_
   infix  1 begin_
   infixr 2 _≈⟨_⟩_ _↓⟨_⟩_ _↑⟨_⟩_ _↓≡⟨_⟩_ _↑≡⟨_⟩_ _↕_
-  infix  3 _∎ 
+  infix  3 _∎
 
   data _IsRelatedTo_ {X Y} (f g : _#⇒_ X Y) : Set e where
     relTo : (f∼g : norm f ≡ norm g) → f IsRelatedTo g
@@ -512,14 +512,14 @@ module AUReasoning {o ℓ e} (C : Category o ℓ e) where
 
   aureasoning : NormReasoning C o (ℓ ⊔ o)
   aureasoning = record
-                  { U = Obj 
-                  ; T = λ A → A 
-                  ; _#⇒_ = Climb 
+                  { U = Obj
+                  ; T = λ A → A
+                  ; _#⇒_ = Climb
                   ; eval = eval
                   ; norm = yyeval
                   ; norm≡eval = earr
                   }
-  
+
   open NormReasoning aureasoning public hiding (eval)
 
 {-

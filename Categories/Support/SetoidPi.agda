@@ -7,7 +7,7 @@ open import Function as Fun using (_on_)
 open import Relation.Binary as B using () renaming (_=[_]⇒_ to _=[_]⇒₀_; _⇒_ to _⊆_)
 open import Relation.Binary.PropositionalEquality as PE using (_≡_)
 open import Relation.Binary.HeterogeneousEquality using (_≅_) renaming (refl to ≅-refl)
-open import Relation.Binary.Indexed as I using (_=[_]⇒_)
+open import Relation.Binary.Indexed.Heterogeneous as I using (_=[_]⇒_)
 open import Categories.Support.Equivalence
 open import Categories.Support.SetoidFunctions as SF using (_⟶_) renaming (_⟨$⟩_ to _⟨$⟩₀_; cong to cong₀)
 open Setoid using () renaming (Carrier to Carrier₀; _≈_ to _[_≈_])
@@ -23,14 +23,14 @@ record IndexedSetoid {i iℓ} (I : Set i) (_∼_ : B.Rel I iℓ) c ℓ : Set (su
   infix 4 _≈_
   field
     Carrier       : I → Set c
-    _≈_           : I.Rel Carrier ℓ
-    .isEquivalence : I.IsEquivalence Carrier _≈_
+    _≈_           : I.IRel Carrier ℓ
+    .isEquivalence : I.IsIndexedEquivalence Carrier _≈_
     -- NOTE one more field, see resp below
 
   -- no irrelevant opens ☹
   -- .open I.IsEquivalence isEquivalence public
   private
-    module E = I.IsEquivalence
+    module E = I.IsIndexedEquivalence
   .refl : I.Reflexive Carrier _≈_
   refl = E.refl isEquivalence
   .sym : I.Symmetric Carrier _≈_

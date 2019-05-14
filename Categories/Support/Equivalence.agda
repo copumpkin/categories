@@ -1,10 +1,10 @@
-{-# OPTIONS --universe-polymorphism #-}
+{-# OPTIONS --universe-polymorphism --irrelevant-projections #-}
 module Categories.Support.Equivalence where
 
 open import Level
 open import Relation.Binary using (Rel; IsEquivalence; module IsEquivalence; IsPreorder; Preorder; Reflexive; Transitive; Symmetric; _⇒_) renaming (Setoid to RSetoid; module Setoid to RSetoid)
 open import Data.Product using (_×_; _,_)
-open import Relation.Binary.Product.Pointwise using (_×-isEquivalence_)
+open import Data.Product.Relation.Pointwise.NonDependent using (×-isEquivalence)
 open import Relation.Binary.PropositionalEquality as PropEq using (_≡_)
 
 ------------------------------------------------------------------------
@@ -89,13 +89,13 @@ set→setoid Base = record
 
 _×-setoid_ : ∀ {s₁ s₂ s₃ s₄} → Setoid s₁ s₂ → Setoid s₃ s₄ → Setoid _ _
 S₁ ×-setoid S₂ = record
-  { isEquivalence = isEquivalence S₁ ×-isEquivalence isEquivalence S₂
+  { isEquivalence = ×-isEquivalence (isEquivalence S₁)  (isEquivalence S₂)
   } where open Setoid
 
 Lift-setoid : ∀ {c ℓ a b} -> Setoid c ℓ -> Setoid (c ⊔ a) (ℓ ⊔ b)
 Lift-setoid {c} {ℓ} {a} {b} s = record {
-    Carrier = Lift {c} {a} Carrier;
-    _≈_ = λ x₁ x₂ → Lift {ℓ} {b} (lower x₁ ≈ lower x₂);
+    Carrier = Lift {c} a Carrier;
+    _≈_ = λ x₁ x₂ → Lift {ℓ} b (lower x₁ ≈ lower x₂);
     isEquivalence = record {
         refl = lift refl;
         sym = λ x₁ → lift (sym (lower x₁));
@@ -104,27 +104,27 @@ Lift-setoid {c} {ℓ} {a} {b} s = record {
    open Setoid s
 
 ∀[_]-setoid_ : ∀ {ℓ s₁ s₂} → (A : Set ℓ) → (A → Setoid s₁ s₂) → Setoid _ _
-∀[ A ]-setoid B = record 
+∀[ A ]-setoid B = record
    { Carrier = ∀ a → B.Carrier a
    ; _≈_ = λ f g → ∀ a → B._≈_ a (f a) (g a)
-   ; isEquivalence = record 
+   ; isEquivalence = record
        { refl = λ a → B.refl a
        ; sym = λ f≈g a → B.sym a (f≈g a)
        ; trans = λ f≈g g≈h a → B.trans a (f≈g a) (g≈h a)
-       } 
+       }
    }
   where
     module B a = Setoid (B a)
 
 Fam-setoid : ∀ {ℓ s₁ s₂} → (A : Set ℓ) → (B : Setoid s₁ s₂) → (A → Setoid.Carrier B) → Setoid _ _
-Fam-setoid A B p = record 
+Fam-setoid A B p = record
   { Carrier = A
   ; _≈_ = λ a₁ a₂ → p a₁ ≈ p a₂
-  ; isEquivalence = record 
+  ; isEquivalence = record
     { refl = refl
     ; sym = sym
     ; trans = trans
-    } 
+    }
   }
  where
    open Setoid B

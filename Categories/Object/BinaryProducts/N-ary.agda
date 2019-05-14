@@ -3,7 +3,7 @@ open import Categories.Category
 open import Categories.Object.BinaryProducts
 
 module Categories.Object.BinaryProducts.N-ary {o ℓ e}
-  (C : Category o ℓ e) 
+  (C : Category o ℓ e)
   (BP : BinaryProducts C)
   where
 
@@ -16,7 +16,7 @@ open Categories.Object.Product C
 
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Vec
-open import Data.Product.N-ary
+open import Data.Product.N-ary hiding ([])
 
 Prod : {n : ℕ} → Vec Obj (suc n) → Obj
 Prod { zero} (A ∷ []) = A
@@ -60,11 +60,11 @@ commuteˡ {suc n} (A ∷ As) Bs {f}{g} =
   ↓⟨ ⟨⟩∘ ⟩
     ⟨ π₁              ∘ ⟨ π₁ ∘ f , glue As Bs (π₂ ∘ f) g ⟩
     , (πˡ As Bs ∘ π₂) ∘ ⟨ π₁ ∘ f , glue As Bs (π₂ ∘ f) g ⟩
-    ⟩ 
+    ⟩
   ↓⟨ ⟨⟩-cong₂ commute₁ assoc ⟩
     ⟨ π₁ ∘ f
     , πˡ As Bs ∘ π₂ ∘ ⟨ π₁ ∘ f , glue As Bs (π₂ ∘ f) g ⟩
-    ⟩ 
+    ⟩
   ↓⟨ ⟨⟩-congʳ (refl ⟩∘⟨ commute₂) ⟩
     ⟨ π₁ ∘ f , πˡ As Bs ∘ glue As Bs (π₂ ∘ f) g ⟩
   ↓⟨ ⟨⟩-congʳ (commuteˡ As Bs) ⟩
@@ -97,11 +97,11 @@ commuteʳ {suc n} (A ∷ As) Bs {f}{g} =
   → {f : X ⇒ Prod As}
   → {g : X ⇒ Prod Bs}
   → {h : X ⇒ Prod (As ++ Bs) }
-  → πˡ As Bs ∘ h ≡ f 
-  → πʳ As Bs ∘ h ≡ g 
+  → πˡ As Bs ∘ h ≡ f
+  → πʳ As Bs ∘ h ≡ g
   → glue As Bs f g ≡ h
 N-universal { zero} (A ∷ []) Bs {f}{g}{h} h-commuteˡ h-commuteʳ = universal h-commuteˡ h-commuteʳ
-N-universal {suc n} (A ∷ As) Bs {f}{g}{h} h-commuteˡ h-commuteʳ = 
+N-universal {suc n} (A ∷ As) Bs {f}{g}{h} h-commuteˡ h-commuteʳ =
   begin
     ⟨ π₁ ∘ f , glue As Bs (π₂ ∘ f) g ⟩
   ↓⟨ ⟨⟩-congʳ (N-universal As Bs π₂∘h-commuteˡ π₂∘h-commuteʳ) ⟩
@@ -110,13 +110,13 @@ N-universal {suc n} (A ∷ As) Bs {f}{g}{h} h-commuteˡ h-commuteʳ =
     ⟨ π₁ ∘ h , π₂ ∘ h ⟩
   ↓⟨ g-η ⟩
     h
-  ∎ 
+  ∎
   where
-    -- h-commuteˡ : ⟨ π₁ , πˡ As Bs ∘ π₂ ⟩ ∘ h ≡ f 
-    -- h-commuteʳ : (πʳ As Bs ∘ π₂) ∘ h ≡ g 
-    
-    π₁∘h-commuteˡ : π₁ ∘ h ≡ π₁ ∘ f 
-    π₁∘h-commuteˡ = 
+    -- h-commuteˡ : ⟨ π₁ , πˡ As Bs ∘ π₂ ⟩ ∘ h ≡ f
+    -- h-commuteʳ : (πʳ As Bs ∘ π₂) ∘ h ≡ g
+
+    π₁∘h-commuteˡ : π₁ ∘ h ≡ π₁ ∘ f
+    π₁∘h-commuteˡ =
       begin
         π₁ ∘ h
       ↑⟨ commute₁ ⟩∘⟨ refl ⟩
@@ -126,8 +126,8 @@ N-universal {suc n} (A ∷ As) Bs {f}{g}{h} h-commuteˡ h-commuteʳ =
       ↓⟨ refl ⟩∘⟨ h-commuteˡ ⟩
         π₁ ∘ f
       ∎
-    
-    π₂∘h-commuteˡ :  πˡ As Bs ∘ π₂ ∘ h ≡ π₂ ∘ f 
+
+    π₂∘h-commuteˡ :  πˡ As Bs ∘ π₂ ∘ h ≡ π₂ ∘ f
     π₂∘h-commuteˡ =
       begin
         πˡ As Bs ∘ π₂ ∘ h
@@ -140,8 +140,8 @@ N-universal {suc n} (A ∷ As) Bs {f}{g}{h} h-commuteˡ h-commuteʳ =
       ↓⟨ refl ⟩∘⟨ h-commuteˡ ⟩
         π₂ ∘ f
       ∎
-    
-    π₂∘h-commuteʳ : πʳ As Bs ∘ π₂ ∘ h ≡ g 
+
+    π₂∘h-commuteʳ : πʳ As Bs ∘ π₂ ∘ h ≡ g
     π₂∘h-commuteʳ = trans (sym assoc) h-commuteʳ
 
 isProduct : {n m : ℕ}

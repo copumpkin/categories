@@ -9,16 +9,16 @@ open import Categories.Functor using (Functor; module Functor)
 open import Categories.NaturalTransformation using (NaturalTransformation; module NaturalTransformation)
 
 private
-  Lifted₂ : ∀ ℓ {a} {a′} {A : Set a} {b} → (A → A → Set b) → (Lift {a} {a′} A) → (Lift {a} {a′} A) → Set (b ⊔ ℓ)
-  Lifted₂ ℓ f x y = Lift {ℓ = ℓ} (f (lower x) (lower y))
+  Lifted₂ : ∀ ℓ {a} {a′} {A : Set a} {b} → (A → A → Set b) → (Lift {a} a′ A) → (Lift {a} a′ A) → Set (b ⊔ ℓ)
+  Lifted₂ ℓ f x y = Lift  ℓ  (f (lower x) (lower y))
 
-  lifted₂ : ∀ {a a′ b b′} {A A′ : Set a} {B : Set b} → (A → A′ → B) → Lift {ℓ = a′} A → Lift {ℓ = a′} A′ → Lift {ℓ = b′} B
+  lifted₂ : ∀ {a a′ b b′} {A A′ : Set a} {B : Set b} → (A → A′ → B) → Lift  a′ A → Lift  a′ A′ → Lift  b′ B
   lifted₂ f x y = lift (f (lower x) (lower y))
 
 LiftC : ∀ {o ℓ e} o′ ℓ′ e′ → Category o ℓ e → Category (o ⊔ o′) (ℓ ⊔ ℓ′) (e ⊔ e′)
 LiftC o′ ℓ′ e′ C =
   record
-  { Obj = Lift {ℓ = o′} Obj
+  { Obj = Lift  o′ Obj
   ; _⇒_ = Lifted₂ ℓ′ _⇒_
   ; _≡_ = Lifted₂ e′ _≡_
   ; id = lift id
@@ -69,4 +69,4 @@ LiftFʳ F =
 
 LiftNT : ∀ {oC ℓC eC oD ℓD eD oC′ ℓC′ eC′ oD′ ℓD′ eD′} {C : Category oC ℓC eC} {D : Category oD ℓD eD} {F G : Functor C D} → NaturalTransformation F G → NaturalTransformation (LiftF oC′ ℓC′ eC′ oD′ ℓD′ eD′ F) (LiftF oC′ ℓC′ eC′ oD′ ℓD′ eD′ G)
 LiftNT α = record { η = lift ∙ η ∙ lower; commute = lift ∙ commute ∙ lower }
-  where open NaturalTransformation α 
+  where open NaturalTransformation α

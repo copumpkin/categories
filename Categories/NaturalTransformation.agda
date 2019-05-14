@@ -5,6 +5,7 @@ open import Categories.Category
 open import Categories.Functor hiding (equiv) renaming (id to idF; _≡_ to _≡F_; _∘_ to _∘F_)
 open import Categories.NaturalTransformation.Core public
 
+{-
 infixr 9 _∘ˡ_ _∘ʳ_
 
 _∘ˡ_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
@@ -185,3 +186,4 @@ interchange {C₀ = C₀} {C₁} {C₂} {F₀} {F₁} {F₅} {F₂} {F₃} {F₄
                {f h : NaturalTransformation G G′} {g i : NaturalTransformation F F′}
            → f ≡ h → g ≡ i → f ∘₀ g ≡ h ∘₀ i
 ∘₀-resp-≡ {E = E} {G′ = G′} f≡h g≡i = Category.∘-resp-≡ E (Functor.F-resp-≡ G′ g≡i) f≡h
+-}

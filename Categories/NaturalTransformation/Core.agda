@@ -31,7 +31,7 @@ record NaturalTransformation {o ℓ e o′ ℓ′ e′}
     }
 
 id : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F : Functor C D} → NaturalTransformation F F
-id {C = C} {D} {F} = record 
+id {C = C} {D} {F} = record
   { η = λ _ → D.id
   ; commute = commute′
   }
@@ -49,7 +49,7 @@ id {C = C} {D} {F} = record
                ↑⟨ D.identityʳ ⟩
                  D [ F₁ f ∘ D.id ]
                ∎
-    where 
+    where
     open D.HomReasoning
 
 infixr 9 _∘₁_ _∘₀_
@@ -59,7 +59,7 @@ _∘₁_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁}
         {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁}
         {F G H : Functor C D}
     → NaturalTransformation G H → NaturalTransformation F G → NaturalTransformation F H
-_∘₁_ {C = C} {D} {F} {G} {H} X Y = record 
+_∘₁_ {C = C} {D} {F} {G} {H} X Y = record
   { η = λ q → D [ X.η q ∘ Y.η q ]
   ; commute = commute′
   }
@@ -76,7 +76,7 @@ _∘₁_ {C = C} {D} {F} {G} {H} X Y = record
   open H renaming (F₀ to H₀; F₁ to H₁)
 
   .commute′ : ∀ {A B} (f : C [ A , B ]) → D [ D [ D [ X.η B ∘ Y.η B ] ∘ F₁ f ] ≡ D [ H₁ f ∘ D [ X.η A ∘  Y.η A ] ] ]
-  commute′ {A} {B} f = 
+  commute′ {A} {B} f =
            begin
              D [ D [ X.η B ∘ Y.η B ] ∘ F₁ f ]
            ↓⟨ D.assoc ⟩
@@ -92,13 +92,13 @@ _∘₁_ {C = C} {D} {F} {G} {H} X Y = record
            ∎
     where
     open D.HomReasoning
-
+{-
 -- "Horizontal composition"
-_∘₀_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂} 
+_∘₀_ : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
         {C : Category o₀ ℓ₀ e₀} {D : Category o₁ ℓ₁ e₁} {E : Category o₂ ℓ₂ e₂}
         {F G : Functor C D} {H I : Functor D E}
     → NaturalTransformation H I → NaturalTransformation F G → NaturalTransformation (H ∘F F) (I ∘F G)
-_∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record 
+_∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record
   { η = λ q → E [ I₁ (X.η q) ∘ Y.η (F₀ q) ]
   ; commute = commute′
   }
@@ -118,7 +118,7 @@ _∘₀_ {C = C} {D} {E} {F} {G} {H} {I} Y X = record
   open I renaming (F₀ to I₀; F₁ to I₁; F-resp-≡ to I-resp-≡)
 
   .commute′ : ∀ {A B} (f : C [ A , B ]) → E [ E [ E [ I₁ (X.η B) ∘ Y.η (F₀ B) ] ∘ H₁ (F₁ f) ] ≡ E [ I₁ (G₁ f) ∘ E [ I₁ (X.η A) ∘ Y.η (F₀ A) ] ] ]
-  commute′ {A} {B} f = 
+  commute′ {A} {B} f =
            begin
              E [ E [ I₁ (X.η B) ∘ Y.η (F₀ B) ] ∘ H₁ (F₁ f) ]
            ↓⟨ E.assoc ⟩
@@ -146,7 +146,7 @@ _≡_ : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′
 _≡_ {D = D} X Y = ∀ {x} → D [ NaturalTransformation.η X x ≡ NaturalTransformation.η Y x ]
 
 .equiv : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → IsEquivalence (_≡_ {F = F} {G})
-equiv {C = C} {D} {F} {G} = record 
+equiv {C = C} {D} {F} {G} = record
   { refl = refl
   ; sym = λ f → sym f
   ; trans = λ f g → trans f g
@@ -155,8 +155,9 @@ equiv {C = C} {D} {F} {G} = record
   open Category.Equiv D
 
 setoid : ∀ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} {F G : Functor C D} → Setoid _ _
-setoid {F = F} {G} = record 
+setoid {F = F} {G} = record
   { Carrier = NaturalTransformation F G
   ; _≈_ = _≡_
   ; isEquivalence = equiv {F = F}
   }
+-}

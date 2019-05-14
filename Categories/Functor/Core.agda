@@ -8,8 +8,10 @@ open import Level
 open import Categories.Support.EqReasoning
 
 record Functor {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′) where
+  eta-equality
   private module C = Category C
   private module D = Category D
+
 
   field
     F₀ : C.Obj → D.Obj
@@ -28,6 +30,7 @@ record Functor {o ℓ e o′ ℓ′ e′} (C : Category o ℓ e) (D : Category o
     ; homomorphism = homomorphism
     ; F-resp-≡ = F-resp-≡
     }
+
 
 
 Endofunctor : ∀ {o ℓ e} → Category o ℓ e → Set _

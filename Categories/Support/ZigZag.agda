@@ -5,7 +5,7 @@ module Categories.Support.ZigZag where
 
 open import Level
 open import Relation.Binary
-open import Relation.Binary.On using () renaming (isEquivalence to on-preserves-equivalence)
+open import Relation.Binary.Construct.On using () renaming (isEquivalence to on-preserves-equivalence)
 
 open import Categories.Support.Equivalence using () renaming (Setoid to ISetoid; module Setoid to ISetoid)
 

@@ -1,4 +1,4 @@
-{-# OPTIONS --universe-polymorphism #-}
+{-# OPTIONS --universe-polymorphism --irrelevant-projections #-}
 module Categories.Functor where
 
 open import Level
@@ -26,9 +26,9 @@ _≡_ {C = C} {D} F G = ∀ {A B} → (f : C [ A , B ]) → Functor.F₁ F f ∼
   where
     open Heterogeneous D
 
-.assoc : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃} 
-           {C₀ : Category o₀ ℓ₀ e₀} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃} 
-           {F : Functor C₀ C₁} {G : Functor C₁ C₂} {H : Functor C₂ C₃} 
+.assoc : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂ o₃ ℓ₃ e₃}
+           {C₀ : Category o₀ ℓ₀ e₀} {C₁ : Category o₁ ℓ₁ e₁} {C₂ : Category o₂ ℓ₂ e₂} {C₃ : Category o₃ ℓ₃ e₃}
+           {F : Functor C₀ C₁} {G : Functor C₁ C₂} {H : Functor C₂ C₃}
        → (H ∘ G) ∘ F ≡ H ∘ (G ∘ F)
 assoc {C₃ = C₃} f = refl
   where open Heterogeneous C₃
@@ -42,7 +42,7 @@ identityʳ {C = C} {D} {F} f = refl
   where open Heterogeneous D
 
 .equiv : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → IsEquivalence (_≡_ {C = C} {D = D})
-equiv {C = C} {D} = record 
+equiv {C = C} {D} = record
   { refl = λ f → refl
   ; sym = λ F∼G f → sym (F∼G f)
   ; trans = λ F∼G G∼H f → trans (F∼G f) (G∼H f)
@@ -52,20 +52,20 @@ equiv {C = C} {D} = record
 
 .∘-resp-≡  : ∀ {o₀ ℓ₀ e₀ o₁ ℓ₁ e₁ o₂ ℓ₂ e₂}
                {A : Category o₀ ℓ₀ e₀} {B : Category o₁ ℓ₁ e₁} {C : Category o₂ ℓ₂ e₂}
-               {F H : Functor B C} {G I : Functor A B} 
+               {F H : Functor B C} {G I : Functor A B}
            → F ≡ H → G ≡ I → F ∘ G ≡ H ∘ I
 ∘-resp-≡ {B = B} {C} {F} {I = I} F≡H G≡I q = helper (G≡I q) (F≡H (Functor.F₁ I q))
-  where 
+  where
   open Heterogeneous C
   module C = Category C
-  helper : ∀ {a b c d} {z w} {f : B [ a , b ]} {h : B [ c , d ]} {i : C [ z , w ]} 
+  helper : ∀ {a b c d} {z w} {f : B [ a , b ]} {h : B [ c , d ]} {i : C [ z , w ]}
          → B [ f ∼ h ] → C [ Functor.F₁ F h ∼ i ] → C [ Functor.F₁ F f ∼ i ]
   helper (≡⇒∼ f≡h) (≡⇒∼ g≡i) = ≡⇒∼ (C.Equiv.trans (Functor.F-resp-≡ F f≡h) g≡i)
 
 
 Faithful : ∀ {o ℓ e} {o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′} → Functor C D → Set (o ⊔ ℓ ⊔ e ⊔ e′)
 Faithful {C = C} {D} F = ∀ {X Y} → (f g : C [ X , Y ]) → D [ F₁ f ≡ F₁ g ] → C [ f ≡ g ]
-  where 
+  where
   module C = Category C
   module D = Category D
   open Functor F

@@ -37,9 +37,16 @@ record Terminal : Set (o ⊔ ℓ ⊔ e) where
 
 import Categories.Morphisms
 open Categories.Morphisms C
+open Terminal
+
+.from-⊤-is-Mono : ∀ {A : Obj} {t : Terminal} → (f : ⊤ t ⇒ A) → Mono f
+from-⊤-is-Mono {_} {t} f = helper
+  where
+    helper : ∀ {C : Obj} -> (g h : C ⇒ ⊤ t) → f ∘ g ≡ f ∘ h → g ≡ h
+    helper g h _ = !-unique₂ t g h
+
 open import Categories.Square
 open GlueSquares C
-open Terminal
 open Heterogeneous C
 
 !-is-propertylike : ∀ t₁ t₂ → ⊤ t₁ ≣ ⊤ t₂ → ∀ {A} → ! t₁ {A} ∼ ! t₂ {A}

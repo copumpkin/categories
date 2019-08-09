@@ -1,3 +1,9 @@
+This library is **obsolete** and does not work with newer versions of Agda. It sort-of works with 2.5.2, but less and less so afterwards. It is completely broken from 2.6 onwards.
+
+Users should instead try https://github.com/agda/agda-categories. It is not completely compatible, but close. And it is supported.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
 One of the main goals of this library is to be as general as possible by abstracting over notions of equality between morphisms. 
 
 Another is to keep the definitions of categorical structures as simple as possible and then where possible to prove that the simple definition is equivalent to more interesting formulations.
